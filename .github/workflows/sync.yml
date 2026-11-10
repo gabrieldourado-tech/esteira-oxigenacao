@@ -1,0 +1,34 @@
+name: Atualizar dados do ClickUp
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Puxar tasks da esteira
+        run: node sync.js
+        env:
+          CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
+      - name: Salvar data.json
+        run: |
+          if git diff --quiet -- data.json; then echo "Sem mudanças"; exit 0; fi
+          git config user.name "esteira-bot"
+          git config user.email "esteira-bot@users.noreply.github.com"
+          git add data.json
+          git commit -m "Atualiza dados da esteira"
+          git push
