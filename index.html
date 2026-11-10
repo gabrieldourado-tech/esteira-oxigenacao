@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Esteira de Oxigenação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root{
+  --bg:#05080F; --bg2:#0A1020; --panel:#0C1426; --panel2:#0F1A31; --line:#1A2742; --line2:#24365A;
+  --fg:#E8F0FB; --muted:#8597B5; --dim:#55688A;
+  --cyan:#22D3EE; --violet:#A78BFA; --amber:#FBBF24; --emerald:#34D399; --red:#F87171; --blue:#60A5FA;
+  --display:'Space Grotesk',system-ui,sans-serif; --body:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:14px}
+body{background:
+  radial-gradient(1200px 600px at 10% -10%, rgba(34,211,238,.10), transparent 60%),
+  radial-gradient(900px 500px at 100% 0%, rgba(167,139,250,.10), transparent 60%),
+  var(--bg); min-height:100vh}
+.wrap{max-width:1480px;margin:0 auto;padding:28px max(20px,env(safe-area-inset-right)) 40px max(20px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:18px}
+.grid-bg{position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(36,54,90,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(36,54,90,.18) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,black,transparent 70%)}
+
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;position:relative}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:ping 2s infinite}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,3.4vw,44px);letter-spacing:-.02em;margin:6px 0 4px;line-height:1.05}
+h1 span{background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{color:var(--muted);max-width:760px;line-height:1.55;margin:0}
+.lede b{color:var(--fg);font-weight:600}
+.meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid rgba(251,191,36,.45);background:rgba(251,191,36,.08);color:var(--amber);font-family:var(--mono);font-size:11px;letter-spacing:.06em}
+
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.card{position:relative;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:18px 20px;overflow:hidden;min-width:0}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent,rgba(34,211,238,.55),transparent);opacity:.7}
+.k-label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.k-num{font-family:var(--display);font-weight:600;font-size:44px;line-height:1;margin-top:12px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.k-num small{font-size:18px;color:var(--muted);font-weight:500;margin-left:4px}
+.k-sub{color:var(--dim);font-size:12px;margin-top:8px}
+.k-ring{position:absolute;right:16px;top:16px}
+.k-cyan .k-num{color:var(--cyan);text-shadow:0 0 24px rgba(34,211,238,.35)}
+.k-emerald .k-num{color:var(--emerald);text-shadow:0 0 24px rgba(52,211,153,.35)}
+.k-violet .k-num{color:var(--violet);text-shadow:0 0 24px rgba(167,139,250,.35)}
+.k-amber .k-num{color:var(--amber)}
+.k-red .k-num{color:var(--red);text-shadow:0 0 24px rgba(248,113,113,.4)}
+.k-red.alert{border-color:rgba(248,113,113,.5);box-shadow:0 0 0 1px rgba(248,113,113,.15),0 0 40px rgba(248,113,113,.12) inset}
+
+.section-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.section-h h2{font-family:var(--display);font-weight:600;font-size:18px;margin:0;letter-spacing:-.01em}
+.section-h p{margin:0;color:var(--muted);font-size:12px}
+.chart{position:relative;width:100%}
+.row3{display:grid;grid-template-columns:1.1fr 1.1fr .8fr;gap:14px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+.tip{position:absolute;pointer-events:none;background:rgba(8,13,26,.96);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.5;box-shadow:0 12px 32px rgba(0,0,0,.5);opacity:0;transition:opacity .12s;z-index:5;max-width:260px}
+.tip b{font-family:var(--display);font-size:13px}
+.tip .m{color:var(--muted)}
+
+table{width:100%;border-collapse:collapse}
+.tbl-wrap{overflow-x:auto}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:500}
+td{padding:12px;border-bottom:1px solid rgba(26,39,66,.6);white-space:nowrap}
+tr:hover td{background:rgba(34,211,238,.03)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:500;border:1px solid}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.prog{display:flex;align-items:center;gap:10px}
+.prog .track{width:110px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.prog .fill{height:100%;border-radius:3px}
+.mono{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.late{color:var(--red);font-weight:600}
+.foot{display:flex;justify-content:space-between;color:var(--dim);font-family:var(--mono);font-size:11px;flex-wrap:wrap;gap:8px}
+
+.flowlink{fill:none;stroke-linecap:round}
+svg text{font-family:var(--body)}
+.particle{stroke-dasharray:2 18;stroke-linecap:round}
+@media (prefers-reduced-motion:no-preference){
+  .particle{animation:flow 1.6s linear infinite}
+  .pulse{animation:pulse 1.8s ease-in-out infinite}
+  .rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+}
+@keyframes flow{to{stroke-dashoffset:-40}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(52,211,153,.6)}80%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.row3{grid-template-columns:1fr}}
+@media (max-width:640px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.k-num{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow"><span class="dot"></span>GEX · Afiliados · Ao vivo do ClickUp</div>
+      <h1>Esteira de <span>Oxigenação</span></h1>
+      <p class="lede" id="lede">Carregando…</p>
+    </div>
+    <div class="meta">
+      <span class="badge" id="badge" hidden>DADOS DE EXEMPLO · aguardando as primeiras tasks reais</span>
+      <span id="stamp">—</span>
+    </div>
+  </header>
+
+  <section class="kpis">
+    <div class="card k-cyan rise"><div class="k-label">Ofertas na esteira</div><div class="k-num" id="k-ativas">—</div><div class="k-sub">em produção agora</div></div>
+    <div class="card k-violet rise"><div class="k-label">Em teste</div><div class="k-num" id="k-teste">—</div><div class="k-sub">rodando com afiliados</div></div>
+    <div class="card k-emerald rise"><div class="k-label">Taxa de validação</div><div class="k-num" id="k-taxa">—</div><div class="k-sub" id="k-taxa-sub">dos testes decididos</div><svg class="k-ring" id="ring" width="58" height="58"></svg></div>
+    <div class="card k-amber rise"><div class="k-label">Ciclo até o envio</div><div class="k-num" id="k-ciclo">—</div><div class="k-sub">média, da task ao afiliado</div></div>
+    <div class="card k-red rise" id="card-late"><div class="k-label">Etapas atrasadas</div><div class="k-num" id="k-late">—</div><div class="k-sub">prazo vencido na etapa atual</div></div>
+  </section>
+
+  <section class="card">
+    <div class="section-h"><h2>Fluxo da esteira</h2><p>Largura = quantas ofertas já passaram por ali. Número grande = quantas estão na fase agora.</p></div>
+    <div class="chart" id="flow"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-h"><h2>Linha do tempo de cada oferta</h2>
+      <div class="legend"><span><i style="background:var(--cyan)"></i>Criar produto</span><span><i style="background:var(--violet)"></i>Vídeos</span><span><i style="background:var(--amber)"></i>Envio</span><span><i style="background:var(--emerald)"></i>Em teste</span><span><i style="background:var(--red)"></i>Atrasada</span></div></div>
+    <div class="chart" id="gantt"></div>
+  </section>
+
+  <section class="row3">
+    <div class="card"><div class="section-h"><h2>Onde a esteira trava</h2><p>Média de dias por fase</p></div><div class="chart" id="fases"></div></div>
+    <div class="card"><div class="section-h"><h2>Quem está segurando o quê</h2><p>Etapas abertas por responsável</p></div><div class="chart" id="carga"></div></div>
+    <div class="card"><div class="section-h"><h2>Resultado dos testes</h2><p>Decisão no FCA</p></div><div class="chart" id="donut"></div></div>
+  </section>
+
+  <section class="card">
+    <div class="section-h"><h2>Ofertas</h2><p>Ativas primeiro, na ordem do fluxo</p></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Oferta</th><th>Squad</th><th>Situação</th><th>Etapa atual</th><th>Com quem</th><th>Progresso</th><th>Dias</th><th>Prazo</th></tr></thead><tbody id="tbody"></tbody></table></div>
+  </section>
+
+  <div class="foot"><span>Fonte: tasks do ClickUp com a tag oxigenacao · espaço Afiliados</span><span id="foot-r">Atualiza sozinho a cada 5 min</span></div>
+</div>
+
+<script>
+const C={criar:'#22D3EE',videos:'#A78BFA',enviar:'#FBBF24',teste:'#34D399',validou:'#34D399',nao_validou:'#F87171',cancelada:'#55688A',late:'#F87171'};
+const LBL={criar:'Criando produto',videos:'Preparando vídeos',enviar:'Enviando',teste:'Em teste',validou:'Validou',nao_validou:'Não validou',cancelada:'Cancelada'};
+const DAY=864e5;
+const feita=s=>/^(feito|conclu[ií]do|complete|closed|done|cancelad[oa])$/i.test(String(s||'').trim());
+const enviada=s=>/^(feito|conclu[ií]do|complete|closed|done)$/i.test(String(s||'').trim());
+const faseDe=n=>{n=String(n||'').toLowerCase();if(/mensagem|enviar|envio/.test(n))return'enviar';if(/direcion|vsl|upsell|drive|edi[cç]|v[ií]deo|pote/.test(n))return'videos';return'criar'};
+const fmtD=d3.timeFormat('%d/%m');
+const fmtN=v=>v==null?'—':(Math.round(v*10)/10).toLocaleString('pt-BR');
+
+function modelo(rows){
+  const agora=Date.now(); const grupos=d3.group(rows,r=>r.oferta_id); const ofertas=[]; const segs=[];
+  for(const [id,rs] of grupos){
+    const o=rs[0]; const et=rs.filter(r=>r.etapa!=null).sort((a,b)=>a.etapa_ordem-b.etapa_ordem);
+    const total=et.length, feitas=et.filter(r=>feita(r.etapa_status)).length, atual=et.find(r=>!feita(r.etapa_status))||null;
+    const tg=String(o.tags||'').toLowerCase().split(',');
+    let chave= tg.includes('validou')?'validou': tg.includes('nao-validou')?'nao_validou': /^cancelad/i.test(o.oferta_status||'')?'cancelada': (total>0&&!atual)?'teste': atual?faseDe(atual.etapa):'criar';
+    const criado=Date.parse(o.criado_em); const envio=et.find(r=>/enviar/i.test(r.etapa)&&enviada(r.etapa_status));
+    const envioT=envio?Date.parse(envio.etapa_atualizada_em):null;
+    const ativa=['criar','videos','enviar'].includes(chave);
+    const prazo=ativa&&atual&&atual.etapa_prazo?Date.parse(atual.etapa_prazo):null;
+    const atrasada=!!(prazo&&prazo+DAY<=agora);
+    const label=o.produto||o.oferta_nome;
+    ofertas.push({id,url:o.oferta_url,label,nicho:o.nicho,squad:o.squad,chave,situacao:LBL[chave],etapa:ativa&&atual?atual.etapa:(chave==='teste'?'Teste com afiliados':''),resp:ativa&&atual?(atual.responsavel||'Sem responsável'):'',feitas,total,dias:Math.max(0,Math.floor((agora-criado)/DAY)),prazo,atrasada,ciclo:envioT?(envioT-criado)/DAY:null,criado,envioT});
+    let t=criado;
+    for(const e of et){
+      if(feita(e.etapa_status)&&e.etapa_atualizada_em){const end=Date.parse(e.etapa_atualizada_em);segs.push({id,label,fase:faseDe(e.etapa),etapa:e.etapa,resp:e.responsavel,t0:t,t1:end,atual:false,late:false});t=end}
+      else if(e===atual&&ativa){segs.push({id,label,fase:faseDe(e.etapa),etapa:e.etapa,resp:e.responsavel,t0:t,t1:agora,atual:true,late:atrasada,prazo});break}
+    }
+    if(chave==='teste'&&envioT)segs.push({id,label,fase:'teste',etapa:'Teste com afiliados',resp:'Afiliados',t0:envioT,t1:agora,atual:true,late:false});
+  }
+  const ordem=['criar','videos','enviar','teste','validou','nao_validou','cancelada'];
+  ofertas.sort((a,b)=>ordem.indexOf(a.chave)-ordem.indexOf(b.chave)||b.dias-a.dias);
+  const cnt=k=>ofertas.filter(o=>o.chave===k).length;
+  const dec=cnt('validou')+cnt('nao_validou');
+  const ciclos=ofertas.map(o=>o.ciclo).filter(v=>v!=null);
+  const kpi={ativas:cnt('criar')+cnt('videos')+cnt('enviar'),teste:cnt('teste'),validou:cnt('validou'),nao:cnt('nao_validou'),taxa:dec?Math.round(cnt('validou')/dec*100):null,ciclo:ciclos.length?d3.mean(ciclos):null,late:ofertas.filter(o=>o.atrasada).length};
+  // dias por fase (só etapas concluídas)
+  const porFase={criar:[],videos:[],enviar:[]};
+  for(const [id,ss] of d3.group(segs.filter(s=>!s.atual),s=>s.id)){for(const f of Object.keys(porFase)){const v=d3.sum(ss.filter(s=>s.fase===f),s=>(s.t1-s.t0)/DAY);if(ss.some(s=>s.fase===f))porFase[f].push(v)}}
+  const fases=Object.entries(porFase).map(([f,v])=>({f,dias:v.length?d3.mean(v):0,n:v.length}));
+  const carga=d3.rollups(ofertas.filter(o=>o.resp),v=>({abertas:v.length,late:v.filter(o=>o.atrasada).length}),o=>o.resp).map(([resp,v])=>({resp,...v})).sort((a,b)=>b.abertas-a.abertas);
+  return {ofertas,segs,kpi,fases,carga,cnt};
+}
+
+function tipper(host){const t=document.createElement('div');t.className='tip';host.appendChild(t);
+  return{show(ev,html){t.innerHTML=html;t.style.opacity=1;const r=host.getBoundingClientRect();let x=ev.clientX-r.left+14,y=ev.clientY-r.top+14;if(x+270>r.width)x=ev.clientX-r.left-270;t.style.left=x+'px';t.style.top=y+'px'},hide(){t.style.opacity=0}}}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function kpis(m){
+  const k=m.kpi; const set=(id,v,u)=>{const el=document.getElementById(id);el.innerHTML=v==null?'—':esc(v)+(u?'<small>'+u+'</small>':'')};
+  set('k-ativas',k.ativas); set('k-teste',k.teste); set('k-taxa',k.taxa,k.taxa==null?'':'%'); set('k-ciclo',k.ciclo==null?null:fmtN(k.ciclo),k.ciclo==null?'':'dias'); set('k-late',k.late);
+  document.getElementById('k-taxa-sub').textContent=k.taxa==null?'nenhum teste decidido ainda':`${k.validou} de ${k.validou+k.nao} testes decididos`;
+  document.getElementById('card-late').classList.toggle('alert',k.late>0);
+  const ring=d3.select('#ring').html(''); const g=ring.append('g').attr('transform','translate(29,29)'); const arc=d3.arc().innerRadius(21).outerRadius(27).cornerRadius(3);
+  g.append('path').attr('d',arc({startAngle:0,endAngle:2*Math.PI})).attr('fill','#1A2742');
+  if(k.taxa!=null)g.append('path').attr('d',arc({startAngle:0,endAngle:2*Math.PI*k.taxa/100})).attr('fill','#34D399').style('filter','drop-shadow(0 0 6px rgba(52,211,153,.6))');
+}
+
+function lede(m){
+  const k=m.kpi,c=m.cnt; const el=document.getElementById('lede');
+  if(!m.ofertas.length){el.textContent='Nenhuma oferta na esteira ainda. A primeira aparece aqui assim que a task mãe for criada com a tag oxigenacao.';return}
+  const gargalo=m.fases.slice().sort((a,b)=>b.dias-a.dias)[0];
+  el.innerHTML=`<b>${k.ativas}</b> ofertas em produção e <b>${k.teste}</b> em teste com afiliados. `+(k.taxa!=null?`Taxa de validação de <b>${k.taxa}%</b>. `:'')+(gargalo&&gargalo.n?`O gargalo hoje é <b>${LBL[gargalo.f].toLowerCase()}</b>, com média de <b>${fmtN(gargalo.dias)} dias</b>. `:'')+(k.late?`<b style="color:var(--red)">${k.late} ${k.late===1?'etapa atrasada':'etapas atrasadas'}</b>.`:'Nenhuma etapa atrasada.');
+}
+
+function flow(m){
+  const host=document.getElementById('flow'); host.innerHTML=''; const W=host.clientWidth, H=Math.max(230,Math.min(260,W*.2));
+  const c=m.cnt; const stages=['criar','videos','enviar','teste'];
+  const now={criar:c('criar'),videos:c('videos'),enviar:c('enviar'),teste:c('teste'),validou:c('validou'),nao_validou:c('nao_validou')};
+  const after={criar:['videos','enviar','teste','validou','nao_validou'],videos:['enviar','teste','validou','nao_validou'],enviar:['teste','validou','nao_validou'],teste:['validou','nao_validou']};
+  const reached=k=>now[k]+d3.sum(after[k]||[],x=>now[x]);
+  const total=Math.max(1,reached('criar'));
+  const svg=d3.select(host).append('svg').attr('width',W).attr('height',H).attr('role','img').attr('aria-label','Fluxo de ofertas pelas fases da esteira');
+  const defs=svg.append('defs');
+  const nodes=[...stages.map((k,i)=>({k,col:i})),{k:'validou',col:4,half:'top'},{k:'nao_validou',col:4,half:'bot'}];
+  const nw=Math.min(170,W*.13), gap=(W-nw*5)/4, cy=H/2, nh=Math.min(120,H*.5);
+  const x=col=>col*(nw+gap);
+  const ny=n=>n.half==='top'?cy-nh*.62-8:n.half==='bot'?cy+8+nh*.0:cy-nh/2;
+  const nhh=n=>n.half?nh*.62:nh;
+  const maxW=nh*.7, wOf=v=>Math.max(3,maxW*v/total);
+  const tip=tipper(host);
+  const links=[];
+  stages.forEach((k,i)=>{if(i<3)links.push({a:nodes[i],b:nodes[i+1],v:reached(stages[i+1])})});
+  links.push({a:nodes[3],b:nodes[4],v:now.validou},{a:nodes[3],b:nodes[5],v:now.nao_validou});
+  links.forEach((l,i)=>{
+    const x0=x(l.a.col)+nw, x1=x(l.b.col), y0=ny(l.a)+nhh(l.a)/2, y1=ny(l.b)+nhh(l.b)/2, mx=(x0+x1)/2;
+    const id='lg'+i; const lg=defs.append('linearGradient').attr('id',id).attr('gradientUnits','userSpaceOnUse').attr('x1',x0).attr('x2',x1).attr('y1',0).attr('y2',0);
+    lg.append('stop').attr('offset','0%').attr('stop-color',C[l.a.k]); lg.append('stop').attr('offset','100%').attr('stop-color',C[l.b.k]);
+    const p=`M${x0},${y0} C${mx},${y0} ${mx},${y1} ${x1},${y1}`; const w=l.v?wOf(l.v):2;
+    svg.append('path').attr('class','flowlink').attr('d',p).attr('stroke',`url(#${id})`).attr('stroke-width',w).attr('opacity',l.v?.28:.12);
+    if(l.v)svg.append('path').attr('class','flowlink particle').attr('d',p).attr('stroke',`url(#${id})`).attr('stroke-width',Math.max(2,w*.35)).attr('opacity',.95).style('filter','drop-shadow(0 0 4px rgba(255,255,255,.35))');
+    if(l.v)svg.append('text').attr('x',mx).attr('y',(y0+y1)/2-w/2-8).attr('text-anchor','middle').attr('fill','#8597B5').attr('font-family','JetBrains Mono').attr('font-size',11).text(l.v+(l.v===1?' passou':' passaram'));
+  });
+  nodes.forEach(n=>{
+    const g=svg.append('g').attr('transform',`translate(${x(n.col)},${ny(n)})`).style('cursor','default');
+    const col=C[n.k], h=nhh(n);
+    g.append('rect').attr('width',nw).attr('height',h).attr('rx',14).attr('fill','#0A1222').attr('stroke',col).attr('stroke-width',1.5).style('filter',`drop-shadow(0 0 14px ${col}55)`);
+    g.append('rect').attr('width',nw).attr('height',3).attr('rx',1.5).attr('fill',col);
+    g.append('text').attr('x',14).attr('y',22).attr('fill','#8597B5').attr('font-family','JetBrains Mono').attr('font-size',10.5).attr('letter-spacing','.08em').text(LBL[n.k].toUpperCase());
+    g.append('text').attr('x',14).attr('y',h-16).attr('fill',col).attr('font-family','Space Grotesk').attr('font-weight',600).attr('font-size',n.half?30:44).text(now[n.k]).style('filter',`drop-shadow(0 0 10px ${col}88)`);
+    g.on('mousemove',ev=>tip.show(ev,`<b>${LBL[n.k]}</b><br><span class="m">Agora:</span> ${now[n.k]} ${now[n.k]===1?'oferta':'ofertas'}`+(n.half?'':`<br><span class="m">Já passaram:</span> ${reached(n.k)}`))).on('mouseleave',tip.hide);
+  });
+}
+
+function gantt(m){
+  const host=document.getElementById('gantt'); host.innerHTML='';
+  const ofs=m.ofertas; if(!ofs.length){host.innerHTML='<p class="mono">Sem ofertas ainda.</p>';return}
+  const W=host.clientWidth, rowH=34, top=30, left=Math.min(220,W*.28), right=70, H=top+ofs.length*rowH+10;
+  const t0=d3.min(ofs,o=>o.criado)-DAY, t1=Date.now()+3*DAY;
+  const x=d3.scaleTime().domain([t0,t1]).range([left,W-right]);
+  const svg=d3.select(host).append('svg').attr('width',W).attr('height',H).attr('role','img').attr('aria-label','Linha do tempo de cada oferta por fase');
+  const tip=tipper(host);
+  const ticks=x.ticks(d3.timeWeek.every(1));
+  svg.append('g').selectAll('line').data(ticks).join('line').attr('x1',x).attr('x2',x).attr('y1',top-6).attr('y2',H).attr('stroke','#1A2742');
+  svg.append('g').selectAll('text').data(ticks).join('text').attr('x',x).attr('y',top-12).attr('text-anchor','middle').attr('fill','#55688A').attr('font-family','JetBrains Mono').attr('font-size',10.5).text(d=>fmtD(d));
+  ofs.forEach((o,i)=>{
+    const y=top+i*rowH;
+    svg.append('rect').attr('x',0).attr('y',y).attr('width',W).attr('height',rowH).attr('fill',i%2?'transparent':'rgba(26,39,66,.18)');
+    svg.append('text').attr('x',4).attr('y',y+rowH/2+4).attr('fill','#E8F0FB').attr('font-size',12.5).attr('font-weight',500).text(o.label.length>26?o.label.slice(0,25)+'…':o.label);
+    svg.append('text').attr('x',left-10).attr('y',y+rowH/2+4).attr('text-anchor','end').attr('fill','#55688A').attr('font-family','JetBrains Mono').attr('font-size',10).text((o.squad||'').replace(' - Ads',''));
+    const ss=m.segs.filter(s=>s.id===o.id);
+    ss.forEach(s=>{
+      const col=s.late?C.late:C[s.fase]; const w=Math.max(3,x(s.t1)-x(s.t0)-1.5);
+      const r=svg.append('rect').attr('x',x(s.t0)).attr('y',y+9).attr('width',w).attr('height',rowH-18).attr('rx',4).attr('fill',col).attr('opacity',s.atual?.95:.55);
+      if(s.atual){r.attr('class','pulse').style('filter',`drop-shadow(0 0 8px ${col})`)}
+      r.on('mousemove',ev=>tip.show(ev,`<b>${esc(o.label)}</b><br>${esc(s.etapa)}<br><span class="m">Com:</span> ${esc(s.resp||'—')}<br><span class="m">Dias:</span> ${fmtN((s.t1-s.t0)/DAY)}${s.atual?' <span class="m">(em andamento)</span>':''}${s.late?'<br><b style="color:#F87171">Atrasada</b>':''}`)).on('mouseleave',tip.hide);
+    });
+    if(o.prazo){svg.append('path').attr('d',`M${x(o.prazo)},${y+5} l5,0 l-5,7 l-5,-7z`).attr('fill',o.atrasada?C.late:'#E8F0FB').attr('opacity',.9)}
+    const end=ss.length?x(d3.max(ss,s=>s.t1)):left;
+    if(o.chave==='validou'||o.chave==='nao_validou'){
+      const col=C[o.chave]; const g=svg.append('g').attr('transform',`translate(${end+12},${y+rowH/2})`);
+      g.append('circle').attr('r',8).attr('fill',col+'22').attr('stroke',col);
+      g.append('path').attr('d',o.chave==='validou'?'M-3.5,0 l2.5,2.8 l4.5,-5':'M-3,-3 l6,6 M3,-3 l-6,6').attr('stroke',col).attr('stroke-width',1.8).attr('fill','none').attr('stroke-linecap','round');
+    }
+  });
+  const nx=x(Date.now());
+  svg.append('line').attr('x1',nx).attr('x2',nx).attr('y1',top-6).attr('y2',H).attr('stroke','#22D3EE').attr('stroke-dasharray','4 4').attr('opacity',.8);
+  svg.append('text').attr('x',nx).attr('y',top-12).attr('text-anchor','middle').attr('fill','#22D3EE').attr('font-family','JetBrains Mono').attr('font-size',10.5).attr('font-weight',600).text('HOJE');
+}
+
+function fases(m){
+  const host=document.getElementById('fases'); host.innerHTML=''; const W=host.clientWidth, H=210;
+  const d=m.fases; const max=d3.max(d,v=>v.dias)||1; const big=d.slice().sort((a,b)=>b.dias-a.dias)[0];
+  const svg=d3.select(host).append('svg').attr('width',W).attr('height',H).attr('role','img').attr('aria-label','Média de dias por fase da esteira');
+  const left=130, right=60, x=d3.scaleLinear().domain([0,max]).range([0,W-left-right]); const bh=34, gap=24;
+  d.forEach((v,i)=>{
+    const y=12+i*(bh+gap); const col=C[v.f]; const isBig=v===big&&v.n>0;
+    svg.append('text').attr('x',0).attr('y',y+bh/2+4).attr('fill','#E8F0FB').attr('font-size',13).text(LBL[v.f]);
+    svg.append('rect').attr('x',left).attr('y',y).attr('width',W-left-right).attr('height',bh).attr('rx',8).attr('fill','#0A1222');
+    svg.append('rect').attr('x',left).attr('y',y).attr('width',Math.max(2,x(v.dias))).attr('height',bh).attr('rx',8).attr('fill',col).attr('opacity',isBig?1:.55).style('filter',isBig?`drop-shadow(0 0 12px ${col})`:null);
+    svg.append('text').attr('x',left+x(v.dias)+10).attr('y',y+bh/2+5).attr('fill',isBig?col:'#8597B5').attr('font-family','Space Grotesk').attr('font-weight',600).attr('font-size',16).text(v.n?fmtN(v.dias)+'d':'—');
+    if(isBig)svg.append('text').attr('x',left+8).attr('y',y+bh+15).attr('fill',col).attr('font-family','JetBrains Mono').attr('font-size',10).attr('letter-spacing','.12em').text('▲ GARGALO');
+  });
+}
+
+function carga(m){
+  const host=document.getElementById('carga'); host.innerHTML=''; const W=host.clientWidth; const d=m.carga.slice(0,7);
+  if(!d.length){host.innerHTML='<p class="mono">Ninguém com etapa aberta.</p>';return}
+  const bh=22,gap=12,left=130,H=d.length*(bh+gap)+8; const max=d3.max(d,v=>v.abertas);
+  const x=d3.scaleLinear().domain([0,max]).range([0,W-left-40]);
+  const svg=d3.select(host).append('svg').attr('width',W).attr('height',H).attr('role','img').attr('aria-label','Etapas abertas por responsável');
+  const tip=tipper(host);
+  d.forEach((v,i)=>{
+    const y=4+i*(bh+gap);
+    svg.append('text').attr('x',0).attr('y',y+bh/2+4).attr('fill','#E8F0FB').attr('font-size',12.5).text(v.resp.length>17?v.resp.slice(0,16)+'…':v.resp);
+    const ok=v.abertas-v.late;
+    svg.append('rect').attr('x',left).attr('y',y).attr('width',Math.max(0,x(ok))).attr('height',bh).attr('rx',5).attr('fill','#60A5FA').attr('opacity',.8);
+    if(v.late)svg.append('rect').attr('x',left+x(ok)).attr('y',y).attr('width',x(v.late)).attr('height',bh).attr('rx',5).attr('fill',C.late).style('filter','drop-shadow(0 0 8px rgba(248,113,113,.7))');
+    svg.append('text').attr('x',left+x(v.abertas)+8).attr('y',y+bh/2+4).attr('fill','#8597B5').attr('font-family','JetBrains Mono').attr('font-size',11.5).text(v.abertas);
+    svg.append('rect').attr('x',0).attr('y',y-4).attr('width',W).attr('height',bh+8).attr('fill','transparent').on('mousemove',ev=>tip.show(ev,`<b>${esc(v.resp)}</b><br>${v.abertas} ${v.abertas===1?'etapa aberta':'etapas abertas'}${v.late?`<br><b style="color:#F87171">${v.late} atrasada${v.late>1?'s':''}</b>`:''}`)).on('mouseleave',tip.hide);
+  });
+}
+
+function donut(m){
+  const host=document.getElementById('donut'); host.innerHTML=''; const W=host.clientWidth, S=Math.min(W,220), r=S/2;
+  const k=m.kpi; const data=[{k:'validou',v:k.validou},{k:'nao_validou',v:k.nao},{k:'teste',v:k.teste}].filter(d=>d.v>0);
+  const svg=d3.select(host).append('svg').attr('width',W).attr('height',S+46).attr('role','img').attr('aria-label','Resultado dos testes');
+  const g=svg.append('g').attr('transform',`translate(${W/2},${r})`);
+  const arc=d3.arc().innerRadius(r*.72).outerRadius(r*.92).cornerRadius(6).padAngle(.03);
+  if(!data.length)g.append('path').attr('d',arc({startAngle:0,endAngle:Math.PI*2})).attr('fill','#1A2742');
+  g.selectAll('path.s').data(d3.pie().value(d=>d.v).sort(null)(data)).join('path').attr('class','s').attr('d',arc).attr('fill',d=>C[d.data.k]).style('filter',d=>`drop-shadow(0 0 8px ${C[d.data.k]}88)`);
+  g.append('text').attr('text-anchor','middle').attr('y',4).attr('fill','#E8F0FB').attr('font-family','Space Grotesk').attr('font-weight',700).attr('font-size',r*.42).text(k.taxa==null?'—':k.taxa+'%');
+  g.append('text').attr('text-anchor','middle').attr('y',r*.28).attr('fill','#8597B5').attr('font-family','JetBrains Mono').attr('font-size',10.5).attr('letter-spacing','.1em').text('VALIDAÇÃO');
+  const lg=svg.append('g').attr('transform',`translate(0,${S+18})`); const items=[['validou',k.validou],['nao_validou',k.nao],['teste',k.teste]]; const cw=W/3;
+  items.forEach(([kk,v],i)=>{const t=lg.append('g').attr('transform',`translate(${i*cw+cw/2},0)`);t.append('text').attr('text-anchor','middle').attr('fill',C[kk]).attr('font-family','Space Grotesk').attr('font-weight',600).attr('font-size',18).text(v);t.append('text').attr('text-anchor','middle').attr('y',16).attr('fill','#55688A').attr('font-size',11).text(LBL[kk])});
+}
+
+function tabela(m){
+  const tb=document.getElementById('tbody'); tb.innerHTML='';
+  for(const o of m.ofertas){
+    const col=o.atrasada?C.late:C[o.chave]; const pct=o.total?Math.round(o.feitas/o.total*100):0;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><div style="font-weight:600">${o.url?`<a href="${esc(o.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(o.label)}</a>`:esc(o.label)}</div><div class="mono" style="font-size:11px">${esc(o.nicho||'')}</div></td>
+      <td class="mono">${esc((o.squad||'').replace(' - Ads',''))}</td>
+      <td><span class="pill" style="color:${C[o.chave]};border-color:${C[o.chave]}55;background:${C[o.chave]}12">${esc(o.situacao)}</span></td>
+      <td>${esc(o.etapa)}</td><td>${esc(o.resp)}</td>
+      <td><div class="prog"><div class="track"><div class="fill" style="width:${pct}%;background:${col};box-shadow:0 0 10px ${col}"></div></div><span class="mono">${o.feitas}/${o.total}</span></div></td>
+      <td class="mono">${o.dias}</td>
+      <td class="${o.atrasada?'late':'mono'}">${o.prazo?fmtD(new Date(o.prazo))+(o.atrasada?' · atrasada':''):''}</td>`;
+    tb.appendChild(tr);
+  }
+}
+
+let DATA=null;
+function render(){ if(!DATA)return; const m=modelo(DATA.rows||[]); kpis(m); lede(m); flow(m); gantt(m); fases(m); carga(m); donut(m); tabela(m); }
+async function load(){
+  try{ const r=await fetch('data.json?'+Date.now(),{cache:'no-store'}); DATA=await r.json();
+    document.getElementById('badge').hidden=DATA.modo!=='exemplo';
+    document.getElementById('stamp').textContent='Atualizado '+new Date(DATA.gerado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    render();
+  }catch(e){ document.getElementById('lede').textContent='Não consegui carregar os dados agora. Tento de novo em 5 minutos.'; }
+}
+load(); setInterval(load,5*60*1000);
+let rt; window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(render,150)});
+</script>
+</body>
+</html>
