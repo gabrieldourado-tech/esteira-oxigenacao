@@ -40,7 +40,13 @@ const campo = (cfs, nome) => {
     if (res.last_page !== false || !(res.tasks || []).length) break;
   }
 
+  const agora = new Date().toISOString();
   if (!maes.length) {
+    // Sem tasks com a tag: mantém os dados de exemplo, mas registra que o ClickUp foi consultado agora.
+    const atual = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+    atual.modo = 'exemplo';
+    atual.sincronizado_em = agora;
+    fs.writeFileSync('data.json', JSON.stringify(atual));
     console.log('Nenhuma task com a tag ainda. Mantendo os dados de exemplo.');
     return;
   }
@@ -63,6 +69,6 @@ const campo = (cfs, nome) => {
     }));
   }
 
-  fs.writeFileSync('data.json', JSON.stringify({ gerado_em: new Date().toISOString(), modo: 'real', rows }));
+  fs.writeFileSync('data.json', JSON.stringify({ gerado_em: agora, sincronizado_em: agora, modo: 'real', rows }));
   console.log(`data.json gravado: ${maes.length} ofertas, ${rows.length} etapas.`);
 })().catch((e) => { console.error(e.message); process.exit(1); });

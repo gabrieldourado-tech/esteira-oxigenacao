@@ -30,6 +30,8 @@ body{background:radial-gradient(900px 420px at 70% -120px,rgba(30,123,255,.10),t
 .top h1 span{color:var(--blue2)}
 .live{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:11.5px}
 .live i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 0 rgba(79,209,255,.6);animation:ping 2.4s infinite}
+.live.warn{color:var(--amber)}.live.warn i{background:var(--amber);animation:none}
+.live.bad{color:var(--red)}.live.bad i{background:var(--red);animation:none}
 .filters{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
 .sel{position:relative}
 .sel select{appearance:none;-webkit-appearance:none;background:#111826;color:#C9D6EA;border:1px solid #1A2335;border-radius:4px;padding:7px 30px 7px 12px;font-family:var(--f);font-size:11.5px;cursor:pointer}
@@ -106,7 +108,7 @@ svg text{font-family:var(--f)}
   <main class="main" id="topo">
     <div class="top">
       <h1>Esteira de <span>Oxigenação</span></h1>
-      <span class="live"><i></i><span id="stamp">Carregando…</span></span>
+      <span class="live" id="live"><i></i><span id="stamp">Carregando…</span></span>
       <div class="filters">
         <div class="sel"><select id="f-periodo" aria-label="Período"><option value="14">Últimos 14 dias</option><option value="21" selected>Últimos 21 dias</option><option value="30">Últimos 30 dias</option><option value="60">Últimos 60 dias</option></select></div>
         <div class="sel"><select id="f-squad" aria-label="Squad"><option value="">Todos os squads</option></select></div>
@@ -130,7 +132,7 @@ svg text{font-family:var(--f)}
       <section class="tile vbars"><h3>Dias por etapa <span class="tag">média</span></h3><div class="chart" id="vbars"></div></section>
       <section class="tile table" id="t-table"><h3>Ofertas <span class="tag" id="tb-tag">—</span></h3><div class="tbl-wrap"><table id="tbl"></table></div></section>
     </div>
-    <div class="foot"><span>Fonte: ClickUp · espaço Afiliados · tasks com a tag oxigenacao</span><span>Atualiza sozinho a cada 5 min</span></div>
+    <div class="foot"><span>Fonte: ClickUp · espaço Afiliados · tasks com a tag oxigenacao</span><span>Dados puxados do ClickUp pelo robô do GitHub · a página confere a cada 2 min</span></div>
   </main>
 </div>
 
@@ -359,11 +361,19 @@ function render(){
 async function load(){
   try{const r=await fetch('data.json?'+Date.now(),{cache:'no-store'});DATA=await r.json();
     document.getElementById('notice').hidden=DATA.modo!=='exemplo';
-    document.getElementById('stamp').textContent='Ao vivo · '+new Date(DATA.gerado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-    render();
-  }catch(e){document.getElementById('stamp').textContent='Não consegui carregar os dados agora'}
+    carimbo();render();
+  }catch(e){const l=document.getElementById('live');l.className='live bad';document.getElementById('stamp').textContent='Não consegui carregar os dados agora'}
 }
-load();setInterval(load,5*60*1000);
+function carimbo(){
+  if(!DATA)return;const l=document.getElementById('live'),st=document.getElementById('stamp');
+  const t=Date.parse(DATA.sincronizado_em||DATA.gerado_em),min=Math.max(0,Math.round((Date.now()-t)/6e4));
+  const quando=min<1?'agora':min<60?`há ${min} min`:min<1440?`há ${Math.floor(min/60)}h${String(min%60).padStart(2,'0')}`:`há ${Math.floor(min/1440)} dia${min>=2880?'s':''}`;
+  const hora=new Date(t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  if(DATA.modo==='exemplo'){l.className='live warn';st.textContent=DATA.sincronizado_em?`Dados de exemplo · ClickUp verificado ${quando} (nenhuma task com a tag)`:'Dados de exemplo · sem conexão com o ClickUp';return}
+  l.className='live'+(min>180?' bad':min>75?' warn':'');
+  st.textContent=(min<=75?'Ao vivo · ':'Atrasado · ')+`sincronizado ${quando} (${hora})`;
+}
+load();setInterval(load,2*60*1000);setInterval(carimbo,60*1000);
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(render,150)});
 </script>
 </body>
