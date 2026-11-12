@@ -30,24 +30,44 @@
       "regex": "troca de pote|troca pote"
     },
     {
-      "nome": "Fluxo de e-mail",
-      "regex": "mailbroad|e-?mail|\\bsms\\b"
+      "nome": "Fluxo de e-mail / SMS",
+      "regex": "mailbroad|e-?mail|\\bsms\\b|smsbroad|follow-?up"
     },
     {
       "nome": "Links de checkout",
       "regex": "links? de checkout|checkout links?"
     },
     {
+      "nome": "Shipping / frete",
+      "regex": "shipping|frete"
+    },
+    {
+      "nome": "Teste A/B / preço",
+      "regex": "teste ?a/?b|teste de preco|troca de preco|\\$ ?\\d"
+    },
+    {
+      "nome": "Troca de vídeo",
+      "regex": "video ganhador|troca de video|trocar video|subir .*vturb"
+    },
+    {
+      "nome": "Close / autoplay",
+      "regex": "\\bclose\\b|autoplay"
+    },
+    {
+      "nome": "Duplicar / adaptar fluxo",
+      "regex": "duplicar|adaptar|replicar"
+    },
+    {
+      "nome": "Novo upsell / downsell",
+      "regex": "novo upsell|\\bup ?\\d|\\bdw ?\\d|downsell|porta dw|order ?bump|\\bob\\b"
+    },
+    {
       "nome": "Troca de botão / link",
       "regex": "botao|\\bcta\\b|troca de link|trocar link|redirect"
     },
     {
-      "nome": "Fluxo de upsell",
-      "regex": "fluxo de upsell|upsell|downsell|order ?bump|\\bob\\b"
-    },
-    {
       "nome": "Cadastro de produto",
-      "regex": "criar produto|cadastr|subir .*(cartpanda|buygoods|digistore)|onboarding|novo produto"
+      "regex": "criar produto|cadastr|subir .*(cartpanda|buygoods|digistore)|onboarding|novo produto|clickbank|jvzoo"
     },
     {
       "nome": "Tracking / pixel",
@@ -60,6 +80,14 @@
     {
       "nome": "Microlead / Lead",
       "regex": "microlead|\\blead"
+    },
+    {
+      "nome": "Fluxo de upsell (geral)",
+      "regex": "fluxo|upsell"
+    },
+    {
+      "nome": "Ocorrências / correções",
+      "regex": "ocorrencia|telegram|arrumar|corrigir|\\bbug"
     },
     {
       "nome": "VSL / Funil",
@@ -75,13 +103,20 @@
     "Troca de botão / link": 1,
     "Links de checkout": 1,
     "Anúncios": 1,
+    "Shipping / frete": 1,
+    "Teste A/B / preço": 1,
+    "Troca de vídeo": 1,
+    "Ocorrências / correções": 1,
     "Tracking / pixel": 2,
     "Configuração de página": 2,
     "Troca de pote": 2,
+    "Close / autoplay": 2,
+    "Duplicar / adaptar fluxo": 2,
+    "Fluxo de upsell (geral)": 2,
     "Outros": 2,
-    "Fluxo de e-mail": 3,
+    "Fluxo de e-mail / SMS": 3,
     "Cadastro de produto": 3,
-    "Fluxo de upsell": 3,
+    "Novo upsell / downsell": 3,
     "Microlead / Lead": 3,
     "VSL / Funil": 5
   },
