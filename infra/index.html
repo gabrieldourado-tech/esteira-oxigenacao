@@ -353,7 +353,7 @@ const COR={112049379:C.orange,118125018:C.blue,118123716:C.purple};
 
 let DATA=null, P=[];
 const hoje0=()=>d3.timeDay.floor(new Date());
-const F={ini:+d3.timeDay.offset(hoje0(),-29),fim:+d3.timeDay.offset(hoje0(),1)-1,preset:'30',pessoa:null,squad:'',cat:'',erros:false};
+const F={ini:+d3.timeDay.offset(hoje0(),-29),fim:+d3.timeDay.offset(hoje0(),1)-1,preset:'30',pessoas:null,squad:'',cat:'',erros:false};
 let sortKey='fim', sortDir=-1, limite=60;
 
 /* ---------- tooltip ---------- */
@@ -438,8 +438,9 @@ function desenhaDP(){
 function montaFiltros(){
   montaPeriodo();
   const pe=document.getElementById('f-pessoa');
-  pe.innerHTML='<option value="">Todos</option>'+P.map(p=>`<option value="${p.id}">${esc(p.curto)}</option>`).join('');
-  pe.onchange=()=>{F.pessoa=pe.value?Number(pe.value):null;render()};
+  const sem=P.filter(p=>p.id!==112049379);
+  pe.innerHTML='<option value="">Todos</option>'+P.map(p=>`<option value="${p.id}">${esc(p.curto)}</option>`).join('')+(sem.length>1?`<option value="${sem.map(p=>p.id).join(',')}">${sem.map(p=>esc(p.curto)).join(' + ')} (sem Malvas)</option>`:'');
+  pe.onchange=()=>{F.pessoas=pe.value?pe.value.split(',').map(Number):null;render()};
   const sq=document.getElementById('f-squad'), squads=[...new Set(DATA.tasks.map(t=>t.squad).filter(Boolean))].sort();
   sq.innerHTML='<option value="">Todos</option>'+squads.map(s=>`<option>${esc(s)}</option>`).join('');sq.onchange=()=>{F.squad=sq.value;render()};
   const ca=document.getElementById('f-cat'), cats=[...new Set(DATA.tasks.map(t=>t.categoria))].sort();
@@ -451,10 +452,12 @@ function montaFiltros(){
 }
 
 /* ---------- modelo ---------- */
-function base(){return DATA.tasks.filter(t=>(!F.pessoa||t.assignees.includes(F.pessoa))&&(!F.squad||t.squad===F.squad)&&(!F.cat||t.categoria===F.cat)&&(!F.erros||t.n_ajustes>0))}
+function base(){return DATA.tasks.filter(t=>(!F.pessoas||t.assignees.some(id=>F.pessoas.includes(id)))&&(!F.squad||t.squad===F.squad)&&(!F.cat||t.categoria===F.cat)&&(!F.erros||t.n_ajustes>0))}
 const entre=(ms,a,b)=>!!ms&&ms>=a&&ms<=b;
+const selP=()=>F.pessoas?P.filter(p=>F.pessoas.includes(p.id)):P;
+const umaPessoa=()=>!!F.pessoas&&F.pessoas.length===1;
 const noPeriodo=ms=>entre(ms,F.ini,F.fim);
-function dono(t){const id=(F.pessoa&&t.assignees.includes(F.pessoa))?F.pessoa:t.assignees[0];return P.find(p=>p.id===id)||{curto:'—',nome:'Sem responsável',cor:C.faint,id:0}}
+function dono(t){const id=(F.pessoas&&t.assignees.find(i=>F.pessoas.includes(i)))||t.assignees[0];return P.find(p=>p.id===id)||{curto:'—',nome:'Sem responsável',cor:C.faint,id:0}}
 function estacao(t){
   const s=st(t.status);
   if(t.feita||t.cancelada)return null;
@@ -550,7 +553,7 @@ function linha(ts){
   const span=(F.fim-F.ini)/DAY, iv=span<=15?d3.timeDay:span<=200?d3.timeMonday:d3.timeMonth;
   document.getElementById('gran').textContent=iv===d3.timeDay?'DIA':iv===d3.timeMonday?'SEMANA':'MÊS';
   const bins=iv.range(iv.floor(new Date(F.ini)),new Date(F.fim+1)); if(!bins.length)return;
-  const lista=F.pessoa?P.filter(p=>p.id===F.pessoa):P;
+  const lista=selP();
   const ent=ts.filter(t=>t.feita&&noPeriodo(t.fim));
   const cont=arr=>{const m=d3.rollup(arr,v=>v.length,t=>+iv.floor(new Date(t.fim)));return bins.map(d=>({d,n:m.get(+d)||0}))};
   const total=cont(ent), series=lista.map(p=>({p,vals:cont(ent.filter(t=>t.assignees.includes(p.id)))}));
@@ -565,12 +568,12 @@ function linha(ts){
   const passo=Math.ceil(bins.length/Math.max(2,Math.floor((W-m.l-m.r)/64)));
   bins.forEach((d,i)=>{if(i%passo===0)svg.append('text').attr('x',x(d)).attr('y',Hh-8).attr('text-anchor','middle').attr('fill',C.faint).attr('font-size',10.5).text(fmtX(d))});
   const cur=d3.curveMonotoneX;
-  if(!F.pessoa){svg.append('path').attr('d',d3.area().x(v=>x(v.d)).y0(Hh-m.b).y1(v=>y(v.n)).curve(cur)(total)).attr('fill','url(#ga)');
+  if(!umaPessoa()){svg.append('path').attr('d',d3.area().x(v=>x(v.d)).y0(Hh-m.b).y1(v=>y(v.n)).curve(cur)(total)).attr('fill','url(#ga)');
     svg.append('path').attr('d',d3.line().x(v=>x(v.d)).y(v=>y(v.n)).curve(cur)(total)).attr('fill','none').attr('stroke',C.orange).attr('stroke-width',2.5);
     const pk=total.reduce((a,b)=>b.n>a.n?b:a);if(pk.n){svg.append('circle').attr('cx',x(pk.d)).attr('cy',y(pk.n)).attr('r',4.5).attr('fill',C.orange);
       const lx=Math.min(W-m.r-60,Math.max(m.l,x(pk.d)-30));svg.append('rect').attr('x',lx).attr('y',y(pk.n)-24).attr('width',60).attr('height',17).attr('rx',3).attr('fill',C.green);
       svg.append('text').attr('x',lx+30).attr('y',y(pk.n)-12).attr('text-anchor','middle').attr('fill','#05210f').attr('font-size',10.5).attr('font-weight',800).text('PICO '+pk.n)}}
-  series.forEach(s=>svg.append('path').attr('d',d3.line().x(v=>x(v.d)).y(v=>y(v.n)).curve(cur)(s.vals)).attr('fill','none').attr('stroke',s.p.cor).attr('stroke-width',F.pessoa?2.5:1.6).attr('stroke-dasharray',F.pessoa?null:'4 3').attr('opacity',F.pessoa?1:.9));
+  series.forEach(s=>svg.append('path').attr('d',d3.line().x(v=>x(v.d)).y(v=>y(v.n)).curve(cur)(s.vals)).attr('fill','none').attr('stroke',s.p.cor).attr('stroke-width',umaPessoa()?2.5:1.6).attr('stroke-dasharray',umaPessoa()?null:'4 3').attr('opacity',umaPessoa()?1:.9));
   const guia=svg.append('line').attr('y1',m.t).attr('y2',Hh-m.b).attr('stroke',C.soft).attr('stroke-dasharray','3 3').attr('opacity',0);
   svg.append('rect').attr('x',m.l).attr('y',m.t).attr('width',W-m.l-m.r).attr('height',Hh-m.t-m.b).attr('fill','transparent')
     .on('mousemove',ev=>{const [mx]=d3.pointer(ev);const i=Math.max(0,Math.min(bins.length-1,d3.bisectCenter(bins.map(d=>x(d)),mx)));const d=bins[i];guia.attr('x1',x(d)).attr('x2',x(d)).attr('opacity',1);
@@ -580,13 +583,13 @@ function linha(ts){
       const arr=ent.filter(t=>t.fim>=+d&&t.fim<=fimB).sort((a,b)=>b.fim-a.fim);if(arr.length)abreLista(reg(`Entregues — ${iv===d3.timeMonth?MES[d.getMonth()]+' '+d.getFullYear():iv===d3.timeDay?fdLong(+d):'semana de '+fdata(d)}`,arr))});
   svg.select('rect:last-of-type').style('cursor','pointer');
   const lg=svg.append('g').attr('transform',`translate(${m.l},12)`);let lx=0;
-  if(!F.pessoa){lg.append('rect').attr('x',0).attr('y',-6).attr('width',14).attr('height',3).attr('fill',C.orange);lg.append('text').attr('x',19).attr('y',-2).attr('fill',C.fg).attr('font-size',11.5).text('Time');lx=70}
+  if(!umaPessoa()){lg.append('rect').attr('x',0).attr('y',-6).attr('width',14).attr('height',3).attr('fill',C.orange);lg.append('text').attr('x',19).attr('y',-2).attr('fill',C.fg).attr('font-size',11.5).text(F.pessoas?'Total da seleção':'Time');lx=70}
   series.forEach(s=>{lg.append('line').attr('x1',lx).attr('x2',lx+14).attr('y1',-5).attr('y2',-5).attr('stroke',s.p.cor).attr('stroke-width',2).attr('stroke-dasharray','4 3');lg.append('text').attr('x',lx+19).attr('y',-2).attr('fill',C.fg).attr('font-size',11.5).text(s.p.curto);lx+=s.p.curto.length*7+38});
   document.getElementById('ent-hint').textContent=`Média: ${fmt(d3.mean(total,v=>v.n),1)} por ${iv===d3.timeDay?'dia':iv===d3.timeMonday?'semana':'mês'}`;
 }
 
 function pessoas(ts){
-  const lista=F.pessoa?P.filter(p=>p.id===F.pessoa):P;
+  const lista=selP();
   const linhas=lista.map(p=>{
     const mine=ts.filter(t=>t.assignees.includes(p.id));
     const ent=mine.filter(t=>t.feita&&noPeriodo(t.fim)), ex=execucoes(ent), aj=ex.filter(t=>t.n_ajustes>0).length;
@@ -624,7 +627,7 @@ function anatomia(ent){
   const quebra=t=>{const h=re=>d3.sum(Object.entries(t.tempos).filter(([s])=>re.test(s)),([,v])=>v)/60;
     const faz=h(FAZ),aj=h(AJ),rev=h(REV);const tot=t.lead_edicao_h!=null?t.lead_edicao_h:Math.max(0,(t.fim-t.criado)/H);
     return {fila:Math.max(0,tot-faz-aj-rev),fazendo:Math.min(faz,tot),ajuste:aj,revisao:rev}};
-  const lista=(F.pessoa?P.filter(p=>p.id===F.pessoa):P).map(p=>{
+  const lista=selP().map(p=>{
     const mine=execucoes(ent).filter(t=>t.assignees.includes(p.id)&&t.fim&&(!t.pai_id||t.lead_edicao_h!=null));
     const qs=mine.map(quebra);const m={};grupos.forEach(([k])=>m[k]=qs.length?d3.mean(qs,q=>q[k]):0);
     return {p,m,mine,n:mine.length,usaFazendo:mine.filter(t=>Object.keys(t.tempos).some(s=>FAZ.test(s))).length};
@@ -651,7 +654,7 @@ function anatomia(ent){
 function quemAjuste(ent){
   const host=document.getElementById('quem-aj');host.innerHTML='';
   const ex=execucoes(ent);
-  const rows=(F.pessoa?P.filter(p=>p.id===F.pessoa):P).map(p=>{const m=ex.filter(t=>t.assignees.includes(p.id));const al=m.filter(t=>t.n_ajustes>0);
+  const rows=selP().map(p=>{const m=ex.filter(t=>t.assignees.includes(p.id));const al=m.filter(t=>t.n_ajustes>0);
     return {p,a:al.length,n:m.length,lid:al.length?reg(`${p.nome}: tasks que voltaram para ajuste`,al.map(t=>({t,extra:(t.ajustes||[]).map(a=>esc(a.texto)).join('<br>')||'<i>Sem comentário explicando o motivo</i>'}))):null}}).sort((x,y)=>y.a-x.a||y.n-x.n);
   if(!rows.some(r=>r.n)){host.innerHTML='<p class="empty">Sem implementações entregues no período.</p>';return}
   const W=host.clientWidth, bh=20, gap=16, left=64, Hh=rows.length*(bh+gap);
@@ -742,7 +745,7 @@ function destaques(ts,R,ab){
   const ex=execucoes(R.ent);
   const sqLento=d3.rollups(R.dem,v=>({m:d3.median(v,d=>d.lead),n:v.length}),d=>d.squad||'Sem squad').filter(d=>d[1].n>=2).sort((a,b)=>b[1].m-a[1].m)[0];
   const catAj=d3.rollups(ex,v=>({a:v.filter(t=>t.n_ajustes>0).length,n:v.length}),t=>t.categoria).filter(d=>d[1].a).sort((a,b)=>b[1].a-a[1].a)[0];
-  const top=(F.pessoa?P.filter(p=>p.id===F.pessoa):P).map(p=>({p,n:R.ent.filter(t=>t.assignees.includes(p.id)).length})).sort((a,b)=>b.n-a.n)[0];
+  const top=selP().map(p=>({p,n:R.ent.filter(t=>t.assignees.includes(p.id)).length})).sort((a,b)=>b.n-a.n)[0];
   const fila=d3.rollups(ab.filter(t=>estacao(t)==='fila'),v=>v.length,t=>dono(t).curto).sort((a,b)=>b[1]-a[1])[0];
   const faz=ex.length?Math.round(ex.filter(t=>Object.keys(t.tempos||{}).some(s=>FAZ.test(s))).length/ex.length*100):null;
   const semPrazo=ab.filter(t=>estacao(t)!=='espera'&&!t.prazo).length;
