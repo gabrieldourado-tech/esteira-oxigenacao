@@ -99,7 +99,7 @@ function textoComentario(c) {
   return (c.comment || []).map((x) => x.text || '').join('');
 }
 const tiraLinks = (s) => String(s || '').replace(/https?:\/\/\S+/g, '[link]').replace(/\s+/g, ' ').trim();
-function ehAjuste(texto, autorId, assigneeIds) {
+function ehAjuste(texto) {
   const t = tiraLinks(texto);
   const so_links = !t.replace(/\[link\]/g, '').replace(/[\s\-–—•:;,.]/g, '');
   if (so_links) return false;
@@ -108,11 +108,22 @@ function ehAjuste(texto, autorId, assigneeIds) {
   return false;
 }
 
+const compacta = (o) => { for (const k of Object.keys(o)) { const v = o[k]; if (v == null || v === false || v === '' || (Array.isArray(v) && !v.length) || (typeof v === 'object' && !Array.isArray(v) && !Object.keys(v).length) || (k === 'n_ajustes' && v === 0) || (k === 'min_ajuste' && v === 0) || (k === 'n_comentarios' && v === 0)) delete o[k]; } return o; };
+
+function classifica(texto) {
+  const limpo = semAcento(tiraLinks(texto)).trim();
+  const confirmacao = limpo.length < 60 && /^(ajustad|corrigid|resolvid|arrumad|feito|pronto|ok)/.test(limpo);
+  const aj = !confirmacao && ehAjuste(texto);
+  return { ajuste: aj, confirmou: confirmacao && /ajust|corrig|arrum/.test(limpo), motivos: aj ? motivoDe(texto) : [], texto: aj || confirmacao ? tiraLinks(texto).slice(0, 320) : null };
+}
+
 // ---------- coleta ----------
 (async () => {
   const t0 = Date.now();
   const cache = fs.existsSync(CACHE) ? JSON.parse(fs.readFileSync(CACHE, 'utf8')) : { tasks: {}, pais: {} };
   cache.tasks = cache.tasks || {}; cache.pais = cache.pais || {};
+  // reclassifica comentários já guardados com as regras atuais do config.json
+  for (const c of Object.values(cache.tasks)) for (const x of c.coms || []) if (x.texto) Object.assign(x, classifica(x.texto));
 
   // 1) todas as tasks e subtasks das 3 pessoas, abertas e fechadas
   const brutas = new Map();
@@ -150,33 +161,16 @@ function ehAjuste(texto, autorId, assigneeIds) {
     }
   }
 
-  // 3) comentários: só nas tasks de execução (onde o ajuste é comentado) e recentes
-  for (const t of novas) {
-    let coms = [];
-    const querComentario = recente(t) && papelDe(t.name, !!t.parent) !== 'revisao' && papelDe(t.name, !!t.parent) !== 'deploy';
-    if (querComentario) {
-      if (estourou()) { pendentes++; continue; } // fica para a próxima rodada (upd não é gravado)
-      try {
-        const res = await api(`/task/${t.id}/comment`);
-        coms = res.comments || [];
-      } catch (e) { console.log('Comentários indisponíveis em', t.id, e.message); }
-    }
-    const assignees = (t.assignees || []).map((a) => String(a.id));
-    cache.tasks[t.id].coms = coms.map((c) => {
-      const texto = textoComentario(c);
-      const aj = ehAjuste(texto, String(c.user && c.user.id), assignees);
-      return {
-        data: num(c.date), autor: (c.user && c.user.username) || '', autor_id: c.user && c.user.id,
-        ajuste: aj, motivos: aj ? motivoDe(texto) : [], texto: aj ? tiraLinks(texto).slice(0, 320) : null,
-      };
-    });
-    cache.tasks[t.id].upd = String(t.date_updated);
+  // 3) tasks-mãe (para ler a subtask de edição e montar o lead time edição → infra)
+  // todas as mães (definem categoria e o lead time); as de tasks mexidas mais recentemente primeiro
+  const ultimoFilho = new Map();
+  for (const t of brutas.values()) {
+    if (!t.parent) continue;
+    const precisa = !cache.pais[t.parent] || (!fechada(t) && recente(t)) || (recente(t) && (!cache.tasks[t.id] || cache.tasks[t.id].paiUpd !== String(t.date_updated)));
+    if (precisa) ultimoFilho.set(t.parent, Math.max(ultimoFilho.get(t.parent) || 0, Number(t.date_updated)));
   }
-
-  // 4) tasks-mãe (para ler a subtask de edição e montar o lead time edição → infra)
-  const paisPrecisam = new Set();
-  for (const t of brutas.values()) if (t.parent && recente(t) && (!cache.pais[t.parent] || !fechada(t) || (cache.tasks[t.id] && cache.tasks[t.id].paiUpd !== String(t.date_updated)))) paisPrecisam.add(t.parent);
-  console.log(`Tasks-mãe para ler: ${paisPrecisam.size}`);
+  const paisPrecisam = [...ultimoFilho.entries()].sort((a, b) => b[1] - a[1]).map(([id]) => id);
+  console.log(`Tasks-mãe para ler: ${paisPrecisam.length}`);
   for (const pid of paisPrecisam) {
     if (estourou()) { pendentes++; continue; }
     try {
@@ -191,6 +185,25 @@ function ehAjuste(texto, autorId, assigneeIds) {
     } catch (e) { console.log('Mãe indisponível', pid, e.message); cache.pais[pid] = cache.pais[pid] || { nome: null, subs: [] }; }
   }
   for (const t of brutas.values()) if (t.parent && cache.pais[t.parent] && cache.tasks[t.id]) cache.tasks[t.id].paiUpd = String(t.date_updated);
+  // 4) comentários: só nas tasks de execução (onde o ajuste é comentado) e recentes
+  for (const t of novas) {
+    let coms = [];
+    const querComentario = recente(t) && papelDe(t.name, !!t.parent) !== 'revisao' && papelDe(t.name, !!t.parent) !== 'deploy';
+    if (querComentario) {
+      if (estourou()) { pendentes++; continue; } // fica para a próxima rodada (upd não é gravado)
+      try {
+        const res = await api(`/task/${t.id}/comment`);
+        coms = res.comments || [];
+      } catch (e) { console.log('Comentários indisponíveis em', t.id, e.message); }
+    }
+    const assignees = (t.assignees || []).map((a) => String(a.id));
+    cache.tasks[t.id].coms = coms.map((c) => {
+      const texto = textoComentario(c);
+      return { data: num(c.date), autor: (c.user && c.user.username) || '', autor_id: c.user && c.user.id, ...classifica(texto) };
+    });
+    cache.tasks[t.id].upd = String(t.date_updated);
+  }
+
   // descobrir campos que a busca do time não traz completos (squad/pasta) já vêm no objeto da task.
 
   // 5) monta as linhas
@@ -216,21 +229,27 @@ function ehAjuste(texto, autorId, assigneeIds) {
     const passouAjuste = hist.some((h) => /ajust/.test(h.s));
     const comsAj = (c.coms || []).filter((x) => x.ajuste);
     const qtdCampo = num(campo(cfs, 'Quantidade de Altera'));
-    const n_ajustes = Math.max(comsAj.length, qtdCampo || 0, passouAjuste || reaberta ? 1 : 0);
+    const confirmacoes = (c.coms || []).filter((x) => x.confirmou).length;
+    const n_ajustes = Math.max(comsAj.length, confirmacoes, qtdCampo || 0, passouAjuste || reaberta ? 1 : 0);
 
     // edição → infra
-    let edicao_fim = null, lead_edicao_h = null;
+    let edicao_fim = null, lead_edicao_h = null, tem_edicao = false, antes_da_edicao = false;
     if (pai) {
-      const ed = pai.subs.filter((s) => /edi[cç][aã]o|editar v[ií]deo/i.test(s.nome) && s.fim);
-      if (ed.length) edicao_fim = Math.max(...ed.map((s) => s.fim));
+      const todas = pai.subs.filter((s) => /edi[cç][aã]o|editar v[ií]deo/i.test(s.nome) && !/cancel/i.test(s.status || ''));
+      tem_edicao = todas.length > 0;
+      const ed = todas.filter((s) => s.fim);
+      if (ed.length && ed.length === todas.length) edicao_fim = Math.max(...ed.map((s) => s.fim));
       const f = fim(t);
-      if (edicao_fim && f && feita(t)) lead_edicao_h = Math.round(((f - edicao_fim) / 36e5) * 10) / 10;
+      if (edicao_fim && f && feita(t)) {
+        const h = Math.round(((f - edicao_fim) / 36e5) * 10) / 10;
+        if (h >= 0) lead_edicao_h = h; else antes_da_edicao = true; // infra entregue antes da edição terminar
+      }
     }
     const lista = t.list && t.list.name;
     const pasta = t.folder && t.folder.name;
     const espaco = t.space && t.space.id;
-    tasks.push({
-      id: t.id, url: t.url, nome, pai_id: t.parent || null, pai_nome: pai ? pai.nome : null, pai_url: pai ? pai.url : null,
+    tasks.push(compacta({
+      id: t.id, nome, pai_id: t.parent || null, pai_nome: pai ? pai.nome : null,
       lista, pasta, espaco,
       squad: (pai && pai.squad) || campo(cfs, 'Squad') || (espaco === '90135421767' ? 'Demanda direta (Infra)' : null) || (pasta && pasta !== 'hidden' ? pasta : null) || lista,
       produto: campo(cfs, 'Produto') || (pai && pai.produto),
@@ -244,8 +263,8 @@ function ehAjuste(texto, autorId, assigneeIds) {
       tempos, reaberta, passou_ajuste: passouAjuste, min_ajuste: minAjuste, n_ajustes,
       ajustes: comsAj.map((x) => ({ data: x.data, autor: x.autor, texto: x.texto, motivos: x.motivos })),
       n_comentarios: (c.coms || []).length,
-      edicao_fim, lead_edicao_h,
-    });
+      edicao_fim, lead_edicao_h, tem_edicao, antes_da_edicao,
+    }));
   }
 
   // limpa cache de tasks que sumiram

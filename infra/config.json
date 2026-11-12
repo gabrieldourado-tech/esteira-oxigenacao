@@ -43,7 +43,7 @@
     },
     {
       "nome": "Fluxo de upsell",
-      "regex": "fluxo de upsell|upsell|downsell|order ?bump"
+      "regex": "fluxo de upsell|upsell|downsell|order ?bump|\\bob\\b"
     },
     {
       "nome": "Cadastro de produto",
@@ -117,11 +117,11 @@
     },
     {
       "nome": "Vídeo / VSL",
-      "regex": "video|\\bvsl|vturb|player|pitch|vazarato|delay"
+      "regex": "video|\\bvsl\\b|vturb|player|vazarato|delay"
     },
     {
       "nome": "Imagem / pote",
-      "regex": "imagem|mockup|foto|garrafa|rotulo|thumb|png|jpe?g"
+      "regex": "imagem|imagens|mockup|foto|garrafa|rotulo|thumb|\\.png|\\.jpe?g"
     },
     {
       "nome": "Texto / copy",
