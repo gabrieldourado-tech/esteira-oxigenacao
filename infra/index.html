@@ -3,40 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Infra · Afiliados — painel do time</title>
+<title>Funnel Ops — painel do time de Infra</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
 :root{
-  --ink:#0F3466;        /* papel azul de planta */
-  --ink-2:#0B2A55;      /* bancada */
-  --ink-3:#123E78;
-  --rule:#2F5E9C;       /* traço de desenho */
-  --rule-2:#4A7CC0;
-  --paper:#EAF2FF;      /* texto */
-  --soft:#A9C2E6;
-  --faint:#7095C8;
-  --signal:#FFD23F;     /* destaque */
-  --coral:#FF6B5A;      /* ajuste / atraso */
-  --mint:#6EE7A8;       /* entregue */
+  --ink:#26282D;        /* fundo grafite */
+  --ink-2:#2E3137;      /* painel */
+  --ink-3:#363A41;
+  --rule:#41454D;
+  --rule-2:#535862;
+  --paper:#ECEDEF;
+  --soft:#A7ACB5;
+  --faint:#7D838D;
+  --signal:#F4B740;
+  --coral:#F0706A;
+  --mint:#6FD6A0;
   --f:'Archivo',system-ui,sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{
-  font-family:var(--f);font-stretch:100%;font-size:14px;line-height:1.45;color:var(--paper);
-  background-color:var(--ink);
-  background-image:
-    linear-gradient(rgba(74,124,192,.16) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(74,124,192,.16) 1px,transparent 1px),
-    linear-gradient(rgba(74,124,192,.07) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(74,124,192,.07) 1px,transparent 1px);
-  background-size:120px 120px,120px 120px,24px 24px,24px 24px;
-  min-height:100vh;
-}
+body{font-family:var(--f);font-stretch:100%;font-size:14px;line-height:1.45;color:var(--paper);background:var(--ink);min-height:100vh}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--signal);outline-offset:2px;border-radius:4px}
 .wrap{max-width:1500px;margin:0 auto;padding:22px clamp(14px,2.4vw,32px) 48px}
@@ -63,9 +53,10 @@ a{color:inherit}
 .chip.warn[aria-pressed="true"]{background:var(--coral);border-color:var(--coral);color:#2a0b07}
 select.chip{padding-right:26px;background-image:linear-gradient(45deg,transparent 50%,var(--paper) 50%),linear-gradient(135deg,var(--paper) 50%,transparent 50%);background-position:calc(100% - 14px) 52%,calc(100% - 9px) 52%;background-size:5px 5px;background-repeat:no-repeat}
 select.chip option{color:#000}
+.chip:hover{border-color:var(--soft)}
 
 /* ---------- blocos ---------- */
-.sheet{margin-top:18px;border:1.5px solid var(--rule-2);background:rgba(11,42,85,.82);position:relative}
+.sheet{margin-top:18px;border:1px solid var(--rule);border-radius:10px;background:var(--ink-2);position:relative}
 .sheet > header{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--rule)}
 .sheet h2{margin:0;font-stretch:115%;font-weight:700;font-size:17px;letter-spacing:.005em}
 .sheet header p{margin:0;color:var(--soft);font-size:12.5px;max-width:78ch}
@@ -114,11 +105,11 @@ svg text{font-family:var(--f)}
 /* ---------- tabela ---------- */
 .tbl{overflow:auto;max-height:620px}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{position:sticky;top:0;background:var(--ink-2);text-align:left;font-weight:600;color:var(--soft);padding:8px 10px;border-bottom:1.5px solid var(--rule-2);white-space:nowrap;cursor:pointer;user-select:none}
+th{position:sticky;top:0;background:var(--ink-3);text-align:left;font-weight:600;color:var(--soft);padding:8px 10px;border-bottom:1.5px solid var(--rule-2);white-space:nowrap;cursor:pointer;user-select:none}
 th[aria-sort="ascending"]::after{content:" ↑"} th[aria-sort="descending"]::after{content:" ↓"}
-td{padding:8px 10px;border-bottom:1px solid rgba(47,94,156,.6);vertical-align:top}
+td{padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
 td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-tr:hover td{background:rgba(74,124,192,.12)}
+tr:hover td{background:rgba(255,255,255,.04)}
 td a{text-decoration:none} td a:hover{text-decoration:underline}
 .sub{color:var(--soft);font-size:12px}
 .st{white-space:nowrap}
@@ -132,8 +123,67 @@ td a{text-decoration:none} td a:hover{text-decoration:underline}
 .health .bad b{color:var(--signal)}
 @media (max-width:900px){.health{grid-template-columns:1fr 1fr}}
 
-.tip{position:fixed;pointer-events:none;z-index:20;background:var(--paper);color:var(--ink);padding:8px 10px;border-radius:4px;font-size:12.5px;line-height:1.45;max-width:300px;box-shadow:4px 4px 0 rgba(0,0,0,.35);opacity:0;transition:opacity .1s}
+.tip{position:fixed;pointer-events:none;z-index:40;background:var(--paper);color:#1d1f23;padding:8px 10px;border-radius:4px;font-size:12.5px;line-height:1.45;max-width:300px;box-shadow:4px 4px 0 rgba(0,0,0,.35);opacity:0;transition:opacity .1s}
 .tip b{font-weight:700}
+/* seletor de período (estilo Looker Studio) */
+.dp{position:relative}
+.dp-btn{display:inline-flex;align-items:center;gap:8px;background:var(--ink-3);border:1px solid var(--rule-2);color:var(--paper);font:inherit;font-size:13px;padding:6px 12px;border-radius:6px;cursor:pointer;min-width:250px;justify-content:space-between}
+.dp-btn:hover{border-color:var(--soft)}
+.dp-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:30;display:flex;background:#fff;color:#202124;border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.45);font-size:13px;overflow:hidden}
+.dp-pop[hidden]{display:none}
+.dp-presets{display:flex;flex-direction:column;padding:8px 0;border-right:1px solid #e3e3e3;min-width:170px}
+.dp-presets button{all:unset;cursor:pointer;padding:7px 18px;color:#202124}
+.dp-presets button:hover{background:#f1f3f4}
+.dp-presets button[aria-pressed="true"]{background:#e8f0fe;color:#1a73e8;font-weight:600}
+.dp-main{padding:10px 14px 12px}
+.dp-head{display:flex;justify-content:space-between;align-items:center}
+.dp-nav{all:unset;cursor:pointer;font-size:22px;line-height:1;padding:2px 10px;border-radius:50%;color:#5f6368}
+.dp-nav:hover{background:#f1f3f4}
+.dp-cals{display:flex;gap:22px}
+.dp-cal h4{margin:0 0 6px;text-align:center;font-size:13px;font-weight:600}
+.dp-grid{display:grid;grid-template-columns:repeat(7,32px);row-gap:2px}
+.dp-grid .wd{color:#70757a;font-size:11px;text-align:center;padding:4px 0}
+.dp-grid button{all:unset;box-sizing:border-box;height:30px;text-align:center;cursor:pointer;font-size:12.5px;color:#202124}
+.dp-grid button:hover{outline:1px solid #1a73e8;border-radius:50%}
+.dp-grid button.in{background:#e8f0fe}
+.dp-grid button.ed{background:#1a73e8;color:#fff;border-radius:50%}
+.dp-grid button.today{font-weight:700;color:#1a73e8}
+.dp-grid button.ed.today{color:#fff}
+.dp-grid button:disabled{color:#c4c7c5;cursor:default}
+.dp-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:10px;border-top:1px solid #e3e3e3;padding-top:10px}
+.dp-foot #dp-sel{color:#5f6368}
+.dp-act{all:unset;cursor:pointer;padding:7px 14px;border-radius:4px;color:#1a73e8;font-weight:600}
+.dp-act:hover{background:#f1f3f4}
+.dp-act.pri{background:#1a73e8;color:#fff;margin-left:6px}
+.dp-act.pri:hover{background:#1765cc}
+@media (max-width:760px){.dp-pop{flex-direction:column;left:-60px}.dp-presets{flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid #e3e3e3}.dp-cals .dp-cal:nth-child(2){display:none}.dp-btn{min-width:0}}
+/* esteira em cards */
+.lanes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.lane{background:var(--ink-3);border:1px solid var(--rule);border-radius:8px;display:flex;flex-direction:column;min-width:0}
+.lane-h{padding:12px 14px 10px;border-bottom:1px solid var(--rule)}
+.lane-h .nm{font-size:13px;color:var(--soft);display:flex;justify-content:space-between;gap:8px}
+.lane-h .ct{font-stretch:115%;font-weight:800;font-size:34px;line-height:1.05;margin-top:2px;font-variant-numeric:tabular-nums}
+.lane-h .late{display:inline-block;margin-top:4px;font-size:12px;color:#fff;background:var(--coral);border-radius:999px;padding:1px 9px;font-weight:600}
+.lane-h .ok{display:inline-block;margin-top:4px;font-size:12px;color:var(--faint)}
+.lane.alert{border-color:var(--coral)}
+.lane ul{list-style:none;margin:0;padding:6px;display:flex;flex-direction:column;gap:6px;max-height:420px;overflow:auto}
+.card{display:block;text-decoration:none;background:var(--ink-2);border:1px solid var(--rule);border-left:4px solid var(--c,#888);border-radius:6px;padding:8px 10px}
+.card:hover{border-color:var(--soft);border-left-color:var(--c,#888)}
+.card .t{font-size:13px;font-weight:600;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .s{font-size:12px;color:var(--soft);margin-top:2px;display:flex;justify-content:space-between;gap:6px}
+.card .s span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card.atr{background:rgba(240,112,106,.12)}
+.card .bad{color:var(--coral);font-weight:700;white-space:nowrap}
+.lane .more{padding:4px 10px 10px;color:var(--faint);font-size:12px}
+.lane .vazio{padding:16px 14px;color:var(--faint);font-size:12.5px}
+@media (max-width:1100px){.lanes{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.lanes{grid-template-columns:1fr}}
+/* pessoas */
+.pcards{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:12px}
+.pcard{background:var(--ink-3);border:1px solid var(--rule);border-top:3px solid var(--c);border-radius:8px;padding:12px 14px}
+.pcard h3{margin:0;font-size:16px;font-weight:700}
+.pcard .role{color:var(--soft);font-size:12px;margin:2px 0 8px}
+@media (max-width:900px){.pcards{grid-template-columns:1fr}}
 .foot{margin-top:18px;color:var(--faint);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 @media (prefers-reduced-motion:no-preference){
   .late-ring{animation:blink 1.4s ease-in-out infinite}
@@ -144,7 +194,7 @@ td a{text-decoration:none} td a:hover{text-decoration:underline}
 <body>
 <div class="wrap">
   <div class="top">
-    <h1 class="title">Infra Afiliados
+    <h1 class="title">Funnel Ops
       <small id="lede">Carregando as tasks do ClickUp…</small></h1>
     <div class="stamp" aria-label="Situação dos dados">
       <div>Time</div><div>Malvas, Pablo, Luis</div>
@@ -154,7 +204,18 @@ td a{text-decoration:none} td a:hover{text-decoration:underline}
   </div>
 
   <div class="filters" role="group" aria-label="Filtros">
-    <div class="fg" id="f-periodo"><span>Período</span></div>
+    <div class="fg"><span>Período</span>
+      <div class="dp" id="dp">
+        <button class="dp-btn" id="dp-btn" aria-haspopup="dialog" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7zm-2 8h14v10H5V10z"/></svg><span id="dp-label">—</span><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg></button>
+        <div class="dp-pop" id="dp-pop" role="dialog" aria-label="Escolher período" hidden>
+          <div class="dp-presets" id="dp-presets"></div>
+          <div class="dp-main">
+            <div class="dp-head"><button class="dp-nav" id="dp-prev" aria-label="Mês anterior">‹</button><span></span><button class="dp-nav" id="dp-next" aria-label="Próximo mês">›</button></div>
+            <div class="dp-cals" id="dp-cals"></div>
+            <div class="dp-foot"><span id="dp-sel"></span><span><button class="dp-act" id="dp-cancel">Cancelar</button><button class="dp-act pri" id="dp-apply">Aplicar</button></span></div>
+          </div>
+        </div>
+      </div></div>
     <div class="fg" id="f-pessoa"><span>Pessoa</span></div>
     <div class="fg"><span>Squad</span><select class="chip" id="f-squad" aria-label="Squad"></select></div>
     <div class="fg"><span>Categoria</span><select class="chip" id="f-cat" aria-label="Categoria"></select></div>
@@ -164,13 +225,13 @@ td a{text-decoration:none} td a:hover{text-decoration:underline}
   <section class="sheet" aria-labelledby="h-esteira">
     <header><h2 id="h-esteira">Esteira agora</h2>
       <div class="legend" id="leg-esteira"></div></header>
-    <div class="body"><div id="esteira"></div></div>
+    <div class="body"><div id="esteira" class="lanes"></div></div>
     <dl class="spec" id="spec"></dl>
   </section>
 
   <section class="sheet" aria-labelledby="h-pessoas">
-    <header><h2 id="h-pessoas">Quem entregou o quê</h2><p>Pontos = soma dos pesos das tasks entregues no período. Cada quadradinho é um dia das últimas 12 semanas; quanto mais claro, mais pontos.</p></header>
-    <div class="people" id="people"></div>
+    <header><h2 id="h-pessoas">Quem entregou o quê</h2><p>Pontos = soma dos pesos das tasks entregues no período. O gráfico mostra os pontos entregues por <span id="gran">semana</span>.</p></header>
+    <div class="body"><div class="pcards" id="people"></div><div id="linha" style="margin-top:16px"></div></div>
   </section>
 
   <div class="cols">
@@ -226,7 +287,8 @@ const st=s=>String(s||'').toLowerCase();
 const FILA=/^(pendente|pending|a fazer|to do|programar|stand ?bye?|esperando)/, FAZ=/^(fazendo|em andamento|in progress)/, AJ=/ajust/, REV=/revis/, ESPERA=/^(n[aã]o executar|do not execute)/;
 
 let DATA=null, P=[], PC={};
-const F={dias:30,pessoa:null,squad:'',cat:'',erros:false};
+const hoje0=()=>d3.timeDay.floor(new Date());
+const F={ini:+d3.timeDay.offset(hoje0(),-29),fim:+d3.timeDay.offset(hoje0(),1)-1,preset:'30',pessoa:null,squad:'',cat:'',erros:false};
 let sortKey='fim', sortDir=-1, limite=60;
 
 /* ---------- tooltip ---------- */
@@ -236,8 +298,7 @@ function untip(){tipEl.style.opacity=0}
 
 /* ---------- filtros ---------- */
 function montaFiltros(){
-  const per=document.getElementById('f-periodo');
-  [[7,'7 dias'],[14,'14 dias'],[30,'30 dias'],[90,'90 dias'],[0,'Tudo']].forEach(([d,l])=>{const b=document.createElement('button');b.className='chip';b.textContent=l;b.setAttribute('aria-pressed',F.dias===d);b.onclick=()=>{F.dias=d;per.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()};per.appendChild(b)});
+  montaPeriodo();
   const pe=document.getElementById('f-pessoa');
   const todos=document.createElement('button');todos.className='chip';todos.textContent='Todos';todos.setAttribute('aria-pressed','true');pe.appendChild(todos);
   const bs=[todos];
@@ -250,12 +311,70 @@ function montaFiltros(){
   const er=document.getElementById('f-erros');er.onclick=()=>{F.erros=!F.erros;er.setAttribute('aria-pressed',F.erros);render()};
 }
 
+/* ---------- período (estilo Looker Studio) ---------- */
+const MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const MESC=['jan.','fev.','mar.','abr.','mai.','jun.','jul.','ago.','set.','out.','nov.','dez.'];
+const fdLong=ms=>{const d=new Date(ms);return `${d.getDate()} de ${MESC[d.getMonth()]} de ${d.getFullYear()}`};
+function presets(){
+  const h=hoje0(), fimHoje=+d3.timeDay.offset(h,1)-1, ontem=d3.timeDay.offset(h,-1);
+  const ult=n=>[+d3.timeDay.offset(h,-(n-1)),fimHoje];
+  const mes0=d3.timeMonth.floor(h), mesAnt=d3.timeMonth.offset(mes0,-1), ano0=d3.timeYear.floor(h);
+  const semana0=d3.timeSunday.floor(h);
+  const minDado=DATA?d3.min(DATA.tasks,t=>t.fim||t.criado):+ano0;
+  return [
+    ['hoje','Hoje',[+h,fimHoje]],['ontem','Ontem',[+ontem,+h-1]],
+    ['semana','Esta semana (dom. até hoje)',[+semana0,fimHoje]],['semana-ant','Semana passada',[+d3.timeWeek.offset(semana0,-1),+semana0-1]],
+    ['7','Últimos 7 dias',ult(7)],['14','Últimos 14 dias',ult(14)],['28','Últimos 28 dias',ult(28)],['30','Últimos 30 dias',ult(30)],['90','Últimos 90 dias',ult(90)],
+    ['mes','Este mês',[+mes0,fimHoje]],['mes-ant','Mês passado',[+mesAnt,+mes0-1]],
+    ['ano','Este ano',[+ano0,fimHoje]],['tudo','Todo o período',[+d3.timeDay.floor(new Date(minDado)),fimHoje]],
+  ];
+}
+let DP={vis:null,a:null,b:null,preset:null};
+function rotulo(){const p=presets().find(x=>x[0]===F.preset);document.getElementById('dp-label').textContent=`${fdLong(F.ini)} – ${fdLong(F.fim)}`;document.getElementById('dp-btn').title=p?p[1]:'Personalizado'}
+function montaPeriodo(){
+  const btn=document.getElementById('dp-btn'),pop=document.getElementById('dp-pop');
+  const abre=()=>{DP={vis:+d3.timeMonth.offset(d3.timeMonth.floor(new Date(F.fim)),-1),a:F.ini,b:+d3.timeDay.floor(new Date(F.fim)),preset:F.preset};pop.hidden=false;btn.setAttribute('aria-expanded','true');desenhaDP()};
+  const fecha=()=>{pop.hidden=true;btn.setAttribute('aria-expanded','false')};
+  btn.onclick=()=>pop.hidden?abre():fecha();
+  document.getElementById('dp-cancel').onclick=fecha;
+  document.getElementById('dp-apply').onclick=()=>{if(DP.a==null)return;const b=DP.b==null?DP.a:DP.b;F.ini=Math.min(DP.a,b);F.fim=+d3.timeDay.offset(new Date(Math.max(DP.a,b)),1)-1;F.preset=DP.preset;fecha();rotulo();render()};
+  document.getElementById('dp-prev').onclick=()=>{DP.vis=+d3.timeMonth.offset(new Date(DP.vis),-1);desenhaDP()};
+  document.getElementById('dp-next').onclick=()=>{DP.vis=+d3.timeMonth.offset(new Date(DP.vis),1);desenhaDP()};
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!pop.hidden)fecha()});
+  document.addEventListener('mousedown',e=>{if(!pop.hidden&&!document.getElementById('dp').contains(e.target))fecha()});
+  rotulo();
+}
+function desenhaDP(){
+  const pr=document.getElementById('dp-presets');
+  pr.innerHTML=presets().map(([k,l])=>`<button data-k="${k}" aria-pressed="${DP.preset===k}">${l}</button>`).join('')+`<button data-k="custom" aria-pressed="${DP.preset==='custom'}">Personalizado</button>`;
+  pr.querySelectorAll('button').forEach(b=>b.onclick=()=>{const p=presets().find(x=>x[0]===b.dataset.k);DP.preset=b.dataset.k;if(p){DP.a=p[2][0];DP.b=+d3.timeDay.floor(new Date(p[2][1]));DP.vis=+d3.timeMonth.offset(d3.timeMonth.floor(new Date(p[2][1])),-1)}desenhaDP()});
+  const cals=document.getElementById('dp-cals');cals.innerHTML='';
+  const hoje=+hoje0();const lo=DP.a,hi=DP.b==null?DP.a:DP.b;const mn=Math.min(lo,hi),mx=Math.max(lo,hi);
+  for(let k=0;k<2;k++){
+    const m0=d3.timeMonth.offset(new Date(DP.vis),k);const div=document.createElement('div');div.className='dp-cal';
+    div.innerHTML=`<h4>${MES[m0.getMonth()][0].toUpperCase()+MES[m0.getMonth()].slice(1)} de ${m0.getFullYear()}</h4>`;
+    const g=document.createElement('div');g.className='dp-grid';
+    g.innerHTML=['D','S','T','Q','Q','S','S'].map(x=>`<span class="wd">${x}</span>`).join('');
+    for(let i=0;i<m0.getDay();i++)g.appendChild(document.createElement('span'));
+    for(let d=new Date(m0);d<d3.timeMonth.offset(m0,1);d=d3.timeDay.offset(d,1)){
+      const ms=+d;const b=document.createElement('button');b.textContent=d.getDate();b.type='button';
+      if(ms>hoje)b.disabled=true;
+      if(ms>=mn&&ms<=mx)b.classList.add('in');if(ms===mn||ms===mx)b.classList.add('ed');if(ms===hoje)b.classList.add('today');
+      b.setAttribute('aria-label',fdLong(ms));
+      b.onclick=()=>{DP.preset='custom';if(DP.b!=null||DP.a==null){DP.a=ms;DP.b=null}else{DP.b=ms}desenhaDP()};
+      g.appendChild(b);
+    }
+    div.appendChild(g);cals.appendChild(div);
+  }
+  document.getElementById('dp-sel').textContent=DP.a==null?'':DP.b==null?`${fdLong(DP.a)} – escolha o fim`:`${fdLong(mn)} – ${fdLong(mx)}`;
+}
+
 /* ---------- modelo ---------- */
 function base(){
   return DATA.tasks.filter(t=>(!F.pessoa||t.assignees.includes(F.pessoa))&&(!F.squad||t.squad===F.squad)&&(!F.cat||t.categoria===F.cat)&&(!F.erros||t.n_ajustes>0));
 }
-function noPeriodo(ms){if(!ms)return false;return !F.dias||ms>=Date.now()-F.dias*DAY}
-function dono(t){const id=(F.pessoa&&t.assignees.includes(F.pessoa))?F.pessoa:t.assignees[0];return P.find(p=>p.id===id)||{curto:'—',nome:'Sem responsável',cor:'#7095C8',id:0}}
+function noPeriodo(ms){if(!ms)return false;return ms>=F.ini&&ms<=F.fim}
+function dono(t){const id=(F.pessoa&&t.assignees.includes(F.pessoa))?F.pessoa:t.assignees[0];return P.find(p=>p.id===id)||{curto:'—',nome:'Sem responsável',cor:'#7D838D',id:0}}
 function estacao(t){
   const s=st(t.status);
   if(t.feita||t.cancelada)return null;
@@ -291,7 +410,7 @@ function render(){
 
 function lede(ent,dem,ab){
   const pts=d3.sum(ent,t=>t.peso), med=d3.median(dem,d=>d.lead);
-  const per=F.dias?`Nos últimos ${F.dias} dias`:'Desde o começo';
+  const per=`De ${fdLong(F.ini)} a ${fdLong(F.fim)}`;
   const late=ab.filter(t=>t.prazo&&t.prazo<Date.now()).length;
   document.getElementById('lede').innerHTML=`${per} o time entregou <b>${ent.length}</b> tasks (<b>${fmt(pts,0)}</b> pontos). `+(med!=null?`Da edição pronta até a infra entregue leva <b>${fmtH(med)}</b> na mediana. `:'')+(late?`<b style="color:var(--coral)">${late} ${late===1?'task aberta passou':'tasks abertas passaram'} do prazo.</b>`:'Nenhuma task aberta atrasada.');
 }
@@ -314,82 +433,66 @@ function spec(ts,ent,ab,dem){
   ].map(([l,v,u,n,c])=>`<div class="${c}"><dt>${l}</dt><dd>${esc(v)}${u?`<small>${u}</small>`:''}</dd><div class="note">${esc(n)}</div></div>`).join('');
 }
 
-const ESTACOES=[['espera','Esperando etapa anterior'],['fila','Na fila'],['fazendo','Fazendo'],['ajuste','Em ajuste'],['revisao','Em revisão']];
-function forma(papel,r){if(papel==='revisao')return d3.symbol(d3.symbolDiamond,r*r*2.2)();if(papel==='deploy')return d3.symbol(d3.symbolTriangle,r*r*2.2)();return d3.symbol(d3.symbolCircle,r*r*3.14)()}
+const ESTACOES=[['espera','Esperando etapa anterior','Edição ou etapa anterior ainda não terminou'],['fila','Na fila','Liberada, ninguém começou'],['fazendo','Fazendo','Em execução'],['ajuste','Em ajuste','Voltou para corrigir'],['revisao','Em revisão','Aguardando revisão']];
 function esteira(ab){
-  const host=document.getElementById('esteira');host.innerHTML='';
-  document.getElementById('leg-esteira').innerHTML=P.map(p=>`<span><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}</span>`).join('')+
-    `<span>● execução ◆ revisão ▲ deploy</span><span>tamanho = peso</span><span style="color:var(--coral)">contorno piscando = atrasada</span>`;
-  const W=host.clientWidth; const n=ESTACOES.length; const gap=14; const vert=W<700;
-  const cw=vert?W:(W-gap*(n-1))/n;
-  const porEst=d3.group(ab,estacao);
-  const rOf=p=>Math.max(5,Math.min(15,4+Math.sqrt(p)*4.2));
-  // empacota cada estação (lado a lado no desktop, uma embaixo da outra no celular)
-  const nodes=[];let maxY=0;const box={};let yv=0;
-  ESTACOES.forEach(([k],i)=>{
-    const arr=(porEst.get(k)||[]).slice().sort((a,b)=>(a.prazo||9e15)-(b.prazo||9e15));
-    const x0=vert?0:i*(cw+gap), y0=vert?yv:0; let cx=x0+8, cy=y0+52, rowH=0, bottom=y0+52;
-    arr.forEach(t=>{const r=rOf(t.peso);if(cx+2*r>x0+cw-8){cx=x0+8;cy+=rowH+6;rowH=0}nodes.push({t,x:cx+r,y:cy+r,r,k});cx+=2*r+6;rowH=Math.max(rowH,2*r);bottom=Math.max(bottom,cy+2*r)});
-    box[k]={x0,y0,h:vert?Math.max(90,bottom-y0+14):null};
-    if(vert)yv+=box[k].h+gap; else maxY=Math.max(maxY,bottom);
-  });
-  const Hh=vert?yv:Math.max(170,maxY+20);
-  if(!vert)ESTACOES.forEach(([k])=>box[k].h=Hh);
-  const svg=d3.select(host).append('svg').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Tasks abertas do time por etapa');
-  // trilho
-  if(!vert)svg.append('line').attr('x1',0).attr('x2',W).attr('y1',30).attr('y2',30).attr('stroke','#4A7CC0').attr('stroke-width',1.5).attr('stroke-dasharray','2 5');
-  ESTACOES.forEach(([k,l],i)=>{
-    const {x0,y0,h}=box[k], c=(porEst.get(k)||[]).length, late=(porEst.get(k)||[]).filter(t=>t.prazo&&t.prazo<Date.now()).length;
-    const g=svg.append('g').attr('transform',`translate(0,${y0})`);
-    g.append('rect').attr('x',x0).attr('y',40).attr('width',cw).attr('height',h-44).attr('fill','none').attr('stroke','#2F5E9C').attr('stroke-dasharray',k==='espera'?'4 4':null);
-    g.append('rect').attr('x',x0).attr('y',8).attr('width',cw).attr('height',26).attr('fill',k==='ajuste'&&c?'#FF6B5A':'#EAF2FF');
-    g.append('text').attr('x',x0+10).attr('y',26).attr('fill','#0F3466').attr('font-weight',700).attr('font-size',13).attr('font-stretch','112%').text(l);
-    g.append('text').attr('x',x0+cw-10).attr('y',26).attr('text-anchor','end').attr('fill','#0F3466').attr('font-weight',800).attr('font-size',15).text(c+(late?`  ·  ${late} atras.`:''));
-    if(i<n-1&&!vert)svg.append('path').attr('d',`M${x0+cw+2},21 l${gap-6},0 m-5,-5 l5,5 l-5,5`).attr('stroke','#EAF2FF').attr('fill','none').attr('stroke-width',1.5);
-    if(!c)g.append('text').attr('x',x0+cw/2).attr('y',Math.min(h/2+24,100)).attr('text-anchor','middle').attr('fill','#7095C8').attr('font-size',12.5).text('vazio');
-  });
-  const g=svg.append('g');
-  nodes.forEach(nd=>{
-    const t=nd.t, p=dono(t), late=t.prazo&&t.prazo<Date.now();
-    const a=g.append('a').attr('href',t.url).attr('target','_blank').attr('rel','noopener').attr('aria-label',`${t.nome} — ${p.curto}`);
-    a.append('path').attr('d',forma(t.papel,nd.r)).attr('transform',`translate(${nd.x},${nd.y})`).attr('fill',p.cor).attr('stroke',late?'#FF6B5A':'#0B2A55').attr('stroke-width',late?3:1.2).attr('class',late?'late-ring':null);
-    const idade=(Date.now()-(t.edicao_fim||t.criado))/H;
-    a.on('mousemove',ev=>tip(ev,`<b>${esc(t.pai_nome?t.pai_nome+' → ':'')}${esc(t.nome)}</b><br>${esc(p.nome)} · ${esc(PAPEL[t.papel])}<br>${esc(t.categoria)} · peso ${fmt(t.peso)}<br>Status: ${esc(t.status)} · há ${fmtH(idade)}${t.prazo?`<br>Prazo: ${fdata(new Date(t.prazo))}${late?' <b style="color:#c0392b">atrasada</b>':''}`:''}${t.n_ajustes?`<br><b style="color:#c0392b">${t.n_ajustes} ajuste(s)</b>`:''}`)).on('mouseleave',untip);
-  });
+  const host=document.getElementById('esteira');
+  document.getElementById('leg-esteira').innerHTML=P.map(p=>`<span><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}</span>`).join('')+`<span style="color:var(--coral)">vermelho = passou do prazo</span>`;
+  const porEst=d3.group(ab,estacao); const agora=Date.now();
+  host.innerHTML=ESTACOES.map(([k,l,dica])=>{
+    const arr=(porEst.get(k)||[]).map(t=>({t,late:!!(t.prazo&&t.prazo<agora),idade:(agora-(t.edicao_fim||t.criado))/H}))
+      .sort((a,b)=>(b.late-a.late)||(b.idade-a.idade));
+    const late=arr.filter(x=>x.late).length, mostra=arr.slice(0,12);
+    const cards=mostra.map(({t,late,idade})=>{const p=dono(t);return `<li><a class="card${late?' atr':''}" style="--c:${p.cor}" href="${esc(t.url)}" target="_blank" rel="noopener" title="${esc((t.pai_nome?t.pai_nome+' → ':'')+t.nome)}">
+      <div class="t">${esc(t.pai_nome||t.nome)}</div>
+      <div class="s"><span>${t.pai_nome?esc(t.nome)+' · ':''}${esc(p.curto)}</span>${late?`<span class="bad">atrasada</span>`:`<span>${fmtH(idade)}</span>`}</div></a></li>`}).join('');
+    return `<div class="lane${late?' alert':''}"><div class="lane-h"><div class="nm"><span>${l}</span></div><div class="ct">${arr.length}</div>${late?`<span class="late">${late} atrasada${late>1?'s':''}</span>`:`<span class="ok">${esc(dica)}</span>`}</div>
+      ${arr.length?`<ul>${cards}</ul>${arr.length>12?`<div class="more">+ ${arr.length-12} na tabela abaixo</div>`:''}`:'<div class="vazio">Nada aqui agora.</div>'}</div>`;
+  }).join('');
 }
 
 function pessoas(ts){
-  const host=document.getElementById('people');host.innerHTML='';
-  const fim=d3.timeDay.ceil(new Date()), ini=d3.timeDay.offset(fim,-84);
+  const host=document.getElementById('people');
   const lista=F.pessoa?P.filter(p=>p.id===F.pessoa):P;
   host.style.setProperty('--n',lista.length);
-  for(const p of lista){
+  host.innerHTML=lista.map(p=>{
     const mine=ts.filter(t=>t.assignees.includes(p.id));
     const ent=mine.filter(t=>t.feita&&noPeriodo(t.fim));
     const exec=ent.filter(t=>t.papel==='execucao'||t.papel==='demanda');
     const aj=exec.filter(t=>t.n_ajustes>0).length;
     const abertas=mine.filter(t=>estacao(t)&&estacao(t)!=='espera').length;
-    const papeis=d3.rollups(mine.filter(t=>t.feita),v=>v.length,t=>t.papel).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${PAPEL[k]} ${Math.round(v/Math.max(1,mine.filter(t=>t.feita).length)*100)}%`).join(', ');
-    const div=document.createElement('div');div.className='person';
-    div.innerHTML=`<h3><i style="background:${p.cor}"></i>${esc(p.nome)}</h3><div class="role">${esc(papeis||'Sem entregas registradas')}</div>
-      <div class="pstats"><div><b>${fmt(d3.sum(ent,t=>t.peso),0)}</b><span>pontos</span></div><div><b>${ent.length}</b><span>entregas</span></div><div><b style="color:${aj?'var(--coral)':'inherit'}">${exec.length?fmt(aj/exec.length*100,0)+'%':'—'}</b><span>voltou p/ ajuste</span></div><div><b>${abertas}</b><span>abertas agora</span></div></div>`;
-    host.appendChild(div);
-    // tira de contribuição (12 semanas)
-    const W=div.clientWidth-32, cell=Math.max(8,Math.min(22,Math.floor((W-20)/12)-3)), gp=3;
-    const porDia=d3.rollup(mine.filter(t=>t.feita&&t.fim>=+ini),v=>d3.sum(v,t=>t.peso),t=>+d3.timeDay.floor(new Date(t.fim)));
-    const max=d3.max([...porDia.values()])||1;
-    const col=d3.scaleLinear().domain([0,max]).range(['#16437f',p.cor]);
-    const svg=d3.select(div).append('svg').attr('width',12*(cell+gp)+30).attr('height',7*(cell+gp)+18).attr('role','img').attr('aria-label',`Pontos por dia de ${p.nome} nas últimas 12 semanas`);
-    ['S','T','Q','Q','S','S','D'].forEach((d,i)=>{if(i%2===0)svg.append('text').attr('x',0).attr('y',i*(cell+gp)+cell-1).attr('fill','#7095C8').attr('font-size',10).text(d)});
-    const semana0=d3.timeMonday.floor(ini);
-    for(let d=new Date(semana0);d<fim;d=d3.timeDay.offset(d,1)){
-      const w=d3.timeMonday.count(semana0,d); if(w>11)break; const wd=(d.getDay()+6)%7; const v=porDia.get(+d)||0;
-      svg.append('rect').attr('x',16+w*(cell+gp)).attr('y',wd*(cell+gp)).attr('width',cell).attr('height',cell).attr('rx',2).attr('fill',v?col(v):'#133a70').attr('stroke',d3.timeDay.floor(new Date())*1===+d?'#EAF2FF':null)
-        .on('mousemove',ev=>tip(ev,`<b>${d3.timeFormat('%a %d/%m')(d)}</b><br>${v?fmt(v)+' pontos':'nada entregue'}`)).on('mouseleave',untip);
-    }
-    svg.append('text').attr('x',16).attr('y',7*(cell+gp)+13).attr('fill','#7095C8').attr('font-size',10).text(fdata(semana0));
-    svg.append('text').attr('x',16+12*(cell+gp)-gp).attr('y',7*(cell+gp)+13).attr('text-anchor','end').attr('fill','#7095C8').attr('font-size',10).text('hoje');
-  }
+    const papeis=d3.rollups(ent,v=>v.length,t=>t.papel).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${PAPEL[k]} ${Math.round(v/Math.max(1,ent.length)*100)}%`).join(' · ');
+    return `<div class="pcard" style="--c:${p.cor}"><h3>${esc(p.nome)}</h3><div class="role">${esc(papeis||'Sem entregas no período')}</div>
+      <div class="pstats"><div><b>${fmt(d3.sum(ent,t=>t.peso),0)}</b><span>pontos</span></div><div><b>${ent.length}</b><span>entregas</span></div><div><b style="color:${aj?'var(--coral)':'inherit'}">${exec.length?fmt(aj/exec.length*100,0)+'%':'—'}</b><span>voltou p/ ajuste</span></div><div><b>${abertas}</b><span>abertas agora</span></div></div></div>`;
+  }).join('');
+  linha(ts,lista);
+}
+function linha(ts,lista){
+  const host=document.getElementById('linha');host.innerHTML='';
+  const span=(F.fim-F.ini)/DAY; const iv=span<=15?d3.timeDay:span<=200?d3.timeMonday:d3.timeMonth;
+  document.getElementById('gran').textContent=iv===d3.timeDay?'dia':iv===d3.timeMonday?'semana (a partir de segunda)':'mês';
+  const b0=iv.floor(new Date(F.ini)), bins=iv.range(b0,new Date(F.fim+1));
+  if(!bins.length)return;
+  const series=lista.map(p=>{const m=d3.rollup(ts.filter(t=>t.feita&&t.assignees.includes(p.id)&&noPeriodo(t.fim)),v=>({pts:d3.sum(v,t=>t.peso),n:v.length}),t=>+iv.floor(new Date(t.fim)));
+    return {p,vals:bins.map(d=>({d,pts:(m.get(+d)||{pts:0}).pts,n:(m.get(+d)||{n:0}).n}))}});
+  const W=host.clientWidth, Hh=260, m={l:44,r:16,t:16,b:30};
+  const x=d3.scaleTime().domain([bins[0],bins[bins.length-1]]).range([m.l,W-m.r]);
+  const y=d3.scaleLinear().domain([0,Math.max(1,d3.max(series,s=>d3.max(s.vals,v=>v.pts)))]).nice().range([Hh-m.b,m.t]);
+  const svg=d3.select(host).append('svg').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Pontos entregues por período e pessoa');
+  y.ticks(5).forEach(v=>{svg.append('line').attr('x1',m.l).attr('x2',W-m.r).attr('y1',y(v)).attr('y2',y(v)).attr('stroke','#41454D');svg.append('text').attr('x',m.l-8).attr('y',y(v)+4).attr('text-anchor','end').attr('fill','#7D838D').attr('font-size',11).text(v)});
+  const fmtX=iv===d3.timeMonth?(d=>MESC[d.getMonth()]+' '+String(d.getFullYear()).slice(2)):d3.timeFormat('%d/%m');
+  const nt=Math.max(2,Math.min(bins.length,Math.floor((W-m.l-m.r)/70)));const passo=Math.ceil(bins.length/nt);
+  bins.forEach((d,i)=>{if(i%passo===0)svg.append('text').attr('x',x(d)).attr('y',Hh-10).attr('text-anchor','middle').attr('fill','#7D838D').attr('font-size',11).text(fmtX(d))});
+  const ln=d3.line().x(v=>x(v.d)).y(v=>y(v.pts)).curve(d3.curveMonotoneX);
+  series.forEach(s=>{svg.append('path').attr('d',ln(s.vals)).attr('fill','none').attr('stroke',s.p.cor).attr('stroke-width',2.5);
+    if(bins.length<=60)svg.append('g').selectAll('circle').data(s.vals).join('circle').attr('cx',v=>x(v.d)).attr('cy',v=>y(v.pts)).attr('r',3).attr('fill',s.p.cor)});
+  // guia ao passar o mouse
+  const guia=svg.append('line').attr('y1',m.t).attr('y2',Hh-m.b).attr('stroke','#A7ACB5').attr('stroke-dasharray','3 3').attr('opacity',0);
+  svg.append('rect').attr('x',m.l).attr('y',m.t).attr('width',W-m.l-m.r).attr('height',Hh-m.t-m.b).attr('fill','transparent')
+    .on('mousemove',ev=>{const [mx]=d3.pointer(ev);const i=Math.max(0,Math.min(bins.length-1,d3.bisectCenter(bins.map(d=>x(d)),mx)));const d=bins[i];guia.attr('x1',x(d)).attr('x2',x(d)).attr('opacity',1);
+      tip(ev,`<b>${iv===d3.timeMonth?MES[d.getMonth()]+' '+d.getFullYear():iv===d3.timeDay?fdLong(+d):'Semana de '+fdata(d)}</b>`+series.map(s=>`<br><span style="color:${s.p.cor}">●</span> ${esc(s.p.curto)}: ${fmt(s.vals[i].pts,0)} pts (${s.vals[i].n} tasks)`).join(''))})
+    .on('mouseleave',()=>{guia.attr('opacity',0);untip()});
+  const lg=svg.append('g').attr('transform',`translate(${m.l+6},${m.t+4})`);let lx=0;
+  series.forEach(s=>{lg.append('rect').attr('x',lx).attr('y',-8).attr('width',14).attr('height',3).attr('fill',s.p.cor);lg.append('text').attr('x',lx+19).attr('y',-3).attr('fill','#ECEDEF').attr('font-size',12).text(s.p.curto);lx+=s.p.curto.length*7.5+40});
 }
 
 function lead(dem){
@@ -402,27 +505,27 @@ function lead(dem){
   const x=d3.scaleLog().domain([Math.max(.5,Math.min(sla/4,d3.min(vals)/1.4)),Math.max(sla*3,d3.max(vals)*1.15)]).range([left,W-right]);
   const svg=d3.select(host).append('svg').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Horas da edição pronta até a infra entregue, por squad');
   const ticks=[.5,1,2,4,8,12,24,48,72,120,168,336,720].filter(v=>v>=x.domain()[0]&&v<=x.domain()[1]);
-  ticks.forEach(v=>{svg.append('line').attr('x1',x(v)).attr('x2',x(v)).attr('y1',top-6).attr('y2',Hh-12).attr('stroke','#2F5E9C').attr('stroke-dasharray',v===24||v===168?null:'2 4');svg.append('text').attr('x',x(v)).attr('y',top-10).attr('text-anchor','middle').attr('fill','#7095C8').attr('font-size',10.5).text(v<1?'30min':v<48?v+'h':v/24+'d')});
-  svg.append('line').attr('x1',x(sla)).attr('x2',x(sla)).attr('y1',top-6).attr('y2',Hh-12).attr('stroke','#FFD23F').attr('stroke-width',2);
+  ticks.forEach(v=>{svg.append('line').attr('x1',x(v)).attr('x2',x(v)).attr('y1',top-6).attr('y2',Hh-12).attr('stroke','#41454D').attr('stroke-dasharray',v===24||v===168?null:'2 4');svg.append('text').attr('x',x(v)).attr('y',top-10).attr('text-anchor','middle').attr('fill','#7D838D').attr('font-size',10.5).text(v<1?'30min':v<48?v+'h':v/24+'d')});
+  svg.append('line').attr('x1',x(sla)).attr('x2',x(sla)).attr('y1',top-6).attr('y2',Hh-12).attr('stroke','#F4B740').attr('stroke-width',2);
   grupos.forEach(([sq,arr],i)=>{
     const cy=top+i*rowH+rowH/2;
-    svg.append('text').attr('x',0).attr('y',cy-4).attr('fill','#EAF2FF').attr('font-weight',600).attr('font-size',13).text(sq.length>20?sq.slice(0,19)+'…':sq);
+    svg.append('text').attr('x',0).attr('y',cy-4).attr('fill','#ECEDEF').attr('font-weight',600).attr('font-size',13).text(sq.length>20?sq.slice(0,19)+'…':sq);
     const med=d3.median(arr,d=>d.lead);
-    svg.append('text').attr('x',0).attr('y',cy+13).attr('fill','#A9C2E6').attr('font-size',11.5).text(`${arr.length} · mediana ${fmtH(med)}`);
+    svg.append('text').attr('x',0).attr('y',cy+13).attr('fill','#A7ACB5').attr('font-size',11.5).text(`${arr.length} · mediana ${fmtH(med)}`);
     // beeswarm simples por empilhamento
     const pts=arr.map(d=>({d,x:x(Math.max(.5,d.lead))})).sort((a,b)=>a.x-b.x);const placed=[];
     pts.forEach(p=>{let dy=0,k=0;while(placed.some(q=>Math.abs(q.x-p.x)<9&&Math.abs(q.dy-dy)<9)){k++;dy=(k%2?1:-1)*Math.ceil(k/2)*8;if(k>12)break}p.dy=dy;placed.push(p)});
     pts.forEach(p=>{const d=p.d, pe=dono(d.exec);
-      svg.append('a').attr('href',d.url).attr('target','_blank').attr('rel','noopener').append('circle').attr('cx',p.x).attr('cy',cy+p.dy).attr('r',4.5).attr('fill',pe.cor).attr('stroke',d.ajustes?'#FF6B5A':'#0B2A55').attr('stroke-width',d.ajustes?2:1)
+      svg.append('a').attr('href',d.url).attr('target','_blank').attr('rel','noopener').append('circle').attr('cx',p.x).attr('cy',cy+p.dy).attr('r',4.5).attr('fill',pe.cor).attr('stroke',d.ajustes?'#F0706A':'#2E3137').attr('stroke-width',d.ajustes?2:1)
        .on('mousemove',ev=>tip(ev,`<b>${esc(d.nome)}</b><br>${esc(sq)} · ${esc(d.categoria)}<br>Edição → infra: <b>${fmtH(d.lead)}</b><br>Executado por ${esc(pe.nome)}${d.ajustes?`<br><b style="color:#c0392b">${d.ajustes} ajuste(s)</b>`:''}`)).on('mouseleave',untip)});
-    svg.append('path').attr('d',`M${x(Math.max(.5,med))},${cy-20} v40`).attr('stroke','#EAF2FF').attr('stroke-width',2.5);
+    svg.append('path').attr('d',`M${x(Math.max(.5,med))},${cy-20} v40`).attr('stroke','#ECEDEF').attr('stroke-width',2.5);
   });
-  svg.append('text').attr('x',x(sla)+5).attr('y',Hh-2).attr('fill','#FFD23F').attr('font-size',11).text(`meta ${sla} h`);
+  svg.append('text').attr('x',x(sla)+5).attr('y',Hh-2).attr('fill','#F4B740').attr('font-size',11).text(`meta ${sla} h`);
 }
 
 function anatomia(ent){
   const host=document.getElementById('anat');host.innerHTML='';
-  const grupos=[['fila','Na fila',FILA,'#4A7CC0'],['fazendo','Fazendo',FAZ,'#6EE7A8'],['ajuste','Em ajuste',AJ,'#FF6B5A'],['revisao','Em revisão',REV,'#FFD23F']];
+  const grupos=[['fila','Na fila',FILA,'#7C8DA6'],['fazendo','Fazendo',FAZ,'#6FD6A0'],['ajuste','Em ajuste',AJ,'#F0706A'],['revisao','Em revisão',REV,'#F4B740']];
   // horas por status; a fila é o que sobra do tempo total (edição pronta → entregue, ou criada → entregue)
   const quebra=t=>{const h=re=>d3.sum(Object.entries(t.tempos).filter(([s])=>re.test(s)),([,v])=>v)/60;
     const faz=h(FAZ),aj=h(AJ),rev=h(REV);const tot=t.lead_edicao_h!=null?t.lead_edicao_h:Math.max(0,(t.fim-t.criado)/H);
@@ -438,13 +541,13 @@ function anatomia(ent){
   const svg=d3.select(host).append('svg').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Média de horas por status');
   lista.forEach((r,i)=>{
     const y=i*(bh+30)+6;let acc=0;
-    svg.append('text').attr('x',0).attr('y',y+bh/2+5).attr('fill','#EAF2FF').attr('font-weight',600).text(r.p.curto);
+    svg.append('text').attr('x',0).attr('y',y+bh/2+5).attr('fill','#ECEDEF').attr('font-weight',600).text(r.p.curto);
     grupos.forEach(([k,l,,c])=>{const v=r.m[k];if(v<=0)return;svg.append('rect').attr('x',left+x(acc)).attr('y',y).attr('width',Math.max(1,x(v)-1)).attr('height',bh).attr('fill',c).on('mousemove',ev=>tip(ev,`<b>${esc(r.p.nome)}</b><br>${l}: ${fmtH(v)} em média`)).on('mouseleave',untip);acc+=v});
-    svg.append('text').attr('x',left+x(acc)+6).attr('y',y+bh/2+5).attr('fill','#A9C2E6').attr('font-size',12).text(r.n?fmtH(acc):'—');
-    svg.append('text').attr('x',left).attr('y',y+bh+15).attr('fill','#7095C8').attr('font-size',11).text(r.n?`${r.n} entregas · ${Math.round(r.usaFazendo/r.n*100)}% passaram por "fazendo"`:'sem entregas no período');
+    svg.append('text').attr('x',left+x(acc)+6).attr('y',y+bh/2+5).attr('fill','#A7ACB5').attr('font-size',12).text(r.n?fmtH(acc):'—');
+    svg.append('text').attr('x',left).attr('y',y+bh+15).attr('fill','#7D838D').attr('font-size',11).text(r.n?`${r.n} entregas · ${Math.round(r.usaFazendo/r.n*100)}% passaram por "fazendo"`:'sem entregas no período');
   });
   const lg=svg.append('g').attr('transform',`translate(${left},${Hh-10})`);let lx=0;
-  grupos.forEach(([,l,,c])=>{lg.append('rect').attr('x',lx).attr('y',-9).attr('width',10).attr('height',10).attr('fill',c);lg.append('text').attr('x',lx+14).attr('y',0).attr('fill','#A9C2E6').attr('font-size',11).text(l);lx+=l.length*6.5+30});
+  grupos.forEach(([,l,,c])=>{lg.append('rect').attr('x',lx).attr('y',-9).attr('width',10).attr('height',10).attr('fill',c);lg.append('text').attr('x',lx+14).attr('y',0).attr('fill','#A7ACB5').attr('font-size',11).text(l);lx+=l.length*6.5+30});
   const tot=d3.sum(lista,r=>r.n), faz=d3.sum(lista,r=>r.usaFazendo);
   document.getElementById('anat-note').textContent=tot&&faz/tot<.5?`Atenção: só ${Math.round(faz/tot*100)}% das entregas passaram pelo status "fazendo". Sem isso, "na fila" mistura espera com execução e o tempo real de trabalho não aparece.`:'';
 }
@@ -461,9 +564,9 @@ function motivos(ts){
   const x=d3.scaleLinear().domain([0,d3.max(cont,d=>d[1])]).range([0,W-left-40]);
   const svg=d3.select(host).append('svg').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Motivos de ajuste');
   cont.forEach(([m,v],i)=>{const y=i*(bh+gap);
-    svg.append('text').attr('x',0).attr('y',y+bh/2+5).attr('fill','#EAF2FF').attr('font-size',13).text(m);
-    svg.append('rect').attr('x',left).attr('y',y).attr('width',Math.max(2,x(v))).attr('height',bh).attr('fill',i===0?'#FF6B5A':'rgba(255,107,90,.55)');
-    svg.append('text').attr('x',left+x(v)+6).attr('y',y+bh/2+5).attr('fill','#A9C2E6').attr('font-weight',700).text(v)});
+    svg.append('text').attr('x',0).attr('y',y+bh/2+5).attr('fill','#ECEDEF').attr('font-size',13).text(m);
+    svg.append('rect').attr('x',left).attr('y',y).attr('width',Math.max(2,x(v))).attr('height',bh).attr('fill',i===0?'#F0706A':'rgba(240,112,106,.5)');
+    svg.append('text').attr('x',left+x(v)+6).attr('y',y+bh/2+5).attr('fill','#A7ACB5').attr('font-weight',700).text(v)});
 }
 function feed(ts){
   const el=document.getElementById('feed');const aj=ajustesDe(ts).slice(0,40);
@@ -480,15 +583,15 @@ function cats(ts,ent){
   const x=d3.scaleLinear().domain([0,d3.max(rows,r=>r[1].pts)]).range([0,Math.max(60,W-left-right-100)]);
   const svg=d3.select(host).append('svg').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Entregas por tipo de demanda');
   const cx=[W-right+10,W-right+10+colW,W-right+10+2*colW];
-  ['Peso','Tempo real','Voltou p/ ajuste'].forEach((h,i)=>svg.append('text').attr('x',cx[i]).attr('y',12).attr('fill','#7095C8').attr('font-size',11).text(h));
-  svg.append('text').attr('x',left).attr('y',12).attr('fill','#7095C8').attr('font-size',11).text('Pontos entregues (tasks)');
+  ['Peso','Tempo real','Voltou p/ ajuste'].forEach((h,i)=>svg.append('text').attr('x',cx[i]).attr('y',12).attr('fill','#7D838D').attr('font-size',11).text(h));
+  svg.append('text').attr('x',left).attr('y',12).attr('fill','#7D838D').attr('font-size',11).text('Pontos entregues (tasks)');
   rows.forEach(([c,r],i)=>{const y=24+i*(bh+gap);
-    svg.append('text').attr('x',0).attr('y',y+bh/2+5).attr('fill','#EAF2FF').attr('font-size',13).text(c);
-    svg.append('rect').attr('x',left).attr('y',y).attr('width',Math.max(2,x(r.pts))).attr('height',bh).attr('fill','#EAF2FF').attr('opacity',.85);
-    svg.append('text').attr('x',left+x(r.pts)+6).attr('y',y+bh/2+5).attr('fill','#A9C2E6').attr('font-size',12).text(`${fmt(r.pts,0)} (${r.n})`);
-    svg.append('text').attr('x',cx[0]).attr('y',y+bh/2+5).attr('fill','#EAF2FF').attr('font-weight',700).text(fmt(r.peso));
-    svg.append('text').attr('x',cx[1]).attr('y',y+bh/2+5).attr('fill','#EAF2FF').text(fmtH(r.h));
-    svg.append('text').attr('x',cx[2]).attr('y',y+bh/2+5).attr('fill',r.aj?'#FF6B5A':'#A9C2E6').text(r.n?Math.round(r.aj/r.n*100)+'%':'—');
+    svg.append('text').attr('x',0).attr('y',y+bh/2+5).attr('fill','#ECEDEF').attr('font-size',13).text(c);
+    svg.append('rect').attr('x',left).attr('y',y).attr('width',Math.max(2,x(r.pts))).attr('height',bh).attr('fill','#ECEDEF').attr('opacity',.85);
+    svg.append('text').attr('x',left+x(r.pts)+6).attr('y',y+bh/2+5).attr('fill','#A7ACB5').attr('font-size',12).text(`${fmt(r.pts,0)} (${r.n})`);
+    svg.append('text').attr('x',cx[0]).attr('y',y+bh/2+5).attr('fill','#ECEDEF').attr('font-weight',700).text(fmt(r.peso));
+    svg.append('text').attr('x',cx[1]).attr('y',y+bh/2+5).attr('fill','#ECEDEF').text(fmtH(r.h));
+    svg.append('text').attr('x',cx[2]).attr('y',y+bh/2+5).attr('fill',r.aj?'#F0706A':'#A7ACB5').text(r.n?Math.round(r.aj/r.n*100)+'%':'—');
   });
 }
 
@@ -533,7 +636,7 @@ async function load(){
   try{
     const r=await fetch('data.json?'+Date.now(),{cache:'no-store'});const d=await r.json();
     for(const t of d.tasks){t.url='https://app.clickup.com/t/'+t.id;if(t.pai_id)t.pai_url='https://app.clickup.com/t/'+t.pai_id;t.assignees=t.assignees||[];t.tempos=t.tempos||{};t.ajustes=t.ajustes||[];t.n_ajustes=t.n_ajustes||0;t.feita=!!t.feita;t.cancelada=!!t.cancelada;t.peso=t.peso||1}
-    const primeira=!DATA; DATA=d; P=d.pessoas; P.forEach(p=>PC[p.id]=p);
+    const primeira=!DATA; DATA=d; const COR={112049379:'#4FC3E8',118125018:'#A98BFA',118123716:'#F4B740'}; P=d.pessoas.map(p=>({...p,cor:COR[p.id]||p.cor})); P.forEach(p=>PC[p.id]=p);
     const s=document.getElementById('stamp');const ago=(Date.now()-Date.parse(d.sincronizado_em||d.gerado_em))/6e4;
     s.textContent=d.modo==='exemplo'?'Dados de exemplo, aguardando a 1ª sincronização':new Date(d.sincronizado_em||d.gerado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+(ago<90?', ao vivo':', atrasado')+(d.completo===false?' · carga inicial em andamento':'');
     s.className=d.modo==='exemplo'||ago>=90?'stale':'live';
