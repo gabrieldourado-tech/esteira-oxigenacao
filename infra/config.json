@@ -1,23 +1,74 @@
 {
   "_leia": "Configuração do painel de Infra. Pode editar direto no GitHub: categorias (primeira regra que bater vence), peso de cada categoria, palavras que marcam ajuste e motivos de erro. Os textos são comparados sem acento e em minúsculas.",
   "pessoas": [
-    { "id": 112049379, "nome": "Vini Malvas", "curto": "Malvas", "cor": "#22D3EE" },
-    { "id": 118125018, "nome": "Pablo Gabriel", "curto": "Pablo", "cor": "#A78BFA" },
-    { "id": 118123716, "nome": "Luis Alexandre Bueno", "curto": "Luis", "cor": "#FBBF24" }
+    {
+      "id": 112049379,
+      "nome": "Vini Malvas",
+      "curto": "Malvas",
+      "cor": "#22D3EE"
+    },
+    {
+      "id": 118125018,
+      "nome": "Pablo Gabriel",
+      "curto": "Pablo",
+      "cor": "#A78BFA"
+    },
+    {
+      "id": 118123716,
+      "nome": "Luis Alexandre Bueno",
+      "curto": "Luis",
+      "cor": "#FBBF24"
+    }
   ],
   "categorias": [
-    { "nome": "Rotina / planilha", "regex": "planilha|preenchimento|relatorio|semanal" },
-    { "nome": "Troca de pote", "regex": "troca de pote|troca pote" },
-    { "nome": "Fluxo de e-mail", "regex": "mailbroad|e-?mail|\\bsms\\b" },
-    { "nome": "Links de checkout", "regex": "links? de checkout|checkout links?" },
-    { "nome": "Troca de botão / link", "regex": "botao|\\bcta\\b|troca de link|trocar link|redirect" },
-    { "nome": "Fluxo de upsell", "regex": "fluxo de upsell|upsell|downsell|order ?bump" },
-    { "nome": "Cadastro de produto", "regex": "criar produto|cadastr|subir .*(cartpanda|buygoods|digistore)|onboarding|novo produto" },
-    { "nome": "Tracking / pixel", "regex": "pixel|\\butm|tracking|\\bgtm\\b|tag manager" },
-    { "nome": "Configuração de página", "regex": "configura.*pagina|pagina|landing|presell|\\blp\\b|layout" },
-    { "nome": "Microlead / Lead", "regex": "microlead|\\blead" },
-    { "nome": "VSL / Funil", "regex": "\\bvsl|funil|oferta" },
-    { "nome": "Anúncios", "regex": "\\bads?\\b|anuncio|criativo|hook|\\bbtc\\b" }
+    {
+      "nome": "Rotina / planilha",
+      "regex": "planilha|preenchimento|relatorio|semanal"
+    },
+    {
+      "nome": "Troca de pote",
+      "regex": "troca de pote|troca pote"
+    },
+    {
+      "nome": "Fluxo de e-mail",
+      "regex": "mailbroad|e-?mail|\\bsms\\b"
+    },
+    {
+      "nome": "Links de checkout",
+      "regex": "links? de checkout|checkout links?"
+    },
+    {
+      "nome": "Troca de botão / link",
+      "regex": "botao|\\bcta\\b|troca de link|trocar link|redirect"
+    },
+    {
+      "nome": "Fluxo de upsell",
+      "regex": "fluxo de upsell|upsell|downsell|order ?bump"
+    },
+    {
+      "nome": "Cadastro de produto",
+      "regex": "criar produto|cadastr|subir .*(cartpanda|buygoods|digistore)|onboarding|novo produto"
+    },
+    {
+      "nome": "Tracking / pixel",
+      "regex": "pixel|\\butm|tracking|\\bgtm\\b|tag manager"
+    },
+    {
+      "nome": "Configuração de página",
+      "regex": "configura.*pagina|pagina|landing|presell|\\blp\\b|layout"
+    },
+    {
+      "nome": "Microlead / Lead",
+      "regex": "microlead|\\blead"
+    },
+    {
+      "nome": "VSL / Funil",
+      "regex": "\\bvsl|funil|oferta"
+    },
+    {
+      "nome": "Anúncios",
+      "regex": "\\bads?\\b|anuncio|criativo|hook|\\bbtc\\b"
+    }
   ],
   "pesos": {
     "Rotina / planilha": 1,
@@ -34,7 +85,12 @@
     "Microlead / Lead": 3,
     "VSL / Funil": 5
   },
-  "multiplicador_papel": { "execucao": 1, "demanda": 1, "revisao": 0.5, "deploy": 0.3 },
+  "multiplicador_papel": {
+    "execucao": 1,
+    "demanda": 1,
+    "revisao": 0.5,
+    "deploy": 0.3
+  },
   "sla_horas": 24,
   "plataformas": {
     "Cartpanda": "cartpanda|\\bcp\\b",
@@ -47,15 +103,48 @@
   },
   "ajuste_regex": "ajust|corrig|errad|\\berro\\b|refaz|nao (esta|ta|funciona|abre|carrega)|quebr|faltou|faltando|\\bbug\\b|problema|incorret|retrabalho|voltou",
   "motivos": [
-    { "nome": "Link / redirect", "regex": "link|redirect|redireciona|\\burl\\b|afid|rota" },
-    { "nome": "Checkout / preço", "regex": "checkout|preco|valor|\\bsku\\b|carrinho|\\bcart\\b|parcela|frete|\\$" },
-    { "nome": "Pixel / tracking", "regex": "pixel|track|\\butm|\\btag\\b|evento|\\bgtm\\b|conversao" },
-    { "nome": "Vídeo / VSL", "regex": "video|\\bvsl|vturb|player|pitch|vazarato|delay" },
-    { "nome": "Imagem / pote", "regex": "imagem|mockup|foto|garrafa|rotulo|thumb|png|jpe?g" },
-    { "nome": "Texto / copy", "regex": "texto|\\bcopy|escrit|ortograf|digita|headline|titulo|nome do produto" },
-    { "nome": "Botão / layout", "regex": "botao|layout|mobile|responsiv|\\bcss\\b|alinh|fonte|\\bcor\\b|design|espaco" },
-    { "nome": "Upsell / fluxo", "regex": "upsell|downsell|fluxo|order ?bump|sequencia" },
-    { "nome": "Produto / plataforma", "regex": "buygoods|cartpanda|digistore|produto|codename|account_?id|plataforma|cadastro" },
-    { "nome": "E-mail", "regex": "e-?mail|mailbroad|\\bsms\\b" }
-  ]
+    {
+      "nome": "Link / redirect",
+      "regex": "link|redirect|redireciona|\\burl\\b|afid|rota"
+    },
+    {
+      "nome": "Checkout / preço",
+      "regex": "checkout|preco|valor|\\bsku\\b|carrinho|\\bcart\\b|parcela|frete|\\$"
+    },
+    {
+      "nome": "Pixel / tracking",
+      "regex": "pixel|track|\\butm|\\btag\\b|evento|\\bgtm\\b|conversao"
+    },
+    {
+      "nome": "Vídeo / VSL",
+      "regex": "video|\\bvsl|vturb|player|pitch|vazarato|delay"
+    },
+    {
+      "nome": "Imagem / pote",
+      "regex": "imagem|mockup|foto|garrafa|rotulo|thumb|png|jpe?g"
+    },
+    {
+      "nome": "Texto / copy",
+      "regex": "texto|\\bcopy|escrit|ortograf|digita|headline|titulo|nome do produto"
+    },
+    {
+      "nome": "Botão / layout",
+      "regex": "botao|layout|mobile|responsiv|\\bcss\\b|alinh|fonte|\\bcor\\b|design|espaco"
+    },
+    {
+      "nome": "Upsell / fluxo",
+      "regex": "upsell|downsell|fluxo|order ?bump|sequencia"
+    },
+    {
+      "nome": "Produto / plataforma",
+      "regex": "buygoods|cartpanda|digistore|produto|codename|account_?id|plataforma|cadastro"
+    },
+    {
+      "nome": "E-mail",
+      "regex": "e-?mail|mailbroad|\\bsms\\b"
+    }
+  ],
+  "janela_detalhe_dias": 120,
+  "janela_dados_dias": 365,
+  "orcamento_minutos": 22
 }

@@ -16,6 +16,9 @@ const OUT = path.join(DIR, 'data.json');
 const CACHE = path.join(DIR, 'cache.json');
 const CONFIG = JSON.parse(fs.readFileSync(path.join(DIR, 'config.json'), 'utf8'));
 const PESSOAS = CONFIG.pessoas; // [{id, nome, cor}]
+const JANELA_DIAS = CONFIG.janela_detalhe_dias || 120;   // comentários e task-mãe só para tasks mexidas nesse período ou abertas
+const ORCAMENTO_MS = (CONFIG.orcamento_minutos || 22) * 60e3; // tempo máximo por rodada; o resto continua na próxima
+const JANELA_DADOS_DIAS = CONFIG.janela_dados_dias || 365;
 const IDS = PESSOAS.map((p) => String(p.id));
 
 if (!TOKEN && !process.env.MOCK_API) { console.error('Falta o segredo CLICKUP_TOKEN.'); process.exit(1); }
@@ -114,15 +117,20 @@ function ehAjuste(texto, autorId, assigneeIds) {
   // 1) todas as tasks e subtasks das 3 pessoas, abertas e fechadas
   const brutas = new Map();
   const qsA = IDS.map((id) => `assignees[]=${id}`).join('&');
-  for (let page = 0; page < 60; page++) {
+  for (let page = 0; page < 150; page++) {
     const res = await api(`/team/${TEAM}/task?${qsA}&include_closed=true&subtasks=true&order_by=updated&page=${page}`);
     for (const t of res.tasks || []) brutas.set(t.id, t);
     if (res.last_page !== false || !(res.tasks || []).length) break;
   }
   console.log(`Tasks encontradas: ${brutas.size}`);
 
+  const corte = Date.now() - JANELA_DIAS * 864e5;
+  const recente = (t) => !fechada(t) || Number(t.date_updated) >= corte;
   const mudou = (t) => !cache.tasks[t.id] || cache.tasks[t.id].upd !== String(t.date_updated);
-  const novas = [...brutas.values()].filter(mudou);
+  // mais recentes primeiro: se o orçamento acabar, o que falta é o mais antigo
+  const novas = [...brutas.values()].filter(mudou).sort((a, b) => Number(b.date_updated) - Number(a.date_updated));
+  const estourou = () => Date.now() - t0 > ORCAMENTO_MS;
+  let pendentes = 0;
   console.log(`Novas ou alteradas desde a última rodada: ${novas.length}`);
 
   // 2) tempo em cada status (em lotes de 100)
@@ -142,13 +150,17 @@ function ehAjuste(texto, autorId, assigneeIds) {
     }
   }
 
-  // 3) comentários (só das tasks novas/alteradas)
+  // 3) comentários: só nas tasks de execução (onde o ajuste é comentado) e recentes
   for (const t of novas) {
     let coms = [];
-    try {
-      const res = await api(`/task/${t.id}/comment`);
-      coms = res.comments || [];
-    } catch (e) { console.log('Comentários indisponíveis em', t.id, e.message); }
+    const querComentario = recente(t) && papelDe(t.name, !!t.parent) !== 'revisao' && papelDe(t.name, !!t.parent) !== 'deploy';
+    if (querComentario) {
+      if (estourou()) { pendentes++; continue; } // fica para a próxima rodada (upd não é gravado)
+      try {
+        const res = await api(`/task/${t.id}/comment`);
+        coms = res.comments || [];
+      } catch (e) { console.log('Comentários indisponíveis em', t.id, e.message); }
+    }
     const assignees = (t.assignees || []).map((a) => String(a.id));
     cache.tasks[t.id].coms = coms.map((c) => {
       const texto = textoComentario(c);
@@ -163,9 +175,10 @@ function ehAjuste(texto, autorId, assigneeIds) {
 
   // 4) tasks-mãe (para ler a subtask de edição e montar o lead time edição → infra)
   const paisPrecisam = new Set();
-  for (const t of brutas.values()) if (t.parent && (mudou(t) || !cache.pais[t.parent] || !fechada(t))) paisPrecisam.add(t.parent);
-  for (const t of novas) if (t.parent) paisPrecisam.add(t.parent);
+  for (const t of brutas.values()) if (t.parent && recente(t) && (!cache.pais[t.parent] || !fechada(t) || (cache.tasks[t.id] && cache.tasks[t.id].paiUpd !== String(t.date_updated)))) paisPrecisam.add(t.parent);
+  console.log(`Tasks-mãe para ler: ${paisPrecisam.size}`);
   for (const pid of paisPrecisam) {
+    if (estourou()) { pendentes++; continue; }
     try {
       const p = await api(`/task/${pid}?include_subtasks=true`);
       cache.pais[pid] = {
@@ -175,13 +188,16 @@ function ehAjuste(texto, autorId, assigneeIds) {
         tipo_tarefa: campo(p.custom_fields, 'Tipo de Tarefa'), classificacao: campo(p.custom_fields, 'Classifica'),
         subs: (p.subtasks || []).map((s) => ({ id: s.id, nome: limpa(s.name), status: statusNome(s.status), tipo: statusTipo(s.status), fim: fim(s), criado: num(s.date_created) })),
       };
-    } catch (e) { console.log('Mãe indisponível', pid, e.message); }
+    } catch (e) { console.log('Mãe indisponível', pid, e.message); cache.pais[pid] = cache.pais[pid] || { nome: null, subs: [] }; }
   }
+  for (const t of brutas.values()) if (t.parent && cache.pais[t.parent] && cache.tasks[t.id]) cache.tasks[t.id].paiUpd = String(t.date_updated);
   // descobrir campos que a busca do time não traz completos (squad/pasta) já vêm no objeto da task.
 
   // 5) monta as linhas
   const tasks = [];
+  const corteDados = Date.now() - JANELA_DADOS_DIAS * 864e5;
   for (const t of brutas.values()) {
+    if (fechada(t) && Number(t.date_updated) < corteDados) continue;
     const c = cache.tasks[t.id] || {};
     const pai = t.parent ? cache.pais[t.parent] : null;
     const nome = limpa(t.name);
@@ -203,13 +219,12 @@ function ehAjuste(texto, autorId, assigneeIds) {
     const n_ajustes = Math.max(comsAj.length, qtdCampo || 0, passouAjuste || reaberta ? 1 : 0);
 
     // edição → infra
-    let edicao_fim = null, lead_edicao_h = null, irmaos = null;
+    let edicao_fim = null, lead_edicao_h = null;
     if (pai) {
       const ed = pai.subs.filter((s) => /edi[cç][aã]o|editar v[ií]deo/i.test(s.nome) && s.fim);
       if (ed.length) edicao_fim = Math.max(...ed.map((s) => s.fim));
       const f = fim(t);
       if (edicao_fim && f && feita(t)) lead_edicao_h = Math.round(((f - edicao_fim) / 36e5) * 10) / 10;
-      irmaos = pai.subs.map((s) => ({ nome: s.nome, status: s.status, fim: s.fim }));
     }
     const lista = t.list && t.list.name;
     const pasta = t.folder && t.folder.name;
@@ -229,7 +244,7 @@ function ehAjuste(texto, autorId, assigneeIds) {
       tempos, reaberta, passou_ajuste: passouAjuste, min_ajuste: minAjuste, n_ajustes,
       ajustes: comsAj.map((x) => ({ data: x.data, autor: x.autor, texto: x.texto, motivos: x.motivos })),
       n_comentarios: (c.coms || []).length,
-      edicao_fim, lead_edicao_h, irmaos,
+      edicao_fim, lead_edicao_h,
     });
   }
 
@@ -239,7 +254,8 @@ function ehAjuste(texto, autorId, assigneeIds) {
   for (const id of Object.keys(cache.pais)) if (!paisUsados.has(id)) delete cache.pais[id];
 
   const agora = new Date().toISOString();
-  fs.writeFileSync(OUT, JSON.stringify({ gerado_em: agora, sincronizado_em: agora, modo: 'real', pessoas: PESSOAS, config: { pesos: CONFIG.pesos, multiplicador_papel: CONFIG.multiplicador_papel, sla_horas: CONFIG.sla_horas }, tasks }));
+  fs.writeFileSync(OUT, JSON.stringify({ gerado_em: agora, sincronizado_em: agora, modo: 'real', completo: pendentes === 0, pendentes, pessoas: PESSOAS, config: { pesos: CONFIG.pesos, multiplicador_papel: CONFIG.multiplicador_papel, sla_horas: CONFIG.sla_horas }, tasks }));
   fs.writeFileSync(CACHE, JSON.stringify(cache));
+  console.log(`Ficou para a próxima rodada: ${pendentes}`);
   console.log(`infra/data.json gravado: ${tasks.length} tasks · ${chamadas} chamadas · ${Math.round((Date.now() - t0) / 1000)}s`);
 })().catch((e) => { console.error(e.stack || e.message); process.exit(1); });
