@@ -10,11 +10,12 @@ permissions:
 
 concurrency:
   group: sync
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,11 +25,17 @@ jobs:
         run: node sync.js
         env:
           CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
-      - name: Salvar data.json
+      - name: Puxar tasks do time de Infra
+        continue-on-error: true
+        run: node infra/sync-infra.js
+        env:
+          CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
+      - name: Salvar dados
         run: |
-          if git diff --quiet -- data.json; then echo "Sem mudanças"; exit 0; fi
+          for f in data.json infra/data.json infra/cache.json; do if [ -f "$f" ]; then git add "$f"; fi; done
+          if git diff --cached --quiet; then echo "Sem mudanças"; exit 0; fi
           git config user.name "esteira-bot"
           git config user.email "esteira-bot@users.noreply.github.com"
-          git add data.json
-          git commit -m "Atualiza dados da esteira"
+          git commit -m "Atualiza dados dos painéis"
+          git pull --rebase -X theirs || true
           git push
