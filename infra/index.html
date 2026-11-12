@@ -333,7 +333,7 @@ svg [data-list]:hover{opacity:.82}
     </div>
 
     <section class="strip" id="strip" aria-label="Destaques"></section>
-    <div class="foot"><span>Fonte: 100% das tasks de Vini Malvas, Pablo Gabriel e Luis Alexandre no ClickUp. Tipo e complexidade vêm do nome da task e da task mãe (regras em infra/config.json).</span><span>Atualiza sozinho a cada 5 minutos</span></div>
+    <div class="foot"><span>Fonte: 100% das tasks de Vini Malvas, Pablo Gabriel e Luis Alexandre no ClickUp. Tipo e complexidade vêm do nome da task e da task mãe (regras em infra/config.json).</span><span>Os dados do ClickUp são atualizados de 2 em 2 horas</span></div>
   </main>
 </div>
 <div class="tip" id="tip" role="tooltip"></div>
@@ -439,7 +439,7 @@ function montaFiltros(){
   montaPeriodo();
   const pe=document.getElementById('f-pessoa');
   const sem=P.filter(p=>p.id!==112049379);
-  pe.innerHTML='<option value="">Todos</option>'+P.map(p=>`<option value="${p.id}">${esc(p.curto)}</option>`).join('')+(sem.length>1?`<option value="${sem.map(p=>p.id).join(',')}">${sem.map(p=>esc(p.curto)).join(' + ')} (sem Malvas)</option>`:'');
+  pe.innerHTML='<option value="">Todos</option>'+(sem.length>1?`<option value="${sem.map(p=>p.id).join(',')}">${sem.map(p=>esc(p.curto)).join(' + ')} (sem Malvas)</option>`:'')+P.map(p=>`<option value="${p.id}">${esc(p.curto)}</option>`).join('');
   pe.onchange=()=>{F.pessoas=pe.value?pe.value.split(',').map(Number):null;render()};
   const sq=document.getElementById('f-squad'), squads=[...new Set(DATA.tasks.map(t=>t.squad).filter(Boolean))].sort();
   sq.innerHTML='<option value="">Todos</option>'+squads.map(s=>`<option>${esc(s)}</option>`).join('');sq.onchange=()=>{F.squad=sq.value;render()};
@@ -772,7 +772,7 @@ async function load(){
     for(const t of d.tasks){t.url='https://app.clickup.com/t/'+t.id;if(t.pai_id)t.pai_url='https://app.clickup.com/t/'+t.pai_id;t.assignees=t.assignees||[];t.tempos=t.tempos||{};t.ajustes=t.ajustes||[];t.n_ajustes=t.n_ajustes||0;t.feita=!!t.feita;t.cancelada=!!t.cancelada;t.peso=t.peso||1}
     const primeira=!DATA; DATA=d; P=d.pessoas.map(p=>({...p,cor:COR[p.id]||p.cor}));
     const s=document.getElementById('stamp'),ago=(Date.now()-Date.parse(d.sincronizado_em||d.gerado_em))/6e4;
-    s.innerHTML=d.modo==='exemplo'?'<span class="stale">Dados de exemplo, aguardando a 1ª sincronização</span>':`Atualizado ${new Date(d.sincronizado_em||d.gerado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})} · <span class="${ago<90?'live':'stale'}">${ago<90?'ao vivo':'atrasado'}</span>${d.completo===false?' · carga inicial em andamento':''}`;
+    s.innerHTML=d.modo==='exemplo'?'<span class="stale">Dados de exemplo, aguardando a 1ª sincronização</span>':`Atualizado ${new Date(d.sincronizado_em||d.gerado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})} · <span class="${ago<150?'live':'stale'}">${ago<150?'atualiza de 2 em 2 horas':'atualização atrasada'}</span>${d.completo===false?' · carga inicial em andamento':''}`;
     if(primeira)montaFiltros();
     render();
   }catch(e){document.getElementById('lede').textContent='Não consegui ler os dados agora. Tento de novo em 5 minutos.';console.error(e)}
