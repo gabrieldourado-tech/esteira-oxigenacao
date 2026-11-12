@@ -1,0 +1,36 @@
+name: Atualizar painel Funnel Ops (Infra)
+
+on:
+  schedule:
+    - cron: '7 */2 * * *'   # a cada 2 horas
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync
+  cancel-in-progress: false
+
+jobs:
+  sync-infra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Puxar tasks do time de Infra
+        run: node infra/sync-infra.js
+        env:
+          CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
+      - name: Salvar dados
+        run: |
+          for f in infra/data.json infra/cache.json; do if [ -f "$f" ]; then git add "$f"; fi; done
+          if git diff --cached --quiet; then echo "Sem mudanças"; exit 0; fi
+          git config user.name "esteira-bot"
+          git config user.email "esteira-bot@users.noreply.github.com"
+          git commit -m "Atualiza dados do Funnel Ops"
+          git pull --rebase -X theirs || true
+          git push
