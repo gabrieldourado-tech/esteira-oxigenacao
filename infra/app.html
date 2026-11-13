@@ -56,6 +56,10 @@ a{color:inherit}
 .btn-o{height:32px;border:0;border-radius:6px;background:var(--panel);color:var(--fg);font:inherit;font-size:12.5px;font-weight:700;padding:0 12px;cursor:pointer;border:1px solid var(--line-2)}
 .btn-o[aria-pressed="true"]{background:var(--orange);border-color:var(--orange);color:#1a0d02}
 .stamp{color:var(--faint);font-size:11.5px;margin-top:6px;text-align:right}
+.upd{display:inline-flex;align-items:center;gap:8px;margin-top:8px;background:var(--panel);border:1px solid var(--line-2);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--soft)}
+.upd b{color:var(--fg)}
+.upd i{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block}
+.upd.stale i{background:var(--amber)}
 .stamp .live{color:var(--green)} .stamp .stale{color:var(--amber)}
 
 /* ---------- seletor de período (estilo Looker Studio, compacto) ---------- */
@@ -244,7 +248,7 @@ svg [data-list]:hover{opacity:.82}
 
   <main class="main" id="visao">
     <div class="top">
-      <div><h1>FUNNEL OPS — TEAM MALVAS</h1><div class="sub" id="lede">Carregando as tasks do ClickUp…</div></div>
+      <div><h1>FUNNEL OPS — TEAM MALVAS</h1><div class="sub" id="lede">Carregando as tasks do ClickUp…</div><div class="upd" id="upd"><i></i><span>Carregando…</span></div></div>
       <div>
         <div class="ctrls">
           <div class="dp" id="dp">
@@ -776,6 +780,10 @@ async function load(){
     const primeira=!DATA; DATA=d; P=d.pessoas.map(p=>({...p,cor:COR[p.id]||p.cor}));
     const s=document.getElementById('stamp'),ago=(Date.now()-Date.parse(d.sincronizado_em||d.gerado_em))/6e4;
     s.innerHTML=d.modo==='exemplo'?'<span class="stale">Dados de exemplo, aguardando a 1ª sincronização</span>':`Atualizado ${new Date(d.sincronizado_em||d.gerado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})} · <span class="${ago<150?'live':'stale'}">${ago<150?'atualiza de 2 em 2 horas':'atualização atrasada'}</span>${d.completo===false?' · carga inicial em andamento':''}`;
+    const u=document.getElementById('upd'),dt=new Date(d.sincronizado_em||d.gerado_em),prox=new Date(+dt+2*36e5);
+    const hm=x=>x.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), dd=x=>x.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+    u.className='upd'+(ago>=150?' stale':'');
+    u.innerHTML=`<i></i><span>Última atualização dos dados: <b>${dd(dt)} às ${hm(dt)}</b> · próxima por volta das <b>${hm(prox)}</b> (atualiza de 2 em 2 horas)</span>`;
     if(primeira)montaFiltros();
     render();
   }catch(e){document.getElementById('lede').textContent='Não consegui ler os dados agora. Tento de novo em 5 minutos.';console.error(e)}
