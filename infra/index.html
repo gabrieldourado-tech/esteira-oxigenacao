@@ -186,6 +186,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 tr:hover td{background:rgba(255,255,255,.025)}
 td a{text-decoration:none} td a:hover{text-decoration:underline}
 .sub{color:var(--faint);font-size:11.5px}
+#cats td,#cats + * td{white-space:nowrap}
 .cx{letter-spacing:1px;color:var(--orange);white-space:nowrap}
 .cx i{font-style:normal;color:var(--line-2)}
 .more{margin-top:10px}
@@ -319,8 +320,8 @@ svg [data-list]:hover{opacity:.82}
         <div class="b"><div id="donut"></div></div>
       </section>
       <section class="pn c8" aria-labelledby="h-cat">
-        <header><h2 id="h-cat">TIPOS DE DEMANDA</h2><p>Complexidade de 1 a 5 (●) definida por tipo. Se o tempo real não bate com a complexidade, ajuste no config.json.</p></header>
-        <div class="b"><div class="tbl" style="max-height:330px"><table><thead><tr><th>Tipo</th><th>Entregas</th><th>Complexidade</th><th>Tempo real (mediana)</th><th>Voltou p/ ajuste</th><th>Participação</th></tr></thead><tbody id="cats"></tbody></table></div></div>
+        <header><h2 id="h-cat">TIPOS DE DEMANDA</h2><p>Conta só as implementações e demandas diretas entregues no período (revisões e deploys ficam de fora). Tempo típico = mediana: metade foi mais rápida, metade mais lenta. <b>Edição → entrega</b>: da subtask de edição feita até a task feita. <b>Demanda direta</b>: da criação ao feito, só para tasks da lista de Infra. Entre parênteses, quantas tasks deu pra medir.</p></header>
+        <div class="b"><div class="tbl" style="max-height:330px"><table><thead><tr><th>Tipo</th><th title="Implementações e demandas diretas entregues no período">Entregas</th><th title="Complexidade de 1 a 5 definida por tipo no config.json">Complexidade</th><th title="Da subtask de edição feita até esta task feita. Só para tasks com edição.">Edição → entrega</th><th title="Da criação da task até o feito. Só para demandas diretas na lista de Infra (sem task mãe).">Demanda direta</th><th>Ajuste</th><th title="Fatia deste tipo no total de entregas da tabela">% do total</th></tr></thead><tbody id="cats"></tbody></table></div></div>
       </section>
     </div>
 
@@ -712,13 +713,15 @@ function mix(ent){
     .on('mousemove',(ev,d)=>tip(ev,`<b>${esc(d.data[0])}</b><br>${d.data[1]} tasks · ${fmt(d.data[1]/ex.length*100,0)}%`)).on('mouseleave',untip);
   g.append('text').attr('text-anchor','middle').attr('y',-2).attr('fill',C.orange).attr('font-weight',800).attr('font-size',r*.32).text(fmt(rows[0][1]/ex.length*100,0)+'%');
   g.append('text').attr('text-anchor','middle').attr('y',r*.22).attr('fill',C.soft).attr('font-size',10.5).text(rows[0][0].length>16?rows[0][0].slice(0,15)+'…':rows[0][0]);
-  wrap.append('div').style('flex','1').style('min-width','0').html(rows.map((d,i)=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:3px 0;font-size:12px" data-list="${d[3]}" tabindex="0" role="button"><span class="clk" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="dot" style="background:${PAL[i%PAL.length]}"></i>${esc(d[0])}</span><b>${d[1]} · ${fmt(d[1]/ex.length*100,0)}%</b></div>`).join(''));
+  wrap.append('div').style('flex','1').style('min-width','0').html(rows.map((d,i)=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:3px 0;font-size:12px" data-list="${d[3]}" tabindex="0" role="button"><span class="clk" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="dot" style="background:${PAL[i%PAL.length]}"></i>${esc(d[0])}</span><b style="white-space:nowrap">${d[1]} · ${fmt(d[1]/ex.length*100,0)}%</b></div>`).join(''));
 }
 const bolas=p=>{const n=Math.max(1,Math.min(5,Math.round(p)));return `<span class="cx" title="Complexidade ${n} de 5">${'●'.repeat(n)}<i>${'●'.repeat(5-n)}</i></span>`};
 function cats(ent){
   const ex=execucoes(ent);
-  const rows=d3.rollups(ex,v=>{const dur=v.map(t=>t.lead_edicao_h!=null?t.lead_edicao_h:(t.fim-t.criado)/H).filter(h=>h>=0);const al=v.filter(t=>t.n_ajustes>0);return {v,n:v.length,peso:d3.median(v,t=>t.peso),h:d3.median(dur),al,aj:al.length}},t=>t.categoria).sort((a,b)=>b[1].n-a[1].n);
-  document.getElementById('cats').innerHTML=rows.length?rows.map(([c,r])=>`<tr><td><span${dl('Tipo: '+c,r.v.slice().sort((a,b)=>b.fim-a.fim))}>${esc(c)}</span></td><td class="n"><span${dl('Tipo: '+c,r.v.slice().sort((a,b)=>b.fim-a.fim))}>${r.n}</span></td><td>${bolas(r.peso)}</td><td class="n">${fmtH(r.h)}</td><td class="n" style="color:${r.aj?'#F87171':'inherit'}">${r.aj?`<span${dl(c+': voltaram para ajuste',r.al.map(t=>({t,extra:(t.ajustes||[]).map(a=>esc(a.texto)).join('<br>')||'<i>Sem comentário explicando o motivo</i>'})))}>${fmt(r.aj/r.n*100,0)}% (${r.aj})</span>`:(r.n?'0%':'—')}</td><td class="n">${fmt(r.n/ex.length*100,1)}%</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Sem entregas no período.</td></tr>';
+  const rows=d3.rollups(ex,v=>{const ed=v.filter(t=>t.lead_edicao_h!=null),dir=v.filter(t=>!t.pai_id&&t.fim&&t.criado);const al=v.filter(t=>t.n_ajustes>0);
+    return {v,n:v.length,peso:d3.median(v,t=>t.peso),ed,hEd:d3.median(ed,t=>t.lead_edicao_h),dir,hDir:d3.median(dir,t=>(t.fim-t.criado)/H),al,aj:al.length}},t=>t.categoria).sort((a,b)=>b[1].n-a[1].n);
+  const tempo=(h,arr,tit,f)=>arr.length?`<span${dl(tit,arr.slice().sort((a,b)=>f(b)-f(a)).map(t=>({t,extra:`Tempo: <b>${fmtH(f(t))}</b>`})))}>${fmtH(h)}</span> <span class="sub">(${arr.length})</span>`:'<span class="sub">—</span>';
+  document.getElementById('cats').innerHTML=rows.length?rows.map(([c,r])=>`<tr><td style="white-space:nowrap"><span${dl('Tipo: '+c,r.v.slice().sort((a,b)=>b.fim-a.fim))}>${esc(c)}</span></td><td class="n"><span${dl('Tipo: '+c,r.v.slice().sort((a,b)=>b.fim-a.fim))}>${r.n}</span></td><td>${bolas(r.peso)}</td><td class="n">${tempo(r.hEd,r.ed,c+': edição pronta → entregue',t=>t.lead_edicao_h)}</td><td class="n">${tempo(r.hDir,r.dir,c+': demanda direta aberta → entregue',t=>(t.fim-t.criado)/H)}</td><td class="n" style="color:${r.aj?'#F87171':'inherit'}">${r.aj?`<span${dl(c+': voltaram para ajuste',r.al.map(t=>({t,extra:(t.ajustes||[]).map(a=>esc(a.texto)).join('<br>')||'<i>Sem comentário explicando o motivo</i>'})))}>${fmt(r.aj/r.n*100,0)}% (${r.aj})</span>`:(r.n?'0%':'—')}</td><td class="n">${fmt(r.n/ex.length*100,1)}%</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Sem entregas no período.</td></tr>';
 }
 
 const COLS=[['nome','Task'],['pessoa','Pessoa'],['categoria','Tipo'],['peso','Complexidade'],['status','Status'],['lead','Edição → infra'],['n_ajustes','Ajustes'],['fim','Entregue']];
