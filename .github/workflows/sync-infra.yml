@@ -2,7 +2,7 @@ name: Atualizar painel Funnel Ops (Infra)
 
 on:
   schedule:
-    - cron: '7 */2 * * *'   # a cada 2 horas
+    - cron: '15,45 * * * *'   # a cada 30 minutos (defasado da esteira, que roda em :00 e :30)
   workflow_dispatch:
 
 permissions:
