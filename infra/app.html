@@ -305,7 +305,7 @@ svg [data-list]:hover{opacity:.82}
 
     <div class="grid" id="ajustes-pn">
       <section class="pn c4" aria-labelledby="h-quem">
-        <header><h2 id="h-quem">QUEM MAIS TEVE AJUSTE</h2><p>Implementações entregues no período que voltaram para corrigir.</p></header>
+        <header><h2 id="h-quem">QUEM MAIS TEVE AJUSTE</h2><p>Tasks que passaram pelo status de ajuste no período.</p></header>
         <div class="b"><div id="quem-aj"></div></div>
       </section>
       <section class="pn c4" aria-labelledby="h-mot">
@@ -313,7 +313,7 @@ svg [data-list]:hover{opacity:.82}
         <div class="b"><div id="motivos"></div></div>
       </section>
       <section class="pn c4" aria-labelledby="h-feed">
-        <header><h2 id="h-feed">ÚLTIMOS AJUSTES PEDIDOS</h2><p>Texto do comentário, sem os links.</p></header>
+        <header><h2 id="h-feed">ÚLTIMOS AJUSTES PEDIDOS</h2><p>Tasks que passaram pelo status de ajuste, da mais recente para a mais antiga. Se tiver comentário do motivo, ele aparece aqui (sem os links).</p></header>
         <div class="b"><ul class="feed" id="feed"></ul></div>
       </section>
     </div>
@@ -484,12 +484,16 @@ function demandas(ts){
   return out;
 }
 const execucoes=ts=>ts.filter(t=>t.papel==='execucao'||t.papel==='demanda');
+const ajData=t=>t.ajuste_em||t.fim||t.criado;           // quando foi para ajuste
+const foiAjuste=t=>t.n_ajustes>0;                       // passou pelo status de ajuste
+const ajustadas=(ts,a,b)=>ts.filter(t=>foiAjuste(t)&&entre(ajData(t),a,b)).sort((x,y)=>ajData(y)-ajData(x));
+const comentAj=t=>(t.ajustes||[]).map(a=>esc(a.texto)).join('<br>')||'<i>Sem comentário do motivo. Abra a task para ver.</i>';
 function resumo(ts,a,b){
   const ent=ts.filter(t=>t.feita&&entre(t.fim,a,b));
   const dem=demandas(ts).filter(d=>d.lead!=null&&entre(d.fim,a,b));
-  const ex=execucoes(ent);const aj=ex.filter(t=>t.n_ajustes>0).length;
+  const ajL=ajustadas(ts,a,b), aj=ajL.length;
   const sla=DATA.config.sla_horas||24;
-  return {ent,dem,n:ent.length,med:d3.median(dem,d=>d.lead),noSla:dem.length?dem.filter(d=>d.lead<=sla).length/dem.length*100:null,taxaAj:ex.length?aj/ex.length*100:null,aj,nEx:ex.length};
+  return {ent,dem,n:ent.length,med:d3.median(dem,d=>d.lead),noSla:dem.length?dem.filter(d=>d.lead<=sla).length/dem.length*100:null,taxaAj:ent.length?aj/ent.length*100:null,aj,ajL,nEx:ent.length};
 }
 
 /* ---------- render ---------- */
@@ -520,15 +524,15 @@ function delta(atual,ant,{bomSobe=true,un='%',pp=false}={}){
 function kpis(R,A,ab){
   const sla=DATA.config.sla_horas||24, late=ab.filter(t=>t.prazo&&t.prazo<Date.now()).length, abN=ab.filter(t=>estacao(t)!=='espera').length;
   const card=(ringH,k,v,u,d,lid)=>`<div class="kpi"${lid?` data-list="${lid}" tabindex="0" role="button" title="Ver as tasks"`:''}>${ringH||''}<div style="min-width:0"><div class="k">${k}</div><div class="v${lid?' clk':''}">${v}${u?`<small>${u}</small>`:''}</div><div class="d">${d}</div></div></div>`;
-  const agora=Date.now(), exAj=execucoes(R.ent).filter(t=>t.n_ajustes>0), forasla=R.dem.filter(d=>d.lead>sla), atr=ab.filter(t=>t.prazo&&t.prazo<agora).sort((a,b)=>a.prazo-b.prazo), and=ab.filter(t=>estacao(t)!=='espera');
+  const agora=Date.now(), exAj=R.ajL, forasla=R.dem.filter(d=>d.lead>sla), atr=ab.filter(t=>t.prazo&&t.prazo<agora).sort((a,b)=>a.prazo-b.prazo), and=ab.filter(t=>estacao(t)!=='espera');
   const L={ent:R.ent.length?reg('Tasks entregues no período',R.ent.slice().sort((a,b)=>b.fim-a.fim)):null,lead:R.dem.length?regDem('Demandas medidas: edição → infra',R.dem,'da mais demorada para a mais rápida'):null,
-    sla:forasla.length?regDem(`Demandas fora da meta de ${sla} h`,forasla):null,aj:exAj.length?reg('Implementações que voltaram para ajuste',exAj.map(t=>({t,extra:(t.ajustes||[]).map(a=>esc(a.texto)).join('<br>')||'<i>Sem comentário explicando o motivo</i>'}))):null,
+    sla:forasla.length?regDem(`Demandas fora da meta de ${sla} h`,forasla):null,aj:exAj.length?reg('Tasks que foram para ajuste no período',exAj.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}<br>${comentAj(t)}`}))):null,
     atr:atr.length?reg('Tasks abertas atrasadas',atr.map(t=>({t,extra:`Prazo era ${fdata(new Date(t.prazo))}`}))):null,and:and.length?reg('Tasks em andamento agora',and):null};
   document.getElementById('kpis').innerHTML=[
     card(ring(A.n?Math.min(100,R.n/Math.max(R.n,A.n)*100):100,C.orange),'TASKS ENTREGUES',R.n,'',delta(R.n,A.n),L.ent),
     card('', 'EDIÇÃO → INFRA', R.med==null?'—':fmtH(R.med).split(' ')[0], R.med==null?'':fmtH(R.med).split(' ')[1], R.med==null?'sem demandas medidas':delta(R.med,A.med,{bomSobe:false}),L.lead),
     card(ring(R.noSla,R.noSla>=80?C.green:R.noSla>=60?C.amber:C.red),`DENTRO DE ${sla} H`,R.noSla==null?'—':fmt(R.noSla,0),R.noSla==null?'':'%',forasla.length?`${forasla.length} fora da meta (clique)`:`${R.dem.length} demandas medidas`,L.sla),
-    card(ring(R.taxaAj,R.taxaAj>20?C.red:R.taxaAj>10?C.amber:C.green),'VOLTOU P/ AJUSTE',R.aj,'',R.taxaAj==null?'sem implementações':`${R.aj} de ${R.nEx} implementações`,L.aj),
+    card(ring(R.taxaAj,R.taxaAj>20?C.red:R.taxaAj>10?C.amber:C.green),'VOLTOU P/ AJUSTE',R.aj,'',R.aj?`${R.aj} tasks foram para ajuste`:'nenhuma foi para ajuste',L.aj),
     card(ring(abN?late/abN*100:0,C.red),'ABERTAS ATRASADAS',late,'',`de ${abN} liberadas para a infra`,L.atr),
     card('','EM ANDAMENTO AGORA',abN,'',`+ ${ab.length-abN} esperando etapa anterior`,L.and),
   ].join('');
@@ -600,7 +604,7 @@ function pessoas(ts){
     const ent=mine.filter(t=>t.feita&&noPeriodo(t.fim)), ex=execucoes(ent), aj=ex.filter(t=>t.n_ajustes>0).length;
     const ab=mine.filter(t=>estacao(t)&&estacao(t)!=='espera').length, med=d3.median(ent.filter(t=>t.lead_edicao_h!=null),t=>t.lead_edicao_h);
     const papeis=d3.rollups(ent,v=>v.length,t=>t.papel).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>`${PAPEL[k]} ${Math.round(v/Math.max(1,ent.length)*100)}%`).join(' · ');
-    const abL=mine.filter(t=>estacao(t)&&estacao(t)!=='espera'), ajL=ex.filter(t=>t.n_ajustes>0).map(t=>({t,extra:(t.ajustes||[]).map(a=>esc(a.texto)).join('<br>')||'<i>Sem comentário explicando o motivo</i>'})), ldL=ent.filter(t=>t.lead_edicao_h!=null).sort((a,b)=>b.lead_edicao_h-a.lead_edicao_h);
+    const abL=mine.filter(t=>estacao(t)&&estacao(t)!=='espera'), ajL=ex.filter(t=>t.n_ajustes>0).map(t=>({t,extra:comentAj(t)})), ldL=ent.filter(t=>t.lead_edicao_h!=null).sort((a,b)=>b.lead_edicao_h-a.lead_edicao_h);
     return {p,n:ent.length,html:`<div class="prow" style="border-left:3px solid ${p.cor}"><div class="n">${esc(p.nome)}</div><div class="r">${esc(papeis||'Sem entregas no período')}</div><div class="big"><b${dl(p.nome+': entregas no período',ent.slice().sort((a,b)=>b.fim-a.fim))}>${ent.length}</b><span>entregas</span></div>
       <div class="mini"><span>Ajustes <b style="color:${aj?'#F87171':'inherit'}"${dl(p.nome+': tasks que voltaram para ajuste',ajL)}>${aj}</b>${ex.length?` (${fmt(aj/ex.length*100,0)}%)`:''}</span><span>Abertas <b${dl(p.nome+': abertas agora',abL)}>${ab}</b></span><span>Edição → infra <b${dl(p.nome+': edição → infra',ldL)}>${fmtH(med)}</b></span></div></div>`};
   }).sort((a,b)=>b.n-a.n);
@@ -658,10 +662,10 @@ function anatomia(ent){
 /* ajustes */
 function quemAjuste(ent){
   const host=document.getElementById('quem-aj');host.innerHTML='';
-  const ex=execucoes(ent);
-  const rows=selP().map(p=>{const m=ex.filter(t=>t.assignees.includes(p.id));const al=m.filter(t=>t.n_ajustes>0);
-    return {p,a:al.length,n:m.length,lid:al.length?reg(`${p.nome}: tasks que voltaram para ajuste`,al.map(t=>({t,extra:(t.ajustes||[]).map(a=>esc(a.texto)).join('<br>')||'<i>Sem comentário explicando o motivo</i>'}))):null}}).sort((x,y)=>y.a-x.a||y.n-x.n);
-  if(!rows.some(r=>r.n)){host.innerHTML='<p class="empty">Sem implementações entregues no período.</p>';return}
+  const ajs=ajustadas(base(),F.ini,F.fim);
+  const rows=selP().map(p=>{const m=ent.filter(t=>t.assignees.includes(p.id));const al=ajs.filter(t=>t.assignees.includes(p.id));
+    return {p,a:al.length,n:m.length,lid:al.length?reg(`${p.nome}: tasks que foram para ajuste`,al.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}<br>${comentAj(t)}`}))):null}}).sort((x,y)=>y.a-x.a||y.n-x.n);
+  if(!rows.some(r=>r.n||r.a)){host.innerHTML='<p class="empty">Sem entregas nem ajustes no período.</p>';return}
   const W=host.clientWidth, bh=20, gap=16, left=64, Hh=rows.length*(bh+gap);
   const x=d3.scaleLinear().domain([0,Math.max(1,d3.max(rows,r=>r.a))]).range([0,W-left-110]);
   const svg=d3.select(host).append('svg').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Tasks com ajuste por pessoa');
@@ -671,17 +675,16 @@ function quemAjuste(ent){
     svg.append('rect').attr('x',left).attr('y',y).attr('width',W-left-110).attr('height',bh).attr('rx',4).attr('fill',C.line).attr('pointer-events','none');
     if(r.a)svg.append('rect').attr('x',left).attr('y',y).attr('width',Math.max(4,x(r.a))).attr('height',bh).attr('rx',4).attr('fill',i===0?C.red:'rgba(239,68,68,.55)').attr('pointer-events','none');
     svg.append('text').attr('x',W-104).attr('y',y+bh/2+5).attr('fill',r.a?C.orange:C.fg).attr('font-weight',800).attr('font-size',13).attr('text-decoration',r.a?'underline':null).attr('pointer-events','none').text(r.a);
-    svg.append('text').attr('x',W-86).attr('y',y+bh/2+5).attr('fill',C.faint).attr('font-size',11.5).attr('pointer-events','none').text(r.n?`de ${r.n} (${fmt(r.a/r.n*100,0)}%)`:'—');
+    svg.append('text').attr('x',W-86).attr('y',y+bh/2+5).attr('fill',C.faint).attr('font-size',11.5).attr('pointer-events','none').text(r.n?`${fmt(r.a/r.n*100,0)}% de ${r.n}`:'—');
   });
 }
-function ajustesDe(ts){const out=[];ts.forEach(t=>(t.ajustes||[]).forEach(a=>{if(noPeriodo(a.data))out.push({...a,t})}));return out.sort((a,b)=>b.data-a.data)}
+function ajustesDe(ts){const out=[];ajustadas(ts,F.ini,F.fim).forEach(t=>(t.ajustes||[]).forEach(a=>out.push({...a,t})));return out.sort((a,b)=>b.data-a.data)}
 function motivos(ts){
   const host=document.getElementById('motivos');host.innerHTML='';
   const aj=ajustesDe(ts);
-  const semCom=ts.filter(t=>t.n_ajustes>0&&!(t.ajustes||[]).length&&noPeriodo(t.fim||t.criado)).length;
-  const semComL=ts.filter(t=>t.n_ajustes>0&&!(t.ajustes||[]).length&&noPeriodo(t.fim||t.criado));
-  document.getElementById('motivos-sub').innerHTML=`${aj.length} comentários de ajuste no período`+(semCom?` · <span style="color:#FCD34D"${dl('Voltaram para ajuste sem motivo escrito',semComL)}>${semCom} ajustes sem motivo escrito</span>`:'')+' · clique no número para ver as tasks';
-  if(!aj.length){host.innerHTML='<p class="empty">Nenhum comentário de ajuste no período. Comente na subtask de implementação começando com "Ajuste:" e o motivo.</p>';return}
+  const semComL=ajustadas(ts,F.ini,F.fim).filter(t=>!(t.ajustes||[]).length), semCom=semComL.length;
+  document.getElementById('motivos-sub').innerHTML=`${aj.length} comentários de ajuste no período`+(semCom?` · <span style="color:#FCD34D"${dl('Foram para ajuste sem motivo escrito',semComL.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}`})))}>${semCom} ajustes sem motivo escrito</span>`:'')+' · clique no número para ver as tasks';
+  if(!aj.length){host.innerHTML=`<p class="empty">Nenhum motivo escrito nos ajustes do período. Ao mandar para ajuste, comente na subtask começando com "Ajuste:" e o motivo.</p>`;return}
   const porM=d3.group(aj.flatMap(a=>a.motivos.map(m=>({m,a}))),d=>d.m);
   const cont=[...porM].map(([m,v])=>[m,v.length,reg(`Voltou para ajuste: ${m}`,v.map(({a})=>({t:a.t,extra:`“${esc(a.texto)}” — ${esc(a.autor)}, ${fdh(new Date(a.data))}`})))]).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const W=host.clientWidth, bh=18, gap=9, left=Math.min(140,W*.45), Hh=cont.length*(bh+gap);
@@ -695,9 +698,12 @@ function motivos(ts){
     g.append('text').attr('x',left+x(v)+6).attr('y',y+bh/2+4).attr('fill',C.orange).attr('font-weight',800).attr('font-size',12.5).attr('text-decoration','underline').text(v)});
 }
 function feed(ts){
-  const aj=ajustesDe(ts).slice(0,40);
-  document.getElementById('feed').innerHTML=aj.length?aj.map(a=>{const p=dono(a.t);return `<li><div class="q">“${esc(a.texto)}”</div><div class="meta"><span><i class="dot" style="background:${p.cor}"></i><a href="${esc(a.t.url)}" target="_blank" rel="noopener">${esc(a.t.pai_nome||a.t.nome)}</a></span><span>por ${esc(a.autor)} · ${fdh(new Date(a.data))}</span>${a.motivos.map(m=>`<span class="tag">${esc(m)}</span>`).join('')}</div></li>`}).join(''):'<li class="empty">Sem ajustes comentados no período.</li>';
+  const lista=ajustadas(ts,F.ini,F.fim).slice(0,50);
+  document.getElementById('feed').innerHTML=lista.length?lista.map(t=>{const p=dono(t),cs=t.ajustes||[];return `<li><div class="q"><a href="${esc(t.url)}" target="_blank" rel="noopener" style="font-weight:700;text-decoration:none">${esc(t.pai_nome?t.pai_nome+' → '+t.nome:t.nome)} ↗</a></div>
+    ${cs.length?cs.map(a=>`<div class="q" style="color:var(--soft);margin-top:3px">“${esc(a.texto)}” <span class="sub">— ${esc(a.autor)}, ${fdh(new Date(a.data))}</span></div>`).join(''):'<div class="sub" style="margin-top:3px">Sem comentário do motivo</div>'}
+    <div class="meta"><span><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}</span><span>${esc(t.squad||t.lista||'')}</span><span>foi para ajuste em ${fdh(new Date(ajData(t)))}</span><span>status agora: ${esc(t.status)}</span>${[...new Set(cs.flatMap(a=>a.motivos))].map(m=>`<span class="tag">${esc(m)}</span>`).join('')}</div></li>`}).join(''):'<li class="empty">Nenhuma task foi para ajuste no período.</li>';
 }
+
 
 /* tipos de demanda */
 const PAL=[C.orange,C.blue,'#22D3EE',C.purple,C.green,C.amber,'#F472B6','#94A3B8'];
@@ -725,7 +731,7 @@ function cats(ent){
   const rows=d3.rollups(ex,v=>{const ed=v.filter(t=>t.lead_edicao_h!=null),dir=v.filter(t=>!t.pai_id&&t.fim&&t.criado);const al=v.filter(t=>t.n_ajustes>0);
     return {v,n:v.length,peso:d3.median(v,t=>t.peso),ed,hEd:d3.median(ed,t=>t.lead_edicao_h),dir,hDir:d3.median(dir,t=>(t.fim-t.criado)/H),al,aj:al.length}},t=>t.categoria).sort((a,b)=>b[1].n-a[1].n);
   const tempo=(h,arr,tit,f)=>arr.length?`<span${dl(tit,arr.slice().sort((a,b)=>f(b)-f(a)).map(t=>({t,extra:`Tempo: <b>${fmtH(f(t))}</b>`})))}>${fmtH(h)}</span> <span class="sub">(${arr.length})</span>`:'<span class="sub">—</span>';
-  document.getElementById('cats').innerHTML=rows.length?rows.map(([c,r])=>`<tr><td style="white-space:nowrap"><span${dl('Tipo: '+c,r.v.slice().sort((a,b)=>b.fim-a.fim))}>${esc(c)}</span></td><td class="n"><span${dl('Tipo: '+c,r.v.slice().sort((a,b)=>b.fim-a.fim))}>${r.n}</span></td><td>${bolas(r.peso)}</td><td class="n">${tempo(r.hEd,r.ed,c+': edição pronta → entregue',t=>t.lead_edicao_h)}</td><td class="n">${tempo(r.hDir,r.dir,c+': demanda direta aberta → entregue',t=>(t.fim-t.criado)/H)}</td><td class="n" style="color:${r.aj?'#F87171':'inherit'}">${r.aj?`<span${dl(c+': voltaram para ajuste',r.al.map(t=>({t,extra:(t.ajustes||[]).map(a=>esc(a.texto)).join('<br>')||'<i>Sem comentário explicando o motivo</i>'})))}>${fmt(r.aj/r.n*100,0)}% (${r.aj})</span>`:(r.n?'0%':'—')}</td><td class="n">${fmt(r.n/ex.length*100,1)}%</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Sem entregas no período.</td></tr>';
+  document.getElementById('cats').innerHTML=rows.length?rows.map(([c,r])=>`<tr><td style="white-space:nowrap"><span${dl('Tipo: '+c,r.v.slice().sort((a,b)=>b.fim-a.fim))}>${esc(c)}</span></td><td class="n"><span${dl('Tipo: '+c,r.v.slice().sort((a,b)=>b.fim-a.fim))}>${r.n}</span></td><td>${bolas(r.peso)}</td><td class="n">${tempo(r.hEd,r.ed,c+': edição pronta → entregue',t=>t.lead_edicao_h)}</td><td class="n">${tempo(r.hDir,r.dir,c+': demanda direta aberta → entregue',t=>(t.fim-t.criado)/H)}</td><td class="n" style="color:${r.aj?'#F87171':'inherit'}">${r.aj?`<span${dl(c+': voltaram para ajuste',r.al.map(t=>({t,extra:comentAj(t)})))}>${fmt(r.aj/r.n*100,0)}% (${r.aj})</span>`:(r.n?'0%':'—')}</td><td class="n">${fmt(r.n/ex.length*100,1)}%</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Sem entregas no período.</td></tr>';
 }
 
 const COLS=[['nome','Task'],['pessoa','Pessoa'],['categoria','Tipo'],['peso','Complexidade'],['status','Status'],['lead','Edição → infra'],['n_ajustes','Ajustes'],['fim','Entregue']];
@@ -760,7 +766,7 @@ function destaques(ts,R,ab){
   const it=(c,p,k,v,d,lid)=>`<div class="hl"${lid?` data-list="${lid}" tabindex="0" role="button"`:''}>${ic(c,p)}<div><div class="k">${k}</div><div class="v${lid?' clk':''}">${v}</div><div class="d">${d}</div></div></div>`;
   const lTop=top&&top.n?reg(`${top.p.nome}: entregas no período`,R.ent.filter(t=>t.assignees.includes(top.p.id)).sort((a,b)=>b.fim-a.fim)):null;
   const lSq=sqLento?regDem(`${sqLento[0]}: demandas medidas`,R.dem.filter(d=>(d.squad||'Sem squad')===sqLento[0])):null;
-  const lCat=catAj?reg(`${catAj[0]}: voltaram para ajuste`,ex.filter(t=>t.categoria===catAj[0]&&t.n_ajustes>0).map(t=>({t,extra:(t.ajustes||[]).map(a=>esc(a.texto)).join('<br>')||'<i>Sem comentário explicando o motivo</i>'}))):null;
+  const lCat=catAj?reg(`${catAj[0]}: voltaram para ajuste`,ex.filter(t=>t.categoria===catAj[0]&&t.n_ajustes>0).map(t=>({t,extra:comentAj(t)}))):null;
   const lFila=fila?reg(`Fila de ${fila[0]}`,ab.filter(t=>estacao(t)==='fila'&&dono(t).curto===fila[0])):null;
   const lPrazo=semPrazo?reg('Abertas sem prazo',ab.filter(t=>estacao(t)!=='espera'&&!t.prazo)):null;
   document.getElementById('strip').innerHTML=[

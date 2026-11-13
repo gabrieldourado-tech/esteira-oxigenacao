@@ -229,8 +229,12 @@ function classifica(texto) {
     const passouAjuste = hist.some((h) => /ajust/.test(h.s));
     const comsAj = (c.coms || []).filter((x) => x.ajuste);
     const qtdCampo = num(campo(cfs, 'Quantidade de Altera'));
+    // ajuste só conta se a task passou pelo status de ajuste (ou foi reaberta depois de feita)
+    const voltou = passouAjuste || reaberta;
     const confirmacoes = (c.coms || []).filter((x) => x.confirmou).length;
-    const n_ajustes = Math.max(comsAj.length, confirmacoes, qtdCampo || 0, passouAjuste || reaberta ? 1 : 0);
+    const n_ajustes = voltou ? Math.max(1, comsAj.length, confirmacoes) : 0;
+    const desdeAj = hist.filter((h) => /ajust/.test(h.s) && h.desde).map((h) => h.desde);
+    const ajuste_em = voltou ? (desdeAj.length ? Math.max(...desdeAj) : (reaberta ? Number(t.date_updated) : null)) : null;
 
     // edição → infra
     let edicao_fim = null, lead_edicao_h = null, tem_edicao = false, antes_da_edicao = false;
@@ -261,7 +265,8 @@ function classifica(texto) {
       assignees: (t.assignees || []).map((a) => a.id).filter((id) => IDS.includes(String(id))),
       criado: num(t.date_created), inicio: num(t.start_date), prazo: num(t.due_date), fim: fim(t),
       tempos, reaberta, passou_ajuste: passouAjuste, min_ajuste: minAjuste, n_ajustes,
-      ajustes: comsAj.map((x) => ({ data: x.data, autor: x.autor, texto: x.texto, motivos: x.motivos })),
+      ajustes: voltou ? comsAj.map((x) => ({ data: x.data, autor: x.autor, texto: x.texto, motivos: x.motivos })) : [],
+      ajuste_em,
       n_comentarios: (c.coms || []).length,
       edicao_fim, lead_edicao_h, tem_edicao, antes_da_edicao,
     }));
