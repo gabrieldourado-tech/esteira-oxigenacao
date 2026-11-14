@@ -785,11 +785,12 @@ async function load(){
     for(const t of d.tasks){t.url='https://app.clickup.com/t/'+t.id;if(t.pai_id)t.pai_url='https://app.clickup.com/t/'+t.pai_id;t.assignees=t.assignees||[];t.tempos=t.tempos||{};t.ajustes=t.ajustes||[];t.n_ajustes=t.n_ajustes||0;t.feita=!!t.feita;t.cancelada=!!t.cancelada;t.peso=t.peso||1}
     const primeira=!DATA; DATA=d; P=d.pessoas.map(p=>({...p,cor:COR[p.id]||p.cor}));
     const s=document.getElementById('stamp'),ago=(Date.now()-Date.parse(d.sincronizado_em||d.gerado_em))/6e4;
-    s.innerHTML=d.modo==='exemplo'?'<span class="stale">Dados de exemplo, aguardando a 1ª sincronização</span>':`Atualizado ${new Date(d.sincronizado_em||d.gerado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})} · <span class="${ago<60?'live':'stale'}">${ago<60?'atualiza de 30 em 30 minutos':'atualização atrasada'}</span>${d.completo===false?' · carga inicial em andamento':''}`;
+    s.innerHTML=d.modo==='exemplo'?'<span class="stale">Dados de exemplo, aguardando a 1ª sincronização</span>':`Atualizado ${new Date(d.sincronizado_em||d.gerado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})} · <span class="${ago<45?'live':'stale'}">${ago<45?'atualiza de 30 em 30 minutos':'atualização atrasada'}</span>${d.completo===false?' · carga inicial em andamento':''}`;
     const u=document.getElementById('upd'),dt=new Date(d.sincronizado_em||d.gerado_em),prox=new Date(+dt+30*6e4);
     const hm=x=>x.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), dd=x=>x.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-    u.className='upd'+(ago>=60?' stale':'');
-    u.innerHTML=`<i></i><span>Última atualização dos dados: <b>${dd(dt)} às ${hm(dt)}</b> · próxima por volta das <b>${hm(prox)}</b> (atualiza de 30 em 30 minutos)</span>`;
+    const haM=Math.max(0,Math.round(ago)), ha=haM<60?`há ${haM} min`:`há ${Math.floor(haM/60)} h ${String(haM%60).padStart(2,'0')} min`;
+    u.className='upd'+(ago>=45?' stale':'');
+    u.innerHTML=`<i></i><span>Última atualização dos dados: <b>${dd(dt)} às ${hm(dt)}</b> (${ha}) · `+(ago<30?`próxima por volta das <b>${hm(prox)}</b>`:ago<45?'próxima a qualquer momento':'<b>atualização atrasada</b>, o GitHub ainda não rodou o robô')+` · atualiza de 30 em 30 minutos</span>`;
     if(primeira)montaFiltros();
     render();
   }catch(e){document.getElementById('lede').textContent='Não consegui ler os dados agora. Tento de novo em 5 minutos.';console.error(e)}
