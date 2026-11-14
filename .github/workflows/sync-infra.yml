@@ -1,15 +1,17 @@
 name: Atualizar painel Funnel Ops (Infra)
 
+# O GitHub atrasa e às vezes pula horários agendados. Por isso o robô "acorda" a cada 10 minutos
+# e só puxa o ClickUp se a última atualização tiver 25 minutos ou mais: na prática fica de 30 em 30 min.
 on:
   schedule:
-    - cron: '15,45 * * * *'   # a cada 30 minutos (defasado da esteira, que roda em :00 e :30)
+    - cron: '5,15,25,35,45,55 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: sync
+  group: sync-infra
   cancel-in-progress: false
 
 jobs:
@@ -21,16 +23,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Ver se já está na hora
+        id: hora
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "rodar=sim" >> "$GITHUB_OUTPUT"; exit 0; fi
+          node -e "const d=require('./infra/data.json');const m=(Date.now()-Date.parse(d.sincronizado_em||0))/6e4;console.log('minutos desde a ultima atualizacao:',Math.round(m));require('fs').appendFileSync(process.env.GITHUB_OUTPUT,'rodar='+(m>=25?'sim':'nao')+'\n')"
       - name: Puxar tasks do time de Infra
+        if: steps.hora.outputs.rodar == 'sim'
         run: node infra/sync-infra.js
         env:
           CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
       - name: Salvar dados
+        if: steps.hora.outputs.rodar == 'sim'
         run: |
           for f in infra/data.json infra/cache.json; do if [ -f "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "Sem mudanças"; exit 0; fi
           git config user.name "esteira-bot"
           git config user.email "esteira-bot@users.noreply.github.com"
           git commit -m "Atualiza dados do Funnel Ops"
-          git pull --rebase -X theirs || true
-          git push
+          for i in 1 2 3 4; do git pull --rebase -X theirs && git push && exit 0; sleep 7; done
+          exit 1

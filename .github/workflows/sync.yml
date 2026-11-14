@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: sync
+  group: sync-esteira
   cancel-in-progress: false
 
 jobs:
@@ -32,5 +32,5 @@ jobs:
           git config user.name "esteira-bot"
           git config user.email "esteira-bot@users.noreply.github.com"
           git commit -m "Atualiza dados da esteira"
-          git pull --rebase -X theirs || true
-          git push
+          for i in 1 2 3 4; do git pull --rebase -X theirs && git push && exit 0; sleep 7; done
+          exit 1
