@@ -841,7 +841,7 @@ function prepara(t){t.url='https://app.clickup.com/t/'+t.id;if(t.pai_id)t.pai_ur
 /* ---------- sincronizar agora: lê o ClickUp na hora (Google Apps Script) ---------- */
 // O robô publica a cada minuto. O botão pula essa espera: pergunta direto ao ClickUp o que mudou
 // e aplica por cima. Quando o robô publica uma versão mais nova, ela substitui o que veio daqui.
-const SYNC_URL='';
+const SYNC_URL='https://script.google.com/macros/s/AKfycbwdVps3bBQxGFzZK2otBJOH00-_qZW5Ilb7OJhxfkOqmAsZsGw3-mrBCKV0SmEf4rLy/exec';
 const PATCH=new Map(), EDP=new Map(); let AOVIVO=null, VIVO=true;
 const papelDeNome=n=>{n=String(n||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();return /revis/.test(n)?'revisao':/subir no apolo|apolo|deploy|publicar/.test(n)?'deploy':'execucao'};
 function aplicaPatches(){
