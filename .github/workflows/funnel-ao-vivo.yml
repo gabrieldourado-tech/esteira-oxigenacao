@@ -1,0 +1,40 @@
+name: Funnel Ops ao vivo (1 em 1 minuto)
+
+# O robô fica ligado das 6h à meia-noite (Fortaleza) atualizando o painel a cada minuto.
+# O GitHub encerra cada turno em 6h; no fim de cada turno ele se religa sozinho.
+# O agendamento de hora em hora é só uma rede de segurança caso ele pare.
+on:
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: funnel-ao-vivo
+  cancel-in-progress: false
+
+jobs:
+  ao-vivo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Robô ao vivo
+        run: node infra/live-infra.js
+        env:
+          CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
+          INFRA_OUT: /tmp/infra-data.json
+          DURACAO_MIN: '340'
+      - name: Religar o robô para o próximo turno
+        if: always()
+        run: |
+          H=$(TZ=America/Fortaleza date +%-H)
+          if [ "$H" -ge 6 ]; then gh workflow run funnel-ao-vivo.yml --ref main; else echo "Fora do horário, o agendamento religa às 6h"; fi
+        env:
+          GH_TOKEN: ${{ github.token }}
