@@ -266,7 +266,7 @@ svg [data-list]:hover{opacity:.82}
           <label class="ctl">Squad:<select id="f-squad"></select></label>
           <label class="ctl">Tipo:<select id="f-cat"></select></label>
           <button class="btn-o" id="f-erros" aria-pressed="false">Só com ajuste</button>
-          <button class="btn-o" id="sync" title="Busca agora os dados mais recentes. O robô confere o ClickUp a cada 1 minuto." style="background:var(--orange);border-color:var(--orange);color:#1a0d02">↻ Sincronizar</button>
+          <button class="btn-o" id="sync" title="Lê o ClickUp agora e atualiza o painel na hora." style="background:var(--orange);border-color:var(--orange);color:#1a0d02">↻ Sincronizar</button>
         </div>
         <div class="stamp" id="stamp">—</div>
       </div>
@@ -815,27 +815,75 @@ function selo(d,vivo){
   const msg=ok?'o robô confere o ClickUp a cada 1 minuto':madrugada?'robô pausado da meia-noite às 6h':vivo?'<b>atualização atrasada</b>, o robô deve voltar em instantes':'modo reserva (robô ao vivo fora do ar)';
   const u=document.getElementById('upd');u.className='upd'+(ok||madrugada?'':' stale');
   const hms=x=>x.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  u.innerHTML=`<i></i><span>Dados do ClickUp de <b>${dd(dt)} às ${hm(dt)}</b> (${ha}) · ${msg}${VERIF?` · painel conferido às ${hms(VERIF)}`:''}</span>`;
+  u.innerHTML=AOVIVO&&AOVIVO>dt?`<i></i><span><b>Sincronizado direto do ClickUp às ${hms(AOVIVO)}</b> · o robô confere o ClickUp a cada 1 minuto</span>`:`<i></i><span>Dados do ClickUp de <b>${dd(dt)} às ${hm(dt)}</b> (${ha}) · ${msg}${VERIF?` · painel conferido às ${hms(VERIF)}`:''}</span>`;
   document.getElementById('stamp').innerHTML=`Atualizado ${dd(dt)} ${hm(dt)} · <span class="${ok?'live':'stale'}">${ok?'ao vivo':'atrasado'}</span>`;
 }
 let CARREGANDO=false;
 async function load(){
-  if(CARREGANDO)return;CARREGANDO=true;const bt=document.getElementById('sync');if(bt){bt.disabled=true;bt.textContent='Sincronizando…'}
+  if(CARREGANDO)return;CARREGANDO=true;
   try{
     const {txt,vivo}=await busca();const d=JSON.parse(txt);VERIF=new Date();
     const assin=JSON.stringify(d.tasks);
     if(assin!==ASSIN){
       ASSIN=assin;
-      for(const t of d.tasks){t.url='https://app.clickup.com/t/'+t.id;if(t.pai_id)t.pai_url='https://app.clickup.com/t/'+t.pai_id;t.assignees=t.assignees||[];t.tempos=t.tempos||{};t.ajustes=t.ajustes||[];t.n_ajustes=t.n_ajustes||0;t.feita=!!t.feita;t.cancelada=!!t.cancelada;t.peso=t.peso||1}
+      for(const t of d.tasks)prepara(t);
       const primeira=!DATA; DATA=d; P=d.pessoas.map(p=>({...p,cor:COR[p.id]||p.cor}));
       if(primeira)montaFiltros();
+      aplicaPatches();
       render();
     }else{DATA.sincronizado_em=d.sincronizado_em}
-    selo(d,vivo);
+    VIVO=vivo;selo(d,vivo);
   }catch(e){document.getElementById('lede').textContent='Não consegui ler os dados agora. Tento de novo em 1 minuto.';console.error(e)}
-  finally{CARREGANDO=false;if(bt){bt.disabled=false;bt.textContent='↻ Sincronizar'}}
+  finally{CARREGANDO=false}
 }
-document.getElementById('sync').onclick=()=>load();
+function prepara(t){t.url='https://app.clickup.com/t/'+t.id;if(t.pai_id)t.pai_url='https://app.clickup.com/t/'+t.pai_id;t.assignees=t.assignees||[];t.tempos=t.tempos||{};t.ajustes=t.ajustes||[];t.n_ajustes=t.n_ajustes||0;t.feita=!!t.feita;t.cancelada=!!t.cancelada;t.peso=t.peso||1;return t}
+
+/* ---------- sincronizar agora: lê o ClickUp na hora (Google Apps Script) ---------- */
+// O robô publica a cada minuto. O botão pula essa espera: pergunta direto ao ClickUp o que mudou
+// e aplica por cima. Quando o robô publica uma versão mais nova, ela substitui o que veio daqui.
+const SYNC_URL='';
+const PATCH=new Map(), EDP=new Map(); let AOVIVO=null, VIVO=true;
+const papelDeNome=n=>{n=String(n||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();return /revis/.test(n)?'revisao':/subir no apolo|apolo|deploy|publicar/.test(n)?'deploy':'execucao'};
+function aplicaPatches(){
+  if(!DATA)return;
+  const corte=Date.parse(DATA.gerado_em||DATA.sincronizado_em)-90e3; // o robô já viu o que é mais velho que isso
+  for(const [k,p] of PATCH)if(p.em<corte)PATCH.delete(k);
+  for(const [k,p] of EDP)if(p.em<corte)EDP.delete(k);
+  const porId=new Map(DATA.tasks.map(t=>[t.id,t]));
+  for(const {f} of PATCH.values()){
+    let t=porId.get(f.id);
+    if(!f.assignees.length){if(t){DATA.tasks.splice(DATA.tasks.indexOf(t),1);porId.delete(f.id)}continue}
+    if(!t){ // task nova: herda classificação de uma irmã até o robô classificar
+      const irma=f.parent&&DATA.tasks.find(x=>x.pai_id===f.parent);
+      t=prepara({id:f.id,nome:String(f.nome||'').replace(/^[^\p{L}\p{N}\[]+/u,'').trim(),pai_id:f.parent,pai_nome:irma&&irma.pai_nome,papel:f.parent?papelDeNome(f.nome):'demanda',
+        categoria:irma?irma.categoria:'Outros',squad:irma?irma.squad:f.lista,lista:f.lista,tem_edicao:irma&&irma.tem_edicao,edicao_fim:irma&&irma.edicao_fim,assignees:[]});
+      DATA.tasks.push(t);porId.set(t.id,t);
+    }
+    Object.assign(t,{status:f.status,status_tipo:f.status_tipo,feita:f.feita,cancelada:f.cancelada,fim:f.fim,prazo:f.prazo,criado:f.criado||t.criado,assignees:f.assignees});
+    if(AJ.test(f.status)&&!t.n_ajustes){t.n_ajustes=1;t.passou_ajuste=true;t.ajuste_em=f.atualizado}
+  }
+  for(const {f} of EDP.values())for(const t of DATA.tasks){
+    if(t.pai_id!==f.parent)continue;
+    if(f.feita&&!t.edicao_fim){t.edicao_fim=f.fim;t.tem_edicao=true}
+    else if(!f.feita&&!f.cancelada&&t.edicao_fim&&!t.feita){t.edicao_fim=null;t.tem_edicao=true}
+  }
+  for(const t of DATA.tasks)if(t.feita&&t.fim&&t.edicao_fim&&t.lead_edicao_h==null){const h=Math.round((t.fim-t.edicao_fim)/36e5*10)/10;if(h>=0)t.lead_edicao_h=h}
+}
+async function aoVivo(){
+  if(!SYNC_URL||!DATA)return false;
+  const desde=Math.min(Date.parse(DATA.gerado_em||DATA.sincronizado_em),Date.now())-3*6e4;
+  const r=await fetch(`${SYNC_URL}?desde=${desde}&t=${Date.now()}`);const j=await r.json();
+  if(!j.ok)throw new Error(j.erro||'falhou');
+  for(const f of j.tasks)PATCH.set(f.id,{f,em:j.agora});
+  for(const f of j.edicoes)EDP.set(f.id,{f,em:j.agora});
+  AOVIVO=new Date(j.agora);aplicaPatches();render();selo(DATA,VIVO);return j.tasks.length;
+}
+document.getElementById('sync').onclick=async()=>{
+  const bt=document.getElementById('sync');if(bt.disabled)return;bt.disabled=true;bt.textContent='Sincronizando…';
+  try{await load();const n=await aoVivo();bt.textContent=n===false?'↻ Sincronizar':'✓ Sincronizado';}
+  catch(e){console.error(e);bt.textContent='Falhou, tente de novo'}
+  finally{setTimeout(()=>{bt.disabled=false;bt.textContent='↻ Sincronizar'},1500)}
+};
 load();setInterval(load,60*1000);
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>DATA&&render(),150)});
 </script>
