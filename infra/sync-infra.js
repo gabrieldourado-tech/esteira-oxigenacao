@@ -12,7 +12,7 @@ const path = require('path');
 const TOKEN = process.env.CLICKUP_TOKEN;
 const TEAM = '3076960';
 const DIR = __dirname;
-const OUT = path.join(DIR, 'data.json');
+const OUT = process.env.INFRA_OUT || path.join(DIR, 'data.json');
 const CACHE = path.join(DIR, 'cache.json');
 const CONFIG = JSON.parse(fs.readFileSync(path.join(DIR, 'config.json'), 'utf8'));
 const PESSOAS = CONFIG.pessoas; // [{id, nome, cor}]
@@ -118,22 +118,33 @@ function classifica(texto) {
 }
 
 // ---------- coleta ----------
-(async () => {
-  const t0 = Date.now();
-  const cache = fs.existsSync(CACHE) ? JSON.parse(fs.readFileSync(CACHE, 'utf8')) : { tasks: {}, pais: {} };
-  cache.tasks = cache.tasks || {}; cache.pais = cache.pais || {};
-  // reclassifica comentários já guardados com as regras atuais do config.json
-  for (const c of Object.values(cache.tasks)) for (const x of c.coms || []) if (x.texto) Object.assign(x, classifica(x.texto));
+// rodada completa (busca todas as tasks) ou incremental (só as alteradas desde opts.desde).
+// "estado" guarda cache e tasks em memória entre rodadas quando o robô fica rodando em loop.
+async function rodada(estado = {}, opts = {}) {
+  const t0 = Date.now(); chamadas = 0;
+  if (!estado.cache) {
+    const cache = fs.existsSync(CACHE) ? JSON.parse(fs.readFileSync(CACHE, 'utf8')) : { tasks: {}, pais: {} };
+    cache.tasks = cache.tasks || {}; cache.pais = cache.pais || {};
+    // reclassifica comentários já guardados com as regras atuais do config.json
+    for (const c of Object.values(cache.tasks)) for (const x of c.coms || []) if (x.texto) Object.assign(x, classifica(x.texto));
+    estado.cache = cache;
+  }
+  const cache = estado.cache;
+  const incremental = !!(opts.incremental && estado.brutas && opts.desde);
 
-  // 1) todas as tasks e subtasks das 3 pessoas, abertas e fechadas
-  const brutas = new Map();
+  // 1) tasks e subtasks das 3 pessoas, abertas e fechadas (todas, ou só as alteradas)
   const qsA = IDS.map((id) => `assignees[]=${id}`).join('&');
+  const filtro = incremental ? `&date_updated_gt=${Math.floor(opts.desde)}` : '';
+  const vistas = new Map();
   for (let page = 0; page < 150; page++) {
-    const res = await api(`/team/${TEAM}/task?${qsA}&include_closed=true&subtasks=true&order_by=updated&page=${page}`);
-    for (const t of res.tasks || []) brutas.set(t.id, t);
+    const res = await api(`/team/${TEAM}/task?${qsA}&include_closed=true&subtasks=true&order_by=updated&page=${page}${filtro}`);
+    for (const t of res.tasks || []) vistas.set(t.id, t);
     if (res.last_page !== false || !(res.tasks || []).length) break;
   }
-  console.log(`Tasks encontradas: ${brutas.size}`);
+  if (incremental) for (const [id, t] of vistas) estado.brutas.set(id, t);
+  else estado.brutas = vistas;
+  const brutas = estado.brutas;
+  console.log(incremental ? `Alteradas desde a última busca: ${vistas.size}` : `Tasks encontradas: ${brutas.size}`);
 
   const corte = Date.now() - JANELA_DIAS * 864e5;
   const recente = (t) => !fechada(t) || Number(t.date_updated) >= corte;
@@ -166,7 +177,9 @@ function classifica(texto) {
   const ultimoFilho = new Map();
   for (const t of brutas.values()) {
     if (!t.parent) continue;
-    const precisa = !cache.pais[t.parent] || (!fechada(t) && recente(t)) || (recente(t) && (!cache.tasks[t.id] || cache.tasks[t.id].paiUpd !== String(t.date_updated)));
+    const precisa = incremental
+      ? (!cache.pais[t.parent] || vistas.has(t.id))
+      : (!cache.pais[t.parent] || (!fechada(t) && recente(t)) || (recente(t) && (!cache.tasks[t.id] || cache.tasks[t.id].paiUpd !== String(t.date_updated))));
     if (precisa) ultimoFilho.set(t.parent, Math.max(ultimoFilho.get(t.parent) || 0, Number(t.date_updated)));
   }
   const paisPrecisam = [...ultimoFilho.entries()].sort((a, b) => b[1] - a[1]).map(([id]) => id);
@@ -272,14 +285,19 @@ function classifica(texto) {
     }));
   }
 
-  // limpa cache de tasks que sumiram
-  for (const id of Object.keys(cache.tasks)) if (!brutas.has(id)) delete cache.tasks[id];
-  const paisUsados = new Set(tasks.map((t) => t.pai_id).filter(Boolean));
-  for (const id of Object.keys(cache.pais)) if (!paisUsados.has(id)) delete cache.pais[id];
+  // limpa cache de tasks que sumiram (só na rodada completa, que enxerga tudo)
+  if (!incremental) {
+    for (const id of Object.keys(cache.tasks)) if (!brutas.has(id)) delete cache.tasks[id];
+    const paisUsados = new Set(tasks.map((t) => t.pai_id).filter(Boolean));
+    for (const id of Object.keys(cache.pais)) if (!paisUsados.has(id)) delete cache.pais[id];
+  }
 
   const agora = new Date().toISOString();
-  fs.writeFileSync(OUT, JSON.stringify({ gerado_em: agora, sincronizado_em: agora, modo: 'real', completo: pendentes === 0, pendentes, pessoas: PESSOAS, config: { pesos: CONFIG.pesos, multiplicador_papel: CONFIG.multiplicador_papel, sla_horas: CONFIG.sla_horas }, tasks }));
+  fs.writeFileSync(OUT, JSON.stringify({ gerado_em: agora, sincronizado_em: agora, modo: 'real', ao_vivo: !!opts.aoVivo, completo: pendentes === 0, pendentes, pessoas: PESSOAS, config: { pesos: CONFIG.pesos, multiplicador_papel: CONFIG.multiplicador_papel, sla_horas: CONFIG.sla_horas }, tasks }));
   fs.writeFileSync(CACHE, JSON.stringify(cache));
   console.log(`Ficou para a próxima rodada: ${pendentes}`);
-  console.log(`infra/data.json gravado: ${tasks.length} tasks · ${chamadas} chamadas · ${Math.round((Date.now() - t0) / 1000)}s`);
-})().catch((e) => { console.error(e.stack || e.message); process.exit(1); });
+  console.log(`${incremental ? 'Incremental' : 'Completa'}: ${tasks.length} tasks · ${novas.length} alteradas · ${chamadas} chamadas · ${Math.round((Date.now() - t0) / 1000)}s`);
+  return { alteradas: novas.length, total: tasks.length, inicio: t0 };
+}
+module.exports = { rodada };
+if (require.main === module) rodada().catch((e) => { console.error(e.stack || e.message); process.exit(1); });

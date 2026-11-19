@@ -338,7 +338,7 @@ svg [data-list]:hover{opacity:.82}
     </div>
 
     <section class="strip" id="strip" aria-label="Destaques"></section>
-    <div class="foot"><span>Fonte: 100% das tasks de Vini Malvas, Pablo Gabriel e Luis Alexandre no ClickUp. Tipo e complexidade vêm do nome da task e da task mãe (regras em infra/config.json).</span><span>Os dados do ClickUp são atualizados de 30 em 30 minutos</span></div>
+    <div class="foot"><span>Fonte: 100% das tasks de Vini Malvas, Pablo Gabriel e Luis Alexandre no ClickUp. Tipo e complexidade vêm do nome da task e da task mãe (regras em infra/config.json).</span><span>Os dados do ClickUp são atualizados de 1 em 1 minuto (das 6h à meia-noite)</span></div>
   </main>
 </div>
 <div class="tip" id="tip" role="tooltip"></div>
@@ -779,23 +779,39 @@ function destaques(ts,R,ab){
 }
 
 /* ---------- carga ---------- */
+// Fonte principal: branch "dados", atualizado pelo robô ao vivo a cada minuto. Reserva: data.json do site.
+const FONTE_VIVO='https://raw.githubusercontent.com/gabrieldourado-tech/esteira-oxigenacao/dados/infra-data.json';
+let ASSIN='';
+async function busca(){
+  try{const r=await fetch(FONTE_VIVO+'?t='+Date.now(),{cache:'no-store'});if(r.ok){const txt=await r.text();return {txt,vivo:true}}}catch(e){}
+  const r=await fetch('data.json?'+Date.now(),{cache:'no-store'});return {txt:await r.text(),vivo:false};
+}
+function selo(d,vivo){
+  const dt=new Date(d.sincronizado_em||d.gerado_em), ago=(Date.now()-dt)/6e4;
+  const hm=x=>x.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), dd=x=>x.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  const haM=Math.max(0,Math.round(ago)), ha=haM<1?'agora mesmo':haM<60?`há ${haM} min`:`há ${Math.floor(haM/60)} h ${String(haM%60).padStart(2,'0')} min`;
+  const h=Number(new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',hour:'numeric',hourCycle:'h23'}).format(new Date()));
+  const madrugada=h<6, ok=vivo&&ago<5;
+  const msg=ok?'atualiza de 1 em 1 minuto':madrugada?'robô pausado da meia-noite às 6h':vivo?'<b>atualização atrasada</b>, o robô deve voltar em instantes':'modo reserva (robô ao vivo fora do ar)';
+  const u=document.getElementById('upd');u.className='upd'+(ok||madrugada?'':' stale');
+  u.innerHTML=`<i></i><span>Última atualização dos dados: <b>${dd(dt)} às ${hm(dt)}</b> (${ha}) · ${msg}</span>`;
+  document.getElementById('stamp').innerHTML=`Atualizado ${dd(dt)} ${hm(dt)} · <span class="${ok?'live':'stale'}">${ok?'ao vivo':'atrasado'}</span>`;
+}
 async function load(){
   try{
-    const r=await fetch('data.json?'+Date.now(),{cache:'no-store'});const d=await r.json();
-    for(const t of d.tasks){t.url='https://app.clickup.com/t/'+t.id;if(t.pai_id)t.pai_url='https://app.clickup.com/t/'+t.pai_id;t.assignees=t.assignees||[];t.tempos=t.tempos||{};t.ajustes=t.ajustes||[];t.n_ajustes=t.n_ajustes||0;t.feita=!!t.feita;t.cancelada=!!t.cancelada;t.peso=t.peso||1}
-    const primeira=!DATA; DATA=d; P=d.pessoas.map(p=>({...p,cor:COR[p.id]||p.cor}));
-    const s=document.getElementById('stamp'),ago=(Date.now()-Date.parse(d.sincronizado_em||d.gerado_em))/6e4;
-    s.innerHTML=d.modo==='exemplo'?'<span class="stale">Dados de exemplo, aguardando a 1ª sincronização</span>':`Atualizado ${new Date(d.sincronizado_em||d.gerado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})} · <span class="${ago<45?'live':'stale'}">${ago<45?'atualiza de 30 em 30 minutos':'atualização atrasada'}</span>${d.completo===false?' · carga inicial em andamento':''}`;
-    const u=document.getElementById('upd'),dt=new Date(d.sincronizado_em||d.gerado_em),prox=new Date(+dt+30*6e4);
-    const hm=x=>x.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), dd=x=>x.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-    const haM=Math.max(0,Math.round(ago)), ha=haM<60?`há ${haM} min`:`há ${Math.floor(haM/60)} h ${String(haM%60).padStart(2,'0')} min`;
-    u.className='upd'+(ago>=45?' stale':'');
-    u.innerHTML=`<i></i><span>Última atualização dos dados: <b>${dd(dt)} às ${hm(dt)}</b> (${ha}) · `+(ago<30?`próxima por volta das <b>${hm(prox)}</b>`:ago<45?'próxima a qualquer momento':'<b>atualização atrasada</b>, o GitHub ainda não rodou o robô')+` · atualiza de 30 em 30 minutos</span>`;
-    if(primeira)montaFiltros();
-    render();
-  }catch(e){document.getElementById('lede').textContent='Não consegui ler os dados agora. Tento de novo em 5 minutos.';console.error(e)}
+    const {txt,vivo}=await busca();const d=JSON.parse(txt);
+    const assin=JSON.stringify(d.tasks);
+    if(assin!==ASSIN){
+      ASSIN=assin;
+      for(const t of d.tasks){t.url='https://app.clickup.com/t/'+t.id;if(t.pai_id)t.pai_url='https://app.clickup.com/t/'+t.pai_id;t.assignees=t.assignees||[];t.tempos=t.tempos||{};t.ajustes=t.ajustes||[];t.n_ajustes=t.n_ajustes||0;t.feita=!!t.feita;t.cancelada=!!t.cancelada;t.peso=t.peso||1}
+      const primeira=!DATA; DATA=d; P=d.pessoas.map(p=>({...p,cor:COR[p.id]||p.cor}));
+      if(primeira)montaFiltros();
+      render();
+    }else{DATA.sincronizado_em=d.sincronizado_em}
+    selo(d,vivo);
+  }catch(e){document.getElementById('lede').textContent='Não consegui ler os dados agora. Tento de novo em 1 minuto.';console.error(e)}
 }
-load();setInterval(load,5*60*1000);
+load();setInterval(load,60*1000);
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>DATA&&render(),150)});
 </script>
 </body>
