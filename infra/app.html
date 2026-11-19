@@ -806,18 +806,25 @@ async function busca(){
   // 3) reserva: cópia do site
   const r=await fetch('data.json?'+Date.now(),{cache:'no-store'});return {txt:await r.text(),vivo:false};
 }
+// horário sempre de Brasília, independente do computador de quem abre
+const TZ='America/Sao_Paulo';
+const hmsBR=x=>x.toLocaleTimeString('pt-BR',{timeZone:TZ,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+const hmBR=x=>x.toLocaleTimeString('pt-BR',{timeZone:TZ,hour:'2-digit',minute:'2-digit'});
+const ddBR=x=>x.toLocaleDateString('pt-BR',{timeZone:TZ,day:'2-digit',month:'2-digit'});
 function selo(d,vivo){
-  const dt=new Date(d.sincronizado_em||d.gerado_em), ago=(Date.now()-dt)/6e4;
-  const hm=x=>x.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), dd=x=>x.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  const robo=new Date(d.sincronizado_em||d.gerado_em);
+  const direto=AOVIVO&&AOVIVO>robo;           // a leitura direta do botão é mais nova que a do robô
+  const dt=direto?AOVIVO:robo, ago=(Date.now()-dt)/6e4;
   const haM=Math.max(0,Math.round(ago)), ha=haM<1?'agora mesmo':haM<60?`há ${haM} min`:`há ${Math.floor(haM/60)} h ${String(haM%60).padStart(2,'0')} min`;
-  const h=Number(new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',hour:'numeric',hourCycle:'h23'}).format(new Date()));
-  const madrugada=h<6, ok=vivo&&ago<8;
-  const msg=ok?'o robô confere o ClickUp a cada 1 minuto':madrugada?'robô pausado da meia-noite às 6h':vivo?'<b>atualização atrasada</b>, o robô deve voltar em instantes':'modo reserva (robô ao vivo fora do ar)';
+  const h=Number(new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hourCycle:'h23'}).format(new Date()));
+  const madrugada=h<6, ok=(vivo||direto)&&ago<5;
+  const msg=direto?'lido direto do ClickUp pelo botão Sincronizar':ok?'o robô confere o ClickUp a cada 1 minuto · clique em Sincronizar para ler agora':madrugada?'robô pausado da meia-noite às 6h · clique em Sincronizar para ler agora':vivo?'<b>robô atrasado</b> · clique em Sincronizar para ler o ClickUp agora':'modo reserva · clique em Sincronizar para ler o ClickUp agora';
   const u=document.getElementById('upd');u.className='upd'+(ok||madrugada?'':' stale');
-  const hms=x=>x.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  u.innerHTML=AOVIVO&&AOVIVO>dt?`<i></i><span><b>Sincronizado direto do ClickUp às ${hms(AOVIVO)}</b> · o robô confere o ClickUp a cada 1 minuto</span>`:`<i></i><span>Dados do ClickUp de <b>${dd(dt)} às ${hm(dt)}</b> (${ha}) · ${msg}${VERIF?` · painel conferido às ${hms(VERIF)}`:''}</span>`;
-  document.getElementById('stamp').innerHTML=`Atualizado ${dd(dt)} ${hm(dt)} · <span class="${ok?'live':'stale'}">${ok?'ao vivo':'atrasado'}</span>`;
+  u.innerHTML=`<i></i><span>Dados do ClickUp de <b>${ddBR(dt)} às ${hmsBR(dt)}</b> (${ha}, horário de Brasília) · ${msg}</span>`;
+  document.getElementById('stamp').innerHTML=`Atualizado ${ddBR(dt)} ${hmsBR(dt)} · <span class="${ok?'live':'stale'}">${ok?'ao vivo':'atrasado'}</span>`;
 }
+// o selo conta "há X min" sozinho, sem esperar a próxima leitura
+setInterval(()=>{if(DATA)selo(DATA,VIVO)},15000);
 let CARREGANDO=false;
 async function load(){
   if(CARREGANDO)return;CARREGANDO=true;
