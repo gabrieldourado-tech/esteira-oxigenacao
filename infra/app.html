@@ -378,7 +378,7 @@ function abreLista(id){
   document.getElementById('m-t').textContent=L.titulo;
   document.getElementById('m-sub').textContent=(L.sub?L.sub+' · ':'')+`${L.itens.length} task${L.itens.length>1?'s':''} · clique para abrir no ClickUp`;
   const agora=Date.now();
-  document.getElementById('m-list').innerHTML=L.itens.slice(0,300).map(({t,extra})=>{const p=dono(t),late=!t.feita&&t.prazo&&t.prazo<agora;return `<li><a href="${esc(t.url)}" target="_blank" rel="noopener"><span class="open">abrir ↗</span>${esc(t.pai_nome?t.pai_nome+' → '+t.nome:t.nome)}</a>
+  document.getElementById('m-list').innerHTML=L.itens.slice(0,300).map(({t,extra})=>{const p=dono(t),late=vencida(t);return `<li><a href="${esc(t.url)}" target="_blank" rel="noopener"><span class="open">abrir ↗</span>${esc(t.pai_nome?t.pai_nome+' → '+t.nome:t.nome)}</a>
     <div class="mm"><span><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}</span><span>${esc(t.squad||t.lista||'')}</span><span>${esc(t.categoria)}</span><span>Status: ${esc(t.status)}${late?' <b style="color:#F87171">atrasada</b>':''}</span>${t.feita&&t.fim?`<span>Entregue ${fdata(new Date(t.fim))}</span>`:''}${t.lead_edicao_h!=null?`<span>Edição → infra ${fmtH(t.lead_edicao_h)}</span>`:''}${t.n_ajustes?`<span style="color:#F87171">${t.n_ajustes} ajuste(s)</span>`:''}</div>${extra?`<div class="mx">${extra}</div>`:''}</li>`}).join('')+(L.itens.length>300?`<li class="sub">Mostrando 300 de ${L.itens.length}.</li>`:'');
   document.getElementById('modal').hidden=false;document.getElementById('m-x').focus();
 }
@@ -487,6 +487,11 @@ function demandas(ts){
   return out;
 }
 const execucoes=ts=>ts.filter(t=>t.papel==='execucao'||t.papel==='demanda');
+// Atrasada = subtask de infra (tem task pai), aberta, cuja data de vencimento JÁ PASSOU.
+// O ClickUp guarda vencimento só com dia (sem hora), então a task vence no fim daquele dia (horário de Fortaleza, UTC-3).
+const FUSO=3*3600*1000, DIA=24*3600*1000;
+const fimDoDia=ms=>Math.floor((ms-FUSO)/DIA)*DIA+FUSO+DIA;
+const vencida=t=>!t.feita&&!!t.pai_id&&!!t.prazo&&fimDoDia(t.prazo)<=Date.now();
 const ajData=t=>t.ajuste_em||t.fim||t.criado;           // quando foi para ajuste
 const foiAjuste=t=>t.n_ajustes>0;                       // passou pelo status de ajuste
 const ajustadas=(ts,a,b)=>ts.filter(t=>foiAjuste(t)&&entre(ajData(t),a,b)).sort((x,y)=>ajData(y)-ajData(x));
@@ -511,7 +516,7 @@ function render(){
 }
 
 function lede(R,ab){
-  const late=ab.filter(t=>t.prazo&&t.prazo<Date.now()).length;
+  const late=ab.filter(vencida).length;
   document.getElementById('lede').innerHTML=`De ${fdLong(F.ini)} a ${fdLong(F.fim)}: <b>${R.n}</b> tasks entregues`+(R.med!=null?`, edição → infra em <b>${fmtH(R.med)}</b> na mediana`:'')+(late?`, <b style="color:var(--red)">${late} abertas atrasadas</b>.`:'.');
 }
 
@@ -525,13 +530,13 @@ function delta(atual,ant,{bomSobe=true,un='%',pp=false}={}){
   const bom=(v>0)===bomSobe; return `<span class="${bom?'up':'down'}">${v>0?'▲':'▼'} ${fmt(Math.abs(v),0)}${pp?' p.p.':un}</span> vs período anterior`;
 }
 function kpis(R,A,ab){
-  const sla=DATA.config.sla_horas||24, late=ab.filter(t=>t.prazo&&t.prazo<Date.now()).length, abN=ab.filter(t=>estacao(t)!=='espera').length;
+  const sla=DATA.config.sla_horas||24, late=ab.filter(vencida).length, abN=ab.filter(t=>estacao(t)!=='espera').length;
   const emAjusteAgora=ab.filter(t=>estacao(t)==='ajuste').length;
   const card=(ringH,k,v,u,d,lid)=>`<div class="kpi"${lid?` data-list="${lid}" tabindex="0" role="button" title="Ver as tasks"`:''}>${ringH||''}<div style="min-width:0"><div class="k">${k}</div><div class="v${lid?' clk':''}">${v}${u?`<small>${u}</small>`:''}</div><div class="d">${d}</div></div></div>`;
-  const agora=Date.now(), exAj=R.ajL, forasla=R.dem.filter(d=>d.lead>sla), atr=ab.filter(t=>t.prazo&&t.prazo<agora).sort((a,b)=>a.prazo-b.prazo), and=ab.filter(t=>estacao(t)!=='espera');
+  const agora=Date.now(), exAj=R.ajL, forasla=R.dem.filter(d=>d.lead>sla), atr=ab.filter(vencida).sort((a,b)=>a.prazo-b.prazo), and=ab.filter(t=>estacao(t)!=='espera');
   const L={ent:R.ent.length?reg('Tasks entregues no período',R.ent.slice().sort((a,b)=>b.fim-a.fim)):null,lead:R.dem.length?regDem('Demandas medidas: edição → infra',R.dem,'da mais demorada para a mais rápida'):null,
     sla:forasla.length?regDem(`Demandas fora da meta de ${sla} h`,forasla):null,aj:exAj.length?reg('Tasks que foram para ajuste no período',exAj.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}<br>${comentAj(t)}`}))):null,
-    atr:atr.length?reg('Tasks abertas atrasadas',atr.map(t=>({t,extra:`Prazo era ${fdata(new Date(t.prazo))}`}))):null,and:and.length?reg('Tasks em andamento agora',and):null};
+    atr:atr.length?reg('Tasks abertas atrasadas',atr.map(t=>({t,extra:`Venceu em ${fdata(new Date(t.prazo))}`}))):null,and:and.length?reg('Tasks em andamento agora',and):null};
   document.getElementById('kpis').innerHTML=[
     card(ring(A.n?Math.min(100,R.n/Math.max(R.n,A.n)*100):100,C.orange),'TASKS ENTREGUES',R.n,'',delta(R.n,A.n),L.ent),
     card('', 'EDIÇÃO → INFRA', R.med==null?'—':fmtH(R.med).split(' ')[0], R.med==null?'':fmtH(R.med).split(' ')[1], R.med==null?'sem demandas medidas':delta(R.med,A.med,{bomSobe:false}),L.lead),
@@ -549,10 +554,10 @@ function metaCard(R){
 /* esteira em cards */
 const ESTACOES=[['espera','Esperando etapa anterior','Edição ou etapa anterior em aberto'],['fila','Na fila','Liberada, ninguém começou'],['fazendo','Fazendo','Em execução'],['ajuste','Em ajuste','Voltou para corrigir'],['revisao','Em revisão','Aguardando revisão']];
 function esteira(ab,ajL){
-  document.getElementById('leg-esteira').innerHTML=P.map(p=>`<span><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}</span>`).join('')+`<span style="color:#F87171">vermelho = passou do prazo</span>`;
+  document.getElementById('leg-esteira').innerHTML=P.map(p=>`<span><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}</span>`).join('')+`<span style="color:#F87171">vermelho = subtask de infra com vencimento já passado</span>`;
   const porEst=d3.group(ab,estacao), agora=Date.now();
   document.getElementById('esteira').innerHTML=ESTACOES.map(([k,l,dica])=>{
-    const arr=(porEst.get(k)||[]).map(t=>({t,late:!!(t.prazo&&t.prazo<agora),idade:(agora-(t.edicao_fim||t.criado))/H})).sort((a,b)=>(b.late-a.late)||(b.idade-a.idade));
+    const arr=(porEst.get(k)||[]).map(t=>({t,late:vencida(t),idade:(agora-(t.edicao_fim||t.criado))/H})).sort((a,b)=>(b.late-a.late)||(b.idade-a.idade));
     const late=arr.filter(x=>x.late).length;
     const cards=arr.slice(0,12).map(({t,late,idade})=>{const p=dono(t);return `<li><a class="card${late?' atr':''}" style="--c:${p.cor}" href="${esc(t.url)}" target="_blank" rel="noopener" title="${esc((t.pai_nome?t.pai_nome+' → ':'')+t.nome)}"><div class="t">${esc(t.pai_nome||t.nome)}</div><div class="s"><span>${t.pai_nome?esc(t.nome)+' · ':''}${esc(p.curto)}</span>${late?'<span class="bad">atrasada</span>':`<span>${fmtH(idade)}</span>`}</div></a></li>`}).join('');
     const todas=arr.map(x=>({t:x.t,extra:x.late?`Atrasada: prazo ${fdata(new Date(x.t.prazo))}`:`Parada há ${fmtH(x.idade)}`})), soAtr=todas.filter((x,i)=>arr[i].late);
@@ -747,7 +752,7 @@ function tabela(ts){
   const rows=ts.filter(t=>(estacao(t)&&abertaNoPeriodo(t))||(t.feita&&noPeriodo(t.fim))).map(t=>({t,nome:(t.pai_nome||'')+' '+t.nome,pessoa:dono(t).curto,categoria:t.categoria,peso:t.peso,status:t.status,lead:t.lead_edicao_h,n_ajustes:t.n_ajustes,fim:t.feita?t.fim:null}));
   rows.sort((a,b)=>{const va=a[sortKey],vb=b[sortKey];if(va==null&&vb==null)return 0;if(va==null)return 1;if(vb==null)return -1;return (typeof va==='string'?va.localeCompare(vb,'pt'):va-vb)*sortDir});
   document.getElementById('tbl-sub').textContent=`${rows.length} tasks: as abertas agora e as entregues no período. Clique no cabeçalho para ordenar.`;
-  document.getElementById('tbody').innerHTML=rows.slice(0,limite).map(({t})=>{const p=dono(t),late=!t.feita&&t.prazo&&t.prazo<Date.now();return `<tr>
+  document.getElementById('tbody').innerHTML=rows.slice(0,limite).map(({t})=>{const p=dono(t),late=vencida(t);return `<tr>
     <td><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.pai_nome||t.nome)}</a><div class="sub">${t.pai_nome?esc(t.nome)+' · ':''}${esc(t.squad||t.lista||'')}${t.produto?' · '+esc(t.produto):''}</div></td>
     <td style="white-space:nowrap"><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}<div class="sub">${esc(PAPEL[t.papel]||'')}</div></td>
     <td>${esc(t.categoria)}${t.plataforma?`<div class="sub">${esc(t.plataforma)}</div>`:''}</td>
