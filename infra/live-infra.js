@@ -30,7 +30,7 @@ function publica() {
       const r = await rodada(estado, { incremental: !full, desde: ultimaBusca - 2 * MIN, aoVivo: true });
       ultimaBusca = r.inicio; if (full) ultimaFull = t;
       // publica quando algo mudou, na busca completa, ou a cada 5 min (para o painel saber que o robô está vivo)
-      if (r.alteradas > 0 || full || Date.now() - ultimoPush > 5 * MIN) { publica(); ultimoPush = Date.now(); console.log('Publicado.'); }
+      if (r.alteradas > 0 || full || Date.now() - ultimoPush > 2 * MIN) { publica(); ultimoPush = Date.now(); console.log('Publicado.'); }
       falhas = 0; rodadas++;
     } catch (e) {
       console.log('Falha na rodada:', e.message);
