@@ -266,6 +266,7 @@ svg [data-list]:hover{opacity:.82}
           <label class="ctl">Squad:<select id="f-squad"></select></label>
           <label class="ctl">Tipo:<select id="f-cat"></select></label>
           <button class="btn-o" id="f-erros" aria-pressed="false">Só com ajuste</button>
+          <button class="btn-o" id="sync" title="Busca agora os dados mais recentes. O robô confere o ClickUp a cada 1 minuto." style="background:var(--orange);border-color:var(--orange);color:#1a0d02">↻ Sincronizar</button>
         </div>
         <div class="stamp" id="stamp">—</div>
       </div>
@@ -275,7 +276,7 @@ svg [data-list]:hover{opacity:.82}
 
     <div class="grid">
       <section class="pn c12" id="esteira-pn" aria-labelledby="h-est">
-        <header><h2 id="h-est">ESTEIRA AGORA</h2><div class="legend" id="leg-esteira"></div></header>
+        <header><h2 id="h-est">ESTEIRA AGORA</h2><div class="legend" id="leg-esteira"></div><p>Tasks abertas agora, respeitando os filtros. Período: entra quem tem prazo no período (ou, sem prazo, foi criada no período).</p></header>
         <div class="b"><div id="esteira" class="lanes"></div></div>
       </section>
     </div>
@@ -462,6 +463,8 @@ const entre=(ms,a,b)=>!!ms&&ms>=a&&ms<=b;
 const selP=()=>F.pessoas?P.filter(p=>F.pessoas.includes(p.id)):P;
 const umaPessoa=()=>!!F.pessoas&&F.pessoas.length===1;
 const noPeriodo=ms=>entre(ms,F.ini,F.fim);
+// tasks abertas entram no período pelo prazo; sem prazo, pela data de criação
+const abertaNoPeriodo=t=>noPeriodo(t.prazo||t.criado);
 function dono(t){const id=(F.pessoas&&t.assignees.find(i=>F.pessoas.includes(i)))||t.assignees[0];return P.find(p=>p.id===id)||{curto:'—',nome:'Sem responsável',cor:C.faint,id:0}}
 function estacao(t){
   const s=st(t.status);
@@ -502,8 +505,8 @@ function render(){
   const ts=base();
   const span=F.fim-F.ini+1;
   const R=resumo(ts,F.ini,F.fim), A=resumo(ts,F.ini-span,F.ini-1);
-  const abertas=ts.filter(t=>estacao(t));
-  kpis(R,A,abertas);metaCard(R);lede(R,abertas);esteira(abertas);linha(ts);pessoas(ts);lead(R.dem);anatomia(R.ent);
+  const abertas=ts.filter(t=>estacao(t)&&abertaNoPeriodo(t));
+  kpis(R,A,abertas);metaCard(R);lede(R,abertas);esteira(abertas,R.ajL);linha(ts);pessoas(ts);lead(R.dem);anatomia(R.ent);
   quemAjuste(R.ent);motivos(ts);feed(ts);mix(R.ent);cats(R.ent);tabela(ts);destaques(ts,R,abertas);
 }
 
@@ -523,6 +526,7 @@ function delta(atual,ant,{bomSobe=true,un='%',pp=false}={}){
 }
 function kpis(R,A,ab){
   const sla=DATA.config.sla_horas||24, late=ab.filter(t=>t.prazo&&t.prazo<Date.now()).length, abN=ab.filter(t=>estacao(t)!=='espera').length;
+  const emAjusteAgora=ab.filter(t=>estacao(t)==='ajuste').length;
   const card=(ringH,k,v,u,d,lid)=>`<div class="kpi"${lid?` data-list="${lid}" tabindex="0" role="button" title="Ver as tasks"`:''}>${ringH||''}<div style="min-width:0"><div class="k">${k}</div><div class="v${lid?' clk':''}">${v}${u?`<small>${u}</small>`:''}</div><div class="d">${d}</div></div></div>`;
   const agora=Date.now(), exAj=R.ajL, forasla=R.dem.filter(d=>d.lead>sla), atr=ab.filter(t=>t.prazo&&t.prazo<agora).sort((a,b)=>a.prazo-b.prazo), and=ab.filter(t=>estacao(t)!=='espera');
   const L={ent:R.ent.length?reg('Tasks entregues no período',R.ent.slice().sort((a,b)=>b.fim-a.fim)):null,lead:R.dem.length?regDem('Demandas medidas: edição → infra',R.dem,'da mais demorada para a mais rápida'):null,
@@ -533,8 +537,8 @@ function kpis(R,A,ab){
     card('', 'EDIÇÃO → INFRA', R.med==null?'—':fmtH(R.med).split(' ')[0], R.med==null?'':fmtH(R.med).split(' ')[1], R.med==null?'sem demandas medidas':delta(R.med,A.med,{bomSobe:false}),L.lead),
     card(ring(R.noSla,R.noSla>=80?C.green:R.noSla>=60?C.amber:C.red),`DENTRO DE ${sla} H`,R.noSla==null?'—':fmt(R.noSla,0),R.noSla==null?'':'%',forasla.length?`${forasla.length} fora da meta (clique)`:`${R.dem.length} demandas medidas`,L.sla),
     card(ring(R.taxaAj,R.taxaAj>20?C.red:R.taxaAj>10?C.amber:C.green),'VOLTOU P/ AJUSTE',R.aj,'',R.aj?`${R.aj} tasks foram para ajuste`:'nenhuma foi para ajuste',L.aj),
-    card(ring(abN?late/abN*100:0,C.red),'ABERTAS ATRASADAS',late,'',`de ${abN} liberadas para a infra`,L.atr),
-    card('','EM ANDAMENTO AGORA',abN,'',`+ ${ab.length-abN} esperando etapa anterior`,L.and),
+    card(ring(ab.length?late/ab.length*100:0,C.red),'ABERTAS ATRASADAS',late,'',`de ${ab.length} abertas na esteira`,L.atr),
+    card('','EM ANDAMENTO AGORA',abN,'',`liberadas para a infra · + ${ab.length-abN} esperando`,L.and),
   ].join('');
 }
 function metaCard(R){
@@ -544,7 +548,7 @@ function metaCard(R){
 
 /* esteira em cards */
 const ESTACOES=[['espera','Esperando etapa anterior','Edição ou etapa anterior em aberto'],['fila','Na fila','Liberada, ninguém começou'],['fazendo','Fazendo','Em execução'],['ajuste','Em ajuste','Voltou para corrigir'],['revisao','Em revisão','Aguardando revisão']];
-function esteira(ab){
+function esteira(ab,ajL){
   document.getElementById('leg-esteira').innerHTML=P.map(p=>`<span><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}</span>`).join('')+`<span style="color:#F87171">vermelho = passou do prazo</span>`;
   const porEst=d3.group(ab,estacao), agora=Date.now();
   document.getElementById('esteira').innerHTML=ESTACOES.map(([k,l,dica])=>{
@@ -552,7 +556,8 @@ function esteira(ab){
     const late=arr.filter(x=>x.late).length;
     const cards=arr.slice(0,12).map(({t,late,idade})=>{const p=dono(t);return `<li><a class="card${late?' atr':''}" style="--c:${p.cor}" href="${esc(t.url)}" target="_blank" rel="noopener" title="${esc((t.pai_nome?t.pai_nome+' → ':'')+t.nome)}"><div class="t">${esc(t.pai_nome||t.nome)}</div><div class="s"><span>${t.pai_nome?esc(t.nome)+' · ':''}${esc(p.curto)}</span>${late?'<span class="bad">atrasada</span>':`<span>${fmtH(idade)}</span>`}</div></a></li>`}).join('');
     const todas=arr.map(x=>({t:x.t,extra:x.late?`Atrasada: prazo ${fdata(new Date(x.t.prazo))}`:`Parada há ${fmtH(x.idade)}`})), soAtr=todas.filter((x,i)=>arr[i].late);
-    return `<div class="lane${late?' alert':''}"><div class="lane-h"><div class="nm">${l}</div><div class="ct"><span${dl(l,todas)}>${arr.length}</span></div>${late?`<span class="late"${dl(l+': atrasadas',soAtr).replace('class="clk"','')}>${late} atrasada${late>1?'s':''}</span>`:`<span class="ok">${esc(dica)}</span>`}</div>${arr.length?`<ul>${cards}</ul>${arr.length>12?`<div class="more"><span${dl(l,todas)}>+ ${arr.length-12} — ver todas</span></div>`:''}`:'<div class="vazio">Nada aqui agora.</div>'}</div>`;
+    const extra=k==='ajuste'&&ajL&&ajL.length?`<div style="margin-top:6px;font-size:11.5px;color:var(--soft)"><span${dl('Subtasks de infra que foram para ajuste no período',ajL.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}<br>${comentAj(t)}`})))}>${ajL.length} foram para ajuste no período</span></div>`:'';
+    return `<div class="lane${late?' alert':''}"><div class="lane-h"><div class="nm">${l}</div><div class="ct"><span${dl(l,todas)}>${arr.length}</span></div>${late?`<span class="late"${dl(l+': atrasadas',soAtr).replace('class="clk"','')}>${late} atrasada${late>1?'s':''}</span>`:`<span class="ok">${esc(dica)}</span>`}${extra}</div>${arr.length?`<ul>${cards}</ul>${arr.length>12?`<div class="more"><span${dl(l,todas)}>+ ${arr.length-12} — ver todas</span></div>`:''}`:'<div class="vazio">Nada aqui agora.</div>'}</div>`;
   }).join('');
 }
 
@@ -601,12 +606,12 @@ function pessoas(ts){
   const lista=selP();
   const linhas=lista.map(p=>{
     const mine=ts.filter(t=>t.assignees.includes(p.id));
-    const ent=mine.filter(t=>t.feita&&noPeriodo(t.fim)), ex=execucoes(ent), aj=ex.filter(t=>t.n_ajustes>0).length;
-    const ab=mine.filter(t=>estacao(t)&&estacao(t)!=='espera').length, med=d3.median(ent.filter(t=>t.lead_edicao_h!=null),t=>t.lead_edicao_h);
+    const ent=mine.filter(t=>t.feita&&noPeriodo(t.fim)), ex=execucoes(ent), ajT=ajustadas(mine,F.ini,F.fim), aj=ajT.length;
+    const ab=mine.filter(t=>estacao(t)&&estacao(t)!=='espera'&&abertaNoPeriodo(t)).length, med=d3.median(ent.filter(t=>t.lead_edicao_h!=null),t=>t.lead_edicao_h);
     const papeis=d3.rollups(ent,v=>v.length,t=>t.papel).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>`${PAPEL[k]} ${Math.round(v/Math.max(1,ent.length)*100)}%`).join(' · ');
-    const abL=mine.filter(t=>estacao(t)&&estacao(t)!=='espera'), ajL=ex.filter(t=>t.n_ajustes>0).map(t=>({t,extra:comentAj(t)})), ldL=ent.filter(t=>t.lead_edicao_h!=null).sort((a,b)=>b.lead_edicao_h-a.lead_edicao_h);
+    const abL=mine.filter(t=>estacao(t)&&estacao(t)!=='espera'&&abertaNoPeriodo(t)), ajL=ajT.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}<br>${comentAj(t)}`})), ldL=ent.filter(t=>t.lead_edicao_h!=null).sort((a,b)=>b.lead_edicao_h-a.lead_edicao_h);
     return {p,n:ent.length,html:`<div class="prow" style="border-left:3px solid ${p.cor}"><div class="n">${esc(p.nome)}</div><div class="r">${esc(papeis||'Sem entregas no período')}</div><div class="big"><b${dl(p.nome+': entregas no período',ent.slice().sort((a,b)=>b.fim-a.fim))}>${ent.length}</b><span>entregas</span></div>
-      <div class="mini"><span>Ajustes <b style="color:${aj?'#F87171':'inherit'}"${dl(p.nome+': tasks que voltaram para ajuste',ajL)}>${aj}</b>${ex.length?` (${fmt(aj/ex.length*100,0)}%)`:''}</span><span>Abertas <b${dl(p.nome+': abertas agora',abL)}>${ab}</b></span><span>Edição → infra <b${dl(p.nome+': edição → infra',ldL)}>${fmtH(med)}</b></span></div></div>`};
+      <div class="mini"><span>Ajustes <b style="color:${aj?'#F87171':'inherit'}"${dl(p.nome+': tasks que foram para ajuste',ajL)}>${aj}</b>${ent.length?` (${fmt(aj/ent.length*100,0)}%)`:''}</span><span>Abertas <b${dl(p.nome+': abertas agora',abL)}>${ab}</b></span><span>Edição → infra <b${dl(p.nome+': edição → infra',ldL)}>${fmtH(med)}</b></span></div></div>`};
   }).sort((a,b)=>b.n-a.n);
   document.getElementById('people').innerHTML=linhas.map(l=>l.html).join('');
 }
@@ -739,7 +744,7 @@ function tabela(ts){
   const thead=document.getElementById('thead');
   if(!thead.children.length)COLS.forEach(([k,l])=>{const th=document.createElement('th');th.textContent=l;th.tabIndex=0;th.dataset.k=k;const go=()=>{if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=['nome','pessoa','categoria','status'].includes(k)?1:-1}render()};th.onclick=go;th.onkeydown=e=>{if(e.key==='Enter')go()};thead.appendChild(th)});
   thead.querySelectorAll('th').forEach(th=>th.setAttribute('aria-sort',th.dataset.k===sortKey?(sortDir>0?'ascending':'descending'):'none'));
-  const rows=ts.filter(t=>estacao(t)||noPeriodo(t.fim)).map(t=>({t,nome:(t.pai_nome||'')+' '+t.nome,pessoa:dono(t).curto,categoria:t.categoria,peso:t.peso,status:t.status,lead:t.lead_edicao_h,n_ajustes:t.n_ajustes,fim:t.feita?t.fim:null}));
+  const rows=ts.filter(t=>(estacao(t)&&abertaNoPeriodo(t))||(t.feita&&noPeriodo(t.fim))).map(t=>({t,nome:(t.pai_nome||'')+' '+t.nome,pessoa:dono(t).curto,categoria:t.categoria,peso:t.peso,status:t.status,lead:t.lead_edicao_h,n_ajustes:t.n_ajustes,fim:t.feita?t.fim:null}));
   rows.sort((a,b)=>{const va=a[sortKey],vb=b[sortKey];if(va==null&&vb==null)return 0;if(va==null)return 1;if(vb==null)return -1;return (typeof va==='string'?va.localeCompare(vb,'pt'):va-vb)*sortDir});
   document.getElementById('tbl-sub').textContent=`${rows.length} tasks: as abertas agora e as entregues no período. Clique no cabeçalho para ordenar.`;
   document.getElementById('tbody').innerHTML=rows.slice(0,limite).map(({t})=>{const p=dono(t),late=!t.feita&&t.prazo&&t.prazo<Date.now();return `<tr>
@@ -780,10 +785,20 @@ function destaques(ts,R,ab){
 
 /* ---------- carga ---------- */
 // Fonte principal: branch "dados", atualizado pelo robô ao vivo a cada minuto. Reserva: data.json do site.
-const FONTE_VIVO='https://raw.githubusercontent.com/gabrieldourado-tech/esteira-oxigenacao/dados/infra-data.json';
-let ASSIN='';
+const REPO='gabrieldourado-tech/esteira-oxigenacao';
+let ASSIN='', SHA='', TXT='', VERIF=null;
 async function busca(){
-  try{const r=await fetch(FONTE_VIVO+'?t='+Date.now(),{cache:'no-store'});if(r.ok){const txt=await r.text();return {txt,vivo:true}}}catch(e){}
+  // 1) pergunta ao GitHub qual é o último commit do branch "dados" (resposta 304 não gasta limite)
+  try{
+    const c=await fetch(`https://api.github.com/repos/${REPO}/commits/dados`,{cache:'no-cache',headers:{Accept:'application/vnd.github+json'}});
+    if(c.ok){const j=await c.json();
+      if(j.sha!==SHA||!TXT){const r=await fetch(`https://raw.githubusercontent.com/${REPO}/${j.sha}/infra-data.json`);if(r.ok){TXT=await r.text();SHA=j.sha}}
+      if(TXT)return {txt:TXT,vivo:true};
+    }
+  }catch(e){}
+  // 2) sem a API (limite de acesso): lê o branch direto (pode ter até 5 min de atraso)
+  try{const r=await fetch(`https://raw.githubusercontent.com/${REPO}/dados/infra-data.json?t=${Date.now()}`,{cache:'no-store'});if(r.ok)return {txt:await r.text(),vivo:true}}catch(e){}
+  // 3) reserva: cópia do site
   const r=await fetch('data.json?'+Date.now(),{cache:'no-store'});return {txt:await r.text(),vivo:false};
 }
 function selo(d,vivo){
@@ -791,15 +806,18 @@ function selo(d,vivo){
   const hm=x=>x.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), dd=x=>x.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
   const haM=Math.max(0,Math.round(ago)), ha=haM<1?'agora mesmo':haM<60?`há ${haM} min`:`há ${Math.floor(haM/60)} h ${String(haM%60).padStart(2,'0')} min`;
   const h=Number(new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',hour:'numeric',hourCycle:'h23'}).format(new Date()));
-  const madrugada=h<6, ok=vivo&&ago<5;
-  const msg=ok?'atualiza de 1 em 1 minuto':madrugada?'robô pausado da meia-noite às 6h':vivo?'<b>atualização atrasada</b>, o robô deve voltar em instantes':'modo reserva (robô ao vivo fora do ar)';
+  const madrugada=h<6, ok=vivo&&ago<8;
+  const msg=ok?'o robô confere o ClickUp a cada 1 minuto':madrugada?'robô pausado da meia-noite às 6h':vivo?'<b>atualização atrasada</b>, o robô deve voltar em instantes':'modo reserva (robô ao vivo fora do ar)';
   const u=document.getElementById('upd');u.className='upd'+(ok||madrugada?'':' stale');
-  u.innerHTML=`<i></i><span>Última atualização dos dados: <b>${dd(dt)} às ${hm(dt)}</b> (${ha}) · ${msg}</span>`;
+  const hms=x=>x.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  u.innerHTML=`<i></i><span>Dados do ClickUp de <b>${dd(dt)} às ${hm(dt)}</b> (${ha}) · ${msg}${VERIF?` · painel conferido às ${hms(VERIF)}`:''}</span>`;
   document.getElementById('stamp').innerHTML=`Atualizado ${dd(dt)} ${hm(dt)} · <span class="${ok?'live':'stale'}">${ok?'ao vivo':'atrasado'}</span>`;
 }
+let CARREGANDO=false;
 async function load(){
+  if(CARREGANDO)return;CARREGANDO=true;const bt=document.getElementById('sync');if(bt){bt.disabled=true;bt.textContent='Sincronizando…'}
   try{
-    const {txt,vivo}=await busca();const d=JSON.parse(txt);
+    const {txt,vivo}=await busca();const d=JSON.parse(txt);VERIF=new Date();
     const assin=JSON.stringify(d.tasks);
     if(assin!==ASSIN){
       ASSIN=assin;
@@ -810,7 +828,9 @@ async function load(){
     }else{DATA.sincronizado_em=d.sincronizado_em}
     selo(d,vivo);
   }catch(e){document.getElementById('lede').textContent='Não consegui ler os dados agora. Tento de novo em 1 minuto.';console.error(e)}
+  finally{CARREGANDO=false;if(bt){bt.disabled=false;bt.textContent='↻ Sincronizar'}}
 }
+document.getElementById('sync').onclick=()=>load();
 load();setInterval(load,60*1000);
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>DATA&&render(),150)});
 </script>

@@ -22,14 +22,16 @@ function publica() {
 (async () => {
   if (!OUT) throw new Error('Falta INFRA_OUT');
   const inicio = Date.now(); const estado = {};
-  let ultimaFull = 0, ultimaBusca = 0, falhas = 0, rodadas = 0;
+  let ultimaFull = 0, ultimaBusca = 0, falhas = 0, rodadas = 0, ultimoPush = 0;
   while (Date.now() - inicio < DURACAO && noHorario()) {
     const t = Date.now();
     try {
       const full = !estado.brutas || t - ultimaFull > FULL_CADA;
       const r = await rodada(estado, { incremental: !full, desde: ultimaBusca - 2 * MIN, aoVivo: true });
       ultimaBusca = r.inicio; if (full) ultimaFull = t;
-      publica(); falhas = 0; rodadas++;
+      // publica quando algo mudou, na busca completa, ou a cada 5 min (para o painel saber que o robô está vivo)
+      if (r.alteradas > 0 || full || Date.now() - ultimoPush > 5 * MIN) { publica(); ultimoPush = Date.now(); console.log('Publicado.'); }
+      falhas = 0; rodadas++;
     } catch (e) {
       console.log('Falha na rodada:', e.message);
       if (++falhas >= 5) throw e;
