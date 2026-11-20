@@ -45,6 +45,32 @@ a{color:inherit}
 
 /* ---------- conteúdo ---------- */
 .main{padding:16px 20px 32px;min-width:0}
+.main[hidden]{display:none!important}
+.oc-lab{display:block;font-size:12px;font-weight:700;color:var(--soft);margin:0 0 6px}
+#ocorr-view textarea{width:100%;min-height:150px;resize:vertical;background:var(--panel-2);border:1px solid var(--line-2);border-radius:8px;color:var(--fg);font:inherit;font-size:13.5px;line-height:1.5;padding:10px 12px}
+#ocorr-view textarea:focus-visible,#oc-pin:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+#ocorr-view fieldset{border:0;margin:14px 0 0;padding:0;min-width:0}
+#ocorr-view legend{padding:0}
+.oc-seg{display:flex;gap:8px}
+.oc-seg label{flex:1;position:relative}
+.oc-seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.oc-seg span{display:block;text-align:center;padding:9px;border:1px solid var(--line-2);border-radius:8px;background:var(--panel-2);font-weight:700;color:var(--soft)}
+.oc-seg input:checked+span{background:var(--orange);border-color:var(--orange);color:#1a0d02}
+.oc-seg input:focus-visible+span{outline:2px solid var(--fg);outline-offset:1px}
+.oc-btn{margin-top:14px;width:100%;height:38px;background:var(--orange)!important;border-color:var(--orange)!important;color:#1a0d02!important;font-size:13px!important}
+.oc-btn:disabled{opacity:.6;cursor:wait}
+.oc-msg{min-height:18px;margin:8px 0 0;font-size:12.5px;color:var(--soft)}
+.oc-msg.err{color:#F87171}.oc-msg.ok{color:var(--green)}
+.oc-note{font-size:11.5px;color:var(--faint);margin:2px 0 0}
+#oc-pin{height:36px;width:220px;max-width:100%;background:var(--panel-2);border:1px solid var(--line-2);border-radius:8px;color:var(--fg);font:inherit;padding:0 12px;margin-right:8px}
+.oc-pinrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.oc-filt{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.oc-filt button{height:28px;border-radius:999px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--soft);font:inherit;font-size:12px;font-weight:700;padding:0 12px;cursor:pointer}
+.oc-filt button[aria-pressed="true"]{background:var(--fg);color:#111;border-color:var(--fg)}
+#oc-tbody td{vertical-align:top}
+#oc-tbody td.desc{white-space:pre-wrap;word-break:break-word;min-width:260px}
+.oc-sheet{margin-left:auto;font-size:12px;font-weight:700;color:var(--orange);text-decoration:none}
+.oc-sheet:hover{text-decoration:underline}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
 .top h1{margin:0;font-stretch:120%;font-weight:800;font-size:22px;letter-spacing:.01em}
 .top .sub{color:var(--soft);font-size:12.5px;margin-top:2px;max-width:72ch}
@@ -243,6 +269,7 @@ svg [data-list]:hover{opacity:.82}
       <a href="#ajustes-pn"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M1 21h22L12 2zm12-3h-2v-2h2zm0-4h-2v-4h2z"/></svg>Ajustes</a>
       <a href="#tipos-pn"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M11 2v20a10 10 0 0 1 0-20zm2 0v9h9a10 10 0 0 0-9-9zm0 11v9a10 10 0 0 0 9-9z"/></svg>Tipos de demanda</a>
       <a href="#tasks-pn"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M3 4h18v3H3zm0 6h18v3H3zm0 6h18v3H3z"/></svg>Todas as tasks</a>
+      <a href="#ocorrencias" id="nav-oc"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h9l5 5v15H6zm8 1.5V8h4.5zM9 12h8v2H9zm0 4h8v2H9z"/></svg>Ocorrências</a>
     </nav>
     <div class="meta-card" id="meta-card"></div>
   </aside>
@@ -341,6 +368,34 @@ svg [data-list]:hover{opacity:.82}
 
     <section class="strip" id="strip" aria-label="Destaques"></section>
     <div class="foot"><span>Fonte: 100% das tasks de Vini Malvas, Pablo Gabriel e Luis Alexandre no ClickUp. Tipo e complexidade vêm do nome da task e da task mãe (regras em infra/config.json).</span><span>Os dados do ClickUp são atualizados de 1 em 1 minuto (das 6h à meia-noite)</span></div>
+  </main>
+
+  <main class="main" id="ocorr-view" hidden aria-labelledby="h-oc">
+    <div class="top"><div><h1 id="h-oc">OCORRÊNCIAS</h1><div class="sub">Registre o que aconteceu na operação e quem é o responsável. Cada registro vai para a planilha de histórico.</div></div></div>
+    <section class="pn" id="oc-lock" hidden style="margin-top:14px;max-width:560px">
+      <header><h2>CÓDIGO DE ACESSO</h2><p>Só quem tem o código vê e registra ocorrências.</p></header>
+      <div class="b"><form id="oc-pinf" class="oc-pinrow"><label for="oc-pin" class="oc-lab" style="width:100%;margin:0">Código</label><input type="password" id="oc-pin" autocomplete="off" required><button class="btn-o oc-btn" style="width:auto;margin:0;padding:0 18px" type="submit">Entrar</button></form><p class="oc-msg" id="oc-pinmsg" role="status"></p></div>
+    </section>
+    <div class="grid" id="oc-body" hidden>
+      <section class="pn c5" aria-labelledby="h-ocnova">
+        <header><h2 id="h-ocnova">NOVA OCORRÊNCIA</h2></header>
+        <div class="b"><form id="oc-form" novalidate>
+          <label for="oc-desc" class="oc-lab">O que aconteceu</label>
+          <textarea id="oc-desc" maxlength="5000" placeholder="Qual task ou funil, o que deu errado, o impacto e o que já foi feito."></textarea>
+          <fieldset><legend class="oc-lab">Responsável</legend>
+            <div class="oc-seg"><label><input type="radio" name="oc-resp" value="Pablo"><span>Pablo</span></label><label><input type="radio" name="oc-resp" value="Luis"><span>Luis</span></label></div>
+          </fieldset>
+          <button class="btn-o oc-btn" id="oc-send" type="submit">Registrar ocorrência</button>
+          <p class="oc-msg" id="oc-msg" role="status"></p>
+          <p class="oc-note">A data e o horário do registro são salvos automaticamente (horário de Brasília).</p>
+        </form></div>
+      </section>
+      <section class="pn c7" aria-labelledby="h-ochist">
+        <header><h2 id="h-ochist">HISTÓRICO</h2><span class="hint" id="oc-count"></span><a class="oc-sheet" id="oc-sheet" target="_blank" rel="noopener" hidden>Abrir planilha ↗</a></header>
+        <div class="b"><div class="oc-filt" id="oc-filt"></div>
+          <div class="tbl"><table><thead><tr><th style="white-space:nowrap">Data e horário</th><th>Responsável</th><th>Descrição</th></tr></thead><tbody id="oc-tbody"></tbody></table></div></div>
+      </section>
+    </div>
   </main>
 </div>
 <div class="tip" id="tip" role="tooltip"></div>
@@ -455,7 +510,7 @@ function montaFiltros(){
   const er=document.getElementById('f-erros');er.onclick=()=>{F.erros=!F.erros;er.setAttribute('aria-pressed',F.erros);render()};
   // menu lateral: marca a seção visível
   const links=[...document.querySelectorAll('#nav a')];
-  links.forEach(a=>a.onclick=()=>{links.forEach(x=>x.classList.toggle('on',x===a))});
+  links.forEach(a=>a.onclick=()=>{links.forEach(x=>x.classList.toggle('on',x===a));mostraAba(a.id==='nav-oc')});
 }
 
 /* ---------- modelo ---------- */
@@ -539,7 +594,7 @@ function kpis(R,A,ab){
     sla:forasla.length?regDem(`Demandas fora da meta de ${sla} h`,forasla):null,aj:exAj.length?reg('Tasks que foram para ajuste no período',exAj.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}<br>${comentAj(t)}`}))):null,
     atr:atr.length?reg('Tasks abertas atrasadas',atr.map(t=>({t,extra:`Venceu em ${fdata(new Date(t.prazo))}`}))):null,and:and.length?reg('Tasks em andamento agora',and):null};
   document.getElementById('kpis').innerHTML=[
-    card(ring(A.n?Math.min(100,R.n/Math.max(R.n,A.n)*100):100,C.orange),'TASKS ENTREGUES',R.n,'',delta(R.n,A.n),L.ent),
+    card('','TASKS ENTREGUES',R.n,'',delta(R.n,A.n),L.ent),
     card('', 'EDIÇÃO → INFRA', R.med==null?'—':fmtH(R.med).split(' ')[0], R.med==null?'':fmtH(R.med).split(' ')[1], R.med==null?'sem demandas medidas':delta(R.med,A.med,{bomSobe:false}),L.lead),
     card(ring(R.noSla,R.noSla>=80?C.green:R.noSla>=60?C.amber:C.red),`DENTRO DE ${sla} H`,R.noSla==null?'—':fmt(R.noSla,0),R.noSla==null?'':'%',forasla.length?`${forasla.length} fora da meta (clique)`:`${R.dem.length} demandas medidas`,L.sla),
     card(ring(R.taxaAj,R.taxaAj>20?C.red:R.taxaAj>10?C.amber:C.green),'VOLTOU P/ AJUSTE',R.aj,'',R.aj?`${R.aj} tasks foram para ajuste`:'nenhuma foi para ajuste',L.aj),
@@ -892,6 +947,63 @@ document.getElementById('sync').onclick=async()=>{
   catch(e){console.error(e);bt.textContent='Falhou, tente de novo'}
   finally{setTimeout(()=>{bt.disabled=false;bt.textContent='↻ Sincronizar'},1500)}
 };
+
+/* ---------- ocorrências (planilha via Google Apps Script) ---------- */
+const OC={pin:null,itens:[],filtro:'',url:null};
+const pinGuardado=()=>{try{return localStorage.getItem('fo_oc_pin')}catch(e){return null}};
+const guardaPin=p=>{try{p?localStorage.setItem('fo_oc_pin',p):localStorage.removeItem('fo_oc_pin')}catch(e){}};
+const dataHoraBR=ms=>ms?new Date(ms).toLocaleString('pt-BR',{timeZone:TZ,day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}).replace(',',''):'—';
+async function ocApi(corpo){
+  if(!SYNC_URL)throw new Error('Serviço de ocorrências indisponível.');
+  const r=await fetch(SYNC_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(corpo)});
+  const j=await r.json();if(!j.ok)throw new Error(j.erro||'Não deu certo.');return j;
+}
+function mostraAba(oc){
+  document.getElementById('visao').hidden=oc;document.getElementById('ocorr-view').hidden=!oc;
+  if(oc){window.scrollTo(0,0);if(history.replaceState)history.replaceState(null,'','#ocorrencias');ocAbrir()}
+  else if(location.hash==='#ocorrencias'&&history.replaceState)history.replaceState(null,'',location.pathname+location.search);
+}
+async function ocAbrir(){
+  const p=OC.pin||pinGuardado();
+  if(!p){document.getElementById('oc-lock').hidden=false;document.getElementById('oc-body').hidden=true;document.getElementById('oc-pin').focus();return}
+  await ocEntrar(p,true);
+}
+async function ocEntrar(p,silencioso){
+  const msg=document.getElementById('oc-pinmsg');msg.className='oc-msg';msg.textContent='Conferindo…';
+  try{
+    const j=await ocApi({acao:'listar',pin:p});OC.pin=p;guardaPin(p);OC.itens=j.itens;OC.url=j.url;
+    document.getElementById('oc-lock').hidden=true;document.getElementById('oc-body').hidden=false;msg.textContent='';ocRender();
+  }catch(e){
+    guardaPin(null);OC.pin=null;document.getElementById('oc-lock').hidden=false;document.getElementById('oc-body').hidden=true;
+    msg.className='oc-msg err';msg.textContent=silencioso&&/incorreto/.test(e.message)?'Digite o código de acesso.':e.message;
+  }
+}
+function ocRender(){
+  const cont=r=>OC.itens.filter(i=>!r||i.responsavel===r).length;
+  document.getElementById('oc-filt').innerHTML=[['','Todos'],['Pablo','Pablo'],['Luis','Luis']].map(([v,l])=>`<button type="button" data-f="${v}" aria-pressed="${OC.filtro===v}">${l} · ${cont(v)}</button>`).join('');
+  document.querySelectorAll('#oc-filt button').forEach(b=>b.onclick=()=>{OC.filtro=b.dataset.f;ocRender()});
+  const itens=OC.itens.filter(i=>!OC.filtro||i.responsavel===OC.filtro);
+  document.getElementById('oc-count').textContent=`${OC.itens.length} registrada${OC.itens.length===1?'':'s'}`;
+  const a=document.getElementById('oc-sheet');if(OC.url){a.href=OC.url;a.hidden=false}
+  document.getElementById('oc-tbody').innerHTML=itens.length?itens.map(i=>`<tr><td style="white-space:nowrap">${dataHoraBR(i.em)}</td><td><b>${esc(i.responsavel)}</b></td><td class="desc">${esc(i.descricao)}</td></tr>`).join(''):`<tr><td colspan="3" class="empty">${OC.itens.length?'Nenhuma ocorrência para esse responsável.':'Nenhuma ocorrência registrada ainda.'}</td></tr>`;
+}
+document.getElementById('oc-pinf').onsubmit=e=>{e.preventDefault();const p=document.getElementById('oc-pin').value.trim();if(p)ocEntrar(p,false)};
+document.getElementById('oc-form').onsubmit=async e=>{
+  e.preventDefault();
+  const msg=document.getElementById('oc-msg'),bt=document.getElementById('oc-send'),ta=document.getElementById('oc-desc');
+  const descricao=ta.value.trim(),r=document.querySelector('input[name="oc-resp"]:checked');
+  msg.className='oc-msg err';
+  if(!descricao){msg.textContent='Descreva a ocorrência antes de registrar.';ta.focus();return}
+  if(!r){msg.textContent='Escolha o responsável: Pablo ou Luis.';return}
+  bt.disabled=true;bt.textContent='Registrando…';msg.className='oc-msg';msg.textContent='';
+  try{
+    const j=await ocApi({acao:'registrar',pin:OC.pin,descricao,responsavel:r.value});
+    OC.itens.unshift(j.registro);ta.value='';r.checked=false;ocRender();
+    msg.className='oc-msg ok';msg.textContent=`Ocorrência registrada em ${dataHoraBR(j.registro.em)}.`;
+  }catch(err){msg.className='oc-msg err';msg.textContent=err.message+' Nada foi salvo; tente de novo.'}
+  finally{bt.disabled=false;bt.textContent='Registrar ocorrência'}
+};
+if(location.hash==='#ocorrencias'){document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('on',x.id==='nav-oc'));mostraAba(true)}
 load();setInterval(load,60*1000);
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>DATA&&render(),150)});
 </script>
