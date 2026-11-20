@@ -183,6 +183,13 @@ svg text{font-family:var(--f)}
 
 /* edição -> infra */
 .leadtop{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px}
+.como{margin:0 14px 2px;padding:10px 12px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--soft);line-height:1.5}
+.como-t{margin:0 0 4px;font-weight:700;color:var(--fg);font-size:12px}
+.como ul{margin:0;padding-left:16px}
+.como li{margin:2px 0}
+.como li.sub-li{list-style:none;margin-left:-4px}
+.como b{color:var(--fg)}
+.como .dot{margin-right:5px;vertical-align:middle}
 .leadtop div{min-width:120px}
 .leadtop b{display:block;font-stretch:115%;font-weight:800;font-size:22px}
 .leadtop span{color:var(--soft);font-size:11.5px}
@@ -323,11 +330,38 @@ svg [data-list]:hover{opacity:.82}
     <div class="grid">
       <section class="pn c7" id="lead-pn" aria-labelledby="h-lead">
         <header><h2 id="h-lead">DA EDIÇÃO PRONTA ATÉ A INFRA ENTREGUE</h2><span class="hint" id="lead-hint"></span>
-          <p>Quanto tempo a infra leva depois que a edição fica pronta. Verde = dentro da meta.</p></header>
+          <p>Quanto tempo a infra leva para entregar uma demanda <b>depois que a edição termina</b>.</p></header>
+        <div class="como">
+          <p class="como-t">Como ler este quadro</p>
+          <ul>
+            <li><b>O relógio começa</b> quando a edição da demanda vai para concluído (a infra já pode trabalhar) e <b>para</b> quando a última subtask de infra (implementar, revisar, subir no Apolo) vai para concluído.</li>
+            <li><b>Tempo típico:</b> metade das demandas foi entregue em menos que isso, metade em mais.</li>
+            <li><b>Dentro de 24 h:</b> de cada 100 demandas, quantas cumpriram a meta de 24 h.</li>
+            <li><b>85% fecham em até:</b> 85 de cada 100 demandas foram entregues até esse tempo. Só as 15 mais lentas passaram disso.</li>
+            <li><b>Demandas medidas:</b> quantas demandas entraram na conta no período escolhido.</li>
+            <li><b>Barras por squad:</b> cada barra é o total de demandas do squad. <i class="dot" style="background:var(--green)"></i>verde = até 24 h, <i class="dot" style="background:var(--amber)"></i>amarelo = de 24 a 48 h, <i class="dot" style="background:var(--red)"></i>vermelho = mais de 48 h. O número dentro da cor é a quantidade de demandas. A % à direita é quantas ficaram no verde. Clique numa cor para ver as tasks.</li>
+            <li><b>As que mais demoraram:</b> as 5 demandas mais lentas do período, com link para o ClickUp.</li>
+            <li>Demandas sem edição (pedidos diretos para a infra) não entram aqui, porque não têm de onde começar a contar.</li>
+          </ul>
+        </div>
         <div class="b"><div id="lead"></div></div>
       </section>
       <section class="pn c5" aria-labelledby="h-anat">
-        <header><h2 id="h-anat">PARA ONDE VAI O TEMPO</h2><p>Média por implementação entregue, da edição pronta (ou da criação, nas demandas diretas) até o feito.</p></header>
+        <header><h2 id="h-anat">PARA ONDE VAI O TEMPO</h2><p>Onde a task passa o tempo até ser entregue: parada esperando ou sendo feita.</p></header>
+        <div class="como">
+          <p class="como-t">Como ler este quadro</p>
+          <ul>
+            <li><b>Cada barra é uma pessoa.</b> O tamanho da barra é o tempo médio de uma entrega dela: da edição pronta até o feito (nos pedidos diretos, da criação até o feito).</li>
+            <li>A barra é dividida pelo tempo que a task passou em cada status:</li>
+            <li class="sub-li"><i class="dot" style="background:#64748B"></i><b>Na fila:</b> parada, esperando alguém começar.</li>
+            <li class="sub-li"><i class="dot" style="background:var(--green)"></i><b>Fazendo:</b> alguém estava trabalhando nela.</li>
+            <li class="sub-li"><i class="dot" style="background:var(--red)"></i><b>Em ajuste:</b> voltou para corrigir erro.</li>
+            <li class="sub-li"><i class="dot" style="background:var(--amber)"></i><b>Em revisão:</b> esperando ou passando pela revisão.</li>
+            <li><b>Exemplo:</b> barra de 16 h com 12 h cinza e 3 h verde = a task ficou 12 h parada e levou 3 h para ser feita. O problema é fila, não velocidade.</li>
+            <li><b>Embaixo de cada barra:</b> quantas entregas entraram na conta e quantas passaram pelo status "fazendo". Se o time pula direto de "pendente" para "feito", todo o tempo aparece como fila.</li>
+            <li>Passe o mouse em cada cor para ver as horas. Clique na barra para ver as tasks.</li>
+          </ul>
+        </div>
         <div class="b"><div id="anat"></div><div id="anat-note"></div></div>
       </section>
     </div>
