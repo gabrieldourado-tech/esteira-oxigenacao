@@ -185,6 +185,14 @@ svg text{font-family:var(--f)}
 .leadtop{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px}
 .como{margin:0 14px 2px;padding:10px 12px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--soft);line-height:1.5}
 .como-t{margin:0 0 4px;font-weight:700;color:var(--fg);font-size:12px}
+.mexp{margin:2px 16px 12px!important;font-size:12.5px!important}
+.mexp p{margin:0 0 6px}
+.ttl{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font:inherit;color:inherit;letter-spacing:inherit;border-radius:4px}
+.ttl:hover{color:var(--orange)}
+.ttl:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.ib{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;border:1px solid currentColor;font-size:10px;font-weight:800;line-height:1;opacity:.7;flex:none}
+.kpi .k .ib{margin-left:6px;vertical-align:1px;width:13px;height:13px;font-size:9px}
+.anat-row:hover rect.bg{fill:#3a414c}
 .como ul{margin:0;padding-left:16px}
 .como li{margin:2px 0}
 .como li.sub-li{list-style:none;margin-left:-4px}
@@ -241,7 +249,7 @@ td a{text-decoration:none} td a:hover{text-decoration:underline}
 @media (max-width:1200px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .foot{margin-top:14px;color:var(--faint);font-size:11.5px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
-.clk,[data-list]{cursor:pointer}
+.clk,[data-list],[data-exp]{cursor:pointer}
 .clk:hover,a.clk:hover{text-decoration:underline;text-decoration-color:var(--orange);text-underline-offset:3px}
 svg [data-list]:hover{opacity:.82}
 .modal{position:fixed;inset:0;z-index:50;background:rgba(5,6,8,.62);display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px}
@@ -329,39 +337,12 @@ svg [data-list]:hover{opacity:.82}
 
     <div class="grid">
       <section class="pn c7" id="lead-pn" aria-labelledby="h-lead">
-        <header><h2 id="h-lead">DA EDIÇÃO PRONTA ATÉ A INFRA ENTREGUE</h2><span class="hint" id="lead-hint"></span>
+        <header><h2 id="h-lead"><button type="button" class="ttl" data-exp="lead" title="O que é este quadro?">DA EDIÇÃO PRONTA ATÉ A INFRA ENTREGUE<span class="ib" aria-hidden="true">?</span></button></h2><span class="hint" id="lead-hint"></span>
           <p>Quanto tempo a infra leva para entregar uma demanda <b>depois que a edição termina</b>.</p></header>
-        <div class="como">
-          <p class="como-t">Como ler este quadro</p>
-          <ul>
-            <li><b>O relógio começa</b> quando a edição da demanda vai para concluído (a infra já pode trabalhar) e <b>para</b> quando a última subtask de infra (implementar, revisar, subir no Apolo) vai para concluído.</li>
-            <li><b>Tempo típico:</b> metade das demandas foi entregue em menos que isso, metade em mais.</li>
-            <li><b>Dentro de 24 h:</b> de cada 100 demandas, quantas cumpriram a meta de 24 h.</li>
-            <li><b>85% fecham em até:</b> 85 de cada 100 demandas foram entregues até esse tempo. Só as 15 mais lentas passaram disso.</li>
-            <li><b>Demandas medidas:</b> quantas demandas entraram na conta no período escolhido.</li>
-            <li><b>Barras por squad:</b> cada barra é o total de demandas do squad. <i class="dot" style="background:var(--green)"></i>verde = até 24 h, <i class="dot" style="background:var(--amber)"></i>amarelo = de 24 a 48 h, <i class="dot" style="background:var(--red)"></i>vermelho = mais de 48 h. O número dentro da cor é a quantidade de demandas. A % à direita é quantas ficaram no verde. Clique numa cor para ver as tasks.</li>
-            <li><b>As que mais demoraram:</b> as 5 demandas mais lentas do período, com link para o ClickUp.</li>
-            <li>Demandas sem edição (pedidos diretos para a infra) não entram aqui, porque não têm de onde começar a contar.</li>
-          </ul>
-        </div>
         <div class="b"><div id="lead"></div></div>
       </section>
       <section class="pn c5" aria-labelledby="h-anat">
-        <header><h2 id="h-anat">PARA ONDE VAI O TEMPO</h2><p>Onde a task passa o tempo até ser entregue: parada esperando ou sendo feita.</p></header>
-        <div class="como">
-          <p class="como-t">Como ler este quadro</p>
-          <ul>
-            <li><b>Cada barra é uma pessoa.</b> O tamanho da barra é o tempo médio de uma entrega dela: da edição pronta até o feito (nos pedidos diretos, da criação até o feito).</li>
-            <li>A barra é dividida pelo tempo que a task passou em cada status:</li>
-            <li class="sub-li"><i class="dot" style="background:#64748B"></i><b>Na fila:</b> parada, esperando alguém começar.</li>
-            <li class="sub-li"><i class="dot" style="background:var(--green)"></i><b>Fazendo:</b> alguém estava trabalhando nela.</li>
-            <li class="sub-li"><i class="dot" style="background:var(--red)"></i><b>Em ajuste:</b> voltou para corrigir erro.</li>
-            <li class="sub-li"><i class="dot" style="background:var(--amber)"></i><b>Em revisão:</b> esperando ou passando pela revisão.</li>
-            <li><b>Exemplo:</b> barra de 16 h com 12 h cinza e 3 h verde = a task ficou 12 h parada e levou 3 h para ser feita. O problema é fila, não velocidade.</li>
-            <li><b>Embaixo de cada barra:</b> quantas entregas entraram na conta e quantas passaram pelo status "fazendo". Se o time pula direto de "pendente" para "feito", todo o tempo aparece como fila.</li>
-            <li>Passe o mouse em cada cor para ver as horas. Clique na barra para ver as tasks.</li>
-          </ul>
-        </div>
+        <header><h2 id="h-anat"><button type="button" class="ttl" data-exp="anat" title="O que é este quadro?">PARA ONDE VAI O TEMPO<span class="ib" aria-hidden="true">?</span></button></h2><p>Onde a task passa o tempo até ser entregue: parada esperando ou sendo feita.</p></header>
         <div class="b"><div id="anat"></div><div id="anat-note"></div></div>
       </section>
     </div>
@@ -433,7 +414,7 @@ svg [data-list]:hover{opacity:.82}
   </main>
 </div>
 <div class="tip" id="tip" role="tooltip"></div>
-<div class="modal" id="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="m-t"><header><h3 id="m-t"></h3><button class="x" id="m-x" aria-label="Fechar">×</button></header><div class="ms" id="m-sub"></div><ul class="mlist" id="m-list"></ul></div></div>
+<div class="modal" id="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="m-t"><header><h3 id="m-t"></h3><button class="x" id="m-x" aria-label="Fechar">×</button></header><div class="mexp como" id="m-exp" hidden></div><div class="ms" id="m-sub"></div><ul class="mlist" id="m-list"></ul></div></div>
 
 <script>
 const H=36e5, DAY=864e5;
@@ -460,21 +441,31 @@ function untip(){tipEl.style.opacity=0}
 /* ---------- listas clicáveis (pop-up com as tasks) ---------- */
 const LISTS=new Map();let LN=0;
 // itens: task ({...task}) ou {t:task, extra:'texto'}; devolve o id para usar em data-list
-function reg(titulo,itens,sub){const id='L'+(++LN);LISTS.set(id,{titulo,itens:itens.map(x=>x&&x.t?x:{t:x}),sub});return id}
+const EXPL={"ent": "<p>Quantas tasks da infra foram <b>concluídas (feito)</b> no período escolhido, respeitando os filtros de pessoa, squad e tipo.</p><ul><li>Cada subtask conta separado: implementar, revisar e subir no Apolo são 3 tasks.</li><li>A seta compara com o período anterior do mesmo tamanho (ex.: estes 30 dias contra os 30 dias antes). <b style=\"color:var(--green)\">▲ verde</b> = entregou mais, <b style=\"color:#F87171\">▼ vermelho</b> = entregou menos.</li></ul>", "lead": "<p>Tempo típico entre <b>a edição ficar pronta</b> e <b>a infra terminar a demanda</b>.</p><ul><li>É a mediana: metade das demandas foi mais rápida que esse número, metade mais lenta.</li><li>Só entram demandas que têm subtask de edição e foram concluídas no período.</li><li>Aqui a seta para baixo é boa: significa que a infra ficou mais rápida que no período anterior.</li></ul>", "sla": "<p>De cada 100 demandas com edição entregues no período, <b>quantas a infra terminou em até 24 horas</b> depois da edição pronta.</p><ul><li>A meta é 80%.</li><li>Anel <b style=\"color:var(--green)\">verde</b> = 80% ou mais, <b style=\"color:var(--amber)\">amarelo</b> = 60 a 79%, <b style=\"color:#F87171\">vermelho</b> = abaixo de 60%.</li><li>A lista abaixo mostra as demandas que passaram de 24 h.</li></ul>", "aj": "<p>Quantas subtasks de infra <b>foram para o status ajuste/ajustar</b> no período, ou seja, voltaram para correção.</p><ul><li>O anel mostra quanto isso representa sobre as tasks entregues.</li><li>Na lista abaixo aparece cada task e o comentário com o motivo, quando alguém comentou.</li></ul>", "atr": "<p>Subtasks de infra <b>ainda abertas cuja data de vencimento já passou</b>.</p><ul><li>A task só conta como atrasada depois que o dia do vencimento termina (meia-noite, horário de Brasília).</li><li>\"de X abertas\" é o total de tasks abertas na esteira com prazo dentro do período (ou criadas nele, se não têm prazo).</li></ul>", "and": "<p>Tasks abertas que <b>já estão liberadas para a infra</b>: na fila, fazendo, em ajuste ou em revisão.</p><ul><li>\"Liberada\" quer dizer que a edição já terminou, ou que a demanda não depende de edição.</li><li>\"+ X esperando\" são as que ainda dependem da edição ou de outra etapa terminar antes.</li></ul>"};
+const EXPL_Q={"lead": ["DA EDIÇÃO PRONTA ATÉ A INFRA ENTREGUE", "<p>Quanto tempo a infra leva para entregar uma demanda <b>depois que a edição termina</b>.</p><ul>\n            <li><b>O relógio começa</b> quando a edição da demanda vai para concluído (a infra já pode trabalhar) e <b>para</b> quando a última subtask de infra (implementar, revisar, subir no Apolo) vai para concluído.</li>\n            <li><b>Tempo típico:</b> metade das demandas foi entregue em menos que isso, metade em mais.</li>\n            <li><b>Dentro de 24 h:</b> de cada 100 demandas, quantas cumpriram a meta de 24 h.</li>\n            <li><b>85% fecham em até:</b> 85 de cada 100 demandas foram entregues até esse tempo. Só as 15 mais lentas passaram disso.</li>\n            <li><b>Demandas medidas:</b> quantas demandas entraram na conta no período escolhido.</li>\n            <li><b>Barras por squad:</b> cada barra é o total de demandas do squad. <i class=\"dot\" style=\"background:var(--green)\"></i>verde = até 24 h, <i class=\"dot\" style=\"background:var(--amber)\"></i>amarelo = de 24 a 48 h, <i class=\"dot\" style=\"background:var(--red)\"></i>vermelho = mais de 48 h. O número dentro da cor é a quantidade de demandas. A % à direita é quantas ficaram no verde. Clique numa cor para ver as tasks.</li>\n            <li><b>As que mais demoraram:</b> as 5 demandas mais lentas do período, com link para o ClickUp.</li>\n            <li>Demandas sem edição (pedidos diretos para a infra) não entram aqui, porque não têm de onde começar a contar.</li>\n          </ul>"], "anat": ["PARA ONDE VAI O TEMPO", "<p>Onde a task passa o tempo até ser entregue: <b>parada esperando</b> ou <b>sendo feita</b>.</p><ul>\n            <li><b>Cada barra é uma pessoa.</b> O tamanho da barra é o tempo médio de uma entrega dela: da edição pronta até o feito (nos pedidos diretos, da criação até o feito).</li>\n            <li>A barra é dividida pelo tempo que a task passou em cada status:</li>\n            <li class=\"sub-li\"><i class=\"dot\" style=\"background:#64748B\"></i><b>Na fila:</b> parada, esperando alguém começar.</li>\n            <li class=\"sub-li\"><i class=\"dot\" style=\"background:var(--green)\"></i><b>Fazendo:</b> alguém estava trabalhando nela.</li>\n            <li class=\"sub-li\"><i class=\"dot\" style=\"background:var(--red)\"></i><b>Em ajuste:</b> voltou para corrigir erro.</li>\n            <li class=\"sub-li\"><i class=\"dot\" style=\"background:var(--amber)\"></i><b>Em revisão:</b> esperando ou passando pela revisão.</li>\n            <li><b>Exemplo:</b> barra de 16 h com 12 h cinza e 3 h verde = a task ficou 12 h parada e levou 3 h para ser feita. O problema é fila, não velocidade.</li>\n            <li><b>Embaixo de cada barra:</b> quantas entregas entraram na conta e quantas passaram pelo status \"fazendo\". Se o time pula direto de \"pendente\" para \"feito\", todo o tempo aparece como fila.</li>\n            <li>Passe o mouse em cada cor para ver as horas. Clique na barra para ver as tasks.</li>\n          </ul>"]};
+function reg(titulo,itens,sub,exp){const id='L'+(++LN);LISTS.set(id,{titulo,itens:itens.map(x=>x&&x.t?x:{t:x}),sub,exp});return id}
 const dl=(titulo,itens,sub)=>itens&&itens.length?` data-list="${reg(titulo,itens,sub)}" class="clk" tabindex="0" role="button"`:'';
 const regDem=(titulo,dems,sub)=>reg(titulo,dems.slice().sort((a,b)=>b.lead-a.lead).map(d=>({t:d.exec,extra:`Edição → infra: <b>${fmtH(d.lead)}</b>`})),sub);
 function abreLista(id){
   const L=LISTS.get(id);if(!L)return;
   document.getElementById('m-t').textContent=L.titulo;
+  const ex=document.getElementById('m-exp');ex.innerHTML=L.exp?EXPL[L.exp]:'';ex.hidden=!L.exp;document.getElementById('m-sub').hidden=false;
   document.getElementById('m-sub').textContent=(L.sub?L.sub+' · ':'')+`${L.itens.length} task${L.itens.length>1?'s':''} · clique para abrir no ClickUp`;
   const agora=Date.now();
   document.getElementById('m-list').innerHTML=L.itens.slice(0,300).map(({t,extra})=>{const p=dono(t),late=vencida(t);return `<li><a href="${esc(t.url)}" target="_blank" rel="noopener"><span class="open">abrir ↗</span>${esc(t.pai_nome?t.pai_nome+' → '+t.nome:t.nome)}</a>
     <div class="mm"><span><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}</span><span>${esc(t.squad||t.lista||'')}</span><span>${esc(t.categoria)}</span><span>Status: ${esc(t.status)}${late?' <b style="color:#F87171">atrasada</b>':''}</span>${t.feita&&t.fim?`<span>Entregue ${fdata(new Date(t.fim))}</span>`:''}${t.lead_edicao_h!=null?`<span>Edição → infra ${fmtH(t.lead_edicao_h)}</span>`:''}${t.n_ajustes?`<span style="color:#F87171">${t.n_ajustes} ajuste(s)</span>`:''}</div>${extra?`<div class="mx">${extra}</div>`:''}</li>`}).join('')+(L.itens.length>300?`<li class="sub">Mostrando 300 de ${L.itens.length}.</li>`:'');
   document.getElementById('modal').hidden=false;document.getElementById('m-x').focus();
 }
+function abreExplica(k){
+  const q=EXPL_Q[k];const titulo=q?q[0]:k;const html=q?q[1]:EXPL[k];if(!html)return;
+  document.getElementById('m-t').textContent=q?titulo:'O que é '+titulo;
+  const ex=document.getElementById('m-exp');ex.innerHTML=html;ex.hidden=false;
+  document.getElementById('m-sub').hidden=true;document.getElementById('m-list').innerHTML='';
+  document.getElementById('modal').hidden=false;document.getElementById('m-x').focus();
+}
 function fechaLista(){document.getElementById('modal').hidden=true}
-document.addEventListener('click',e=>{const el=e.target.closest('[data-list]');if(el){e.preventDefault();untip();abreLista(el.getAttribute('data-list'));return}if(e.target.id==='modal'||e.target.id==='m-x')fechaLista()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')fechaLista();if(e.key==='Enter'){const el=e.target.closest&&e.target.closest('[data-list]');if(el)abreLista(el.getAttribute('data-list'))}});
+document.addEventListener('click',e=>{const el=e.target.closest('[data-list],[data-exp]');if(el){e.preventDefault();untip();if(el.hasAttribute('data-list'))abreLista(el.getAttribute('data-list'));else abreExplica(el.getAttribute('data-exp'));return}if(e.target.id==='modal'||e.target.id==='m-x')fechaLista()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fechaLista();if(e.key==='Enter'){const el=e.target.closest&&e.target.closest('[data-list],[data-exp]');if(el&&el.tagName!=='BUTTON'){if(el.hasAttribute('data-list'))abreLista(el.getAttribute('data-list'));else abreExplica(el.getAttribute('data-exp'))}}});
 
 /* ---------- período (estilo Looker Studio) ---------- */
 const MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
@@ -622,18 +613,18 @@ function delta(atual,ant,{bomSobe=true,un='%',pp=false}={}){
 function kpis(R,A,ab){
   const sla=DATA.config.sla_horas||24, late=ab.filter(vencida).length, abN=ab.filter(t=>estacao(t)!=='espera').length;
   const emAjusteAgora=ab.filter(t=>estacao(t)==='ajuste').length;
-  const card=(ringH,k,v,u,d,lid)=>`<div class="kpi"${lid?` data-list="${lid}" tabindex="0" role="button" title="Ver as tasks"`:''}>${ringH||''}<div style="min-width:0"><div class="k">${k}</div><div class="v${lid?' clk':''}">${v}${u?`<small>${u}</small>`:''}</div><div class="d">${d}</div></div></div>`;
+  const card=(ringH,k,v,u,d,lid,exp)=>{if(lid&&LISTS.get(lid))LISTS.get(lid).exp=exp;return `<div class="kpi"${lid?` data-list="${lid}"`:` data-exp="${exp}"`} tabindex="0" role="button" title="O que é este número${lid?' e quais tasks entram nele':''}">${ringH||''}<div style="min-width:0"><div class="k">${k}<span class="ib" aria-hidden="true">?</span></div><div class="v${lid?' clk':''}">${v}${u?`<small>${u}</small>`:''}</div><div class="d">${d}</div></div></div>`};
   const agora=Date.now(), exAj=R.ajL, forasla=R.dem.filter(d=>d.lead>sla), atr=ab.filter(vencida).sort((a,b)=>a.prazo-b.prazo), and=ab.filter(t=>estacao(t)!=='espera');
   const L={ent:R.ent.length?reg('Tasks entregues no período',R.ent.slice().sort((a,b)=>b.fim-a.fim)):null,lead:R.dem.length?regDem('Demandas medidas: edição → infra',R.dem,'da mais demorada para a mais rápida'):null,
     sla:forasla.length?regDem(`Demandas fora da meta de ${sla} h`,forasla):null,aj:exAj.length?reg('Tasks que foram para ajuste no período',exAj.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}<br>${comentAj(t)}`}))):null,
     atr:atr.length?reg('Tasks abertas atrasadas',atr.map(t=>({t,extra:`Venceu em ${fdata(new Date(t.prazo))}`}))):null,and:and.length?reg('Tasks em andamento agora',and):null};
   document.getElementById('kpis').innerHTML=[
-    card('','TASKS ENTREGUES',R.n,'',delta(R.n,A.n),L.ent),
-    card('', 'EDIÇÃO → INFRA', R.med==null?'—':fmtH(R.med).split(' ')[0], R.med==null?'':fmtH(R.med).split(' ')[1], R.med==null?'sem demandas medidas':delta(R.med,A.med,{bomSobe:false}),L.lead),
-    card(ring(R.noSla,R.noSla>=80?C.green:R.noSla>=60?C.amber:C.red),`DENTRO DE ${sla} H`,R.noSla==null?'—':fmt(R.noSla,0),R.noSla==null?'':'%',forasla.length?`${forasla.length} fora da meta (clique)`:`${R.dem.length} demandas medidas`,L.sla),
-    card(ring(R.taxaAj,R.taxaAj>20?C.red:R.taxaAj>10?C.amber:C.green),'VOLTOU P/ AJUSTE',R.aj,'',R.aj?`${R.aj} tasks foram para ajuste`:'nenhuma foi para ajuste',L.aj),
-    card(ring(ab.length?late/ab.length*100:0,C.red),'ABERTAS ATRASADAS',late,'',`de ${ab.length} abertas na esteira`,L.atr),
-    card('','EM ANDAMENTO AGORA',abN,'',`liberadas para a infra · + ${ab.length-abN} esperando`,L.and),
+    card('','TASKS ENTREGUES',R.n,'',delta(R.n,A.n),L.ent,'ent'),
+    card('', 'EDIÇÃO → INFRA', R.med==null?'—':fmtH(R.med).split(' ')[0], R.med==null?'':fmtH(R.med).split(' ')[1], R.med==null?'sem demandas medidas':delta(R.med,A.med,{bomSobe:false}),L.lead,'lead'),
+    card(ring(R.noSla,R.noSla>=80?C.green:R.noSla>=60?C.amber:C.red),`DENTRO DE ${sla} H`,R.noSla==null?'—':fmt(R.noSla,0),R.noSla==null?'':'%',forasla.length?`${forasla.length} fora da meta (clique)`:`${R.dem.length} demandas medidas`,L.sla,'sla'),
+    card(ring(R.taxaAj,R.taxaAj>20?C.red:R.taxaAj>10?C.amber:C.green),'VOLTOU P/ AJUSTE',R.aj,'',R.aj?`${R.aj} tasks foram para ajuste`:'nenhuma foi para ajuste',L.aj,'aj'),
+    card(ring(ab.length?late/ab.length*100:0,C.red),'ABERTAS ATRASADAS',late,'',`de ${ab.length} abertas na esteira`,L.atr,'atr'),
+    card('','EM ANDAMENTO AGORA',abN,'',`liberadas para a infra · + ${ab.length-abN} esperando`,L.and,'and'),
   ].join('');
 }
 function metaCard(R){
@@ -747,11 +738,13 @@ function anatomia(ent){
   const svg=d3.select(host).append('svg').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Média de horas por status e pessoa');
   lista.forEach((r,i)=>{
     const y=i*(bh+gap)+4;let acc=0;
-    svg.append('text').attr('x',0).attr('y',y+bh/2+5).attr('fill',C.fg).attr('font-weight',700).attr('font-size',12.5).text(r.p.curto);
-    svg.append('rect').attr('x',left).attr('y',y).attr('width',W-left-56).attr('height',bh).attr('rx',4).attr('fill',C.line).attr('data-list',r.n?reg(`${r.p.nome}: implementações entregues`,r.mine.slice().sort((a,b)=>b.fim-a.fim)):null);
-    grupos.forEach(([k,l,c])=>{const v=r.m[k];if(v<=0)return;svg.append('rect').attr('x',left+x(acc)).attr('y',y).attr('width',Math.max(1,x(v)-1)).attr('height',bh).attr('rx',3).attr('fill',c).on('mousemove',ev=>tip(ev,`<b>${esc(r.p.nome)}</b><br>${l}: ${fmtH(v)} em média`)).on('mouseleave',untip);acc+=v});
-    svg.append('text').attr('x',left+x(acc)+6).attr('y',y+bh/2+5).attr('fill',C.soft).attr('font-size',12).text(r.n?fmtH(acc):'—');
-    svg.append('text').attr('x',left).attr('y',y+bh+14).attr('fill',C.faint).attr('font-size',11).text(r.n?`${r.n} entregas · ${Math.round(r.usaFazendo/r.n*100)}% passaram por "fazendo"`:'sem entregas no período');
+    const g=svg.append('g').attr('class','anat-row').attr('data-list',r.n?reg(`${r.p.nome}: implementações entregues`,r.mine.slice().sort((a,b)=>b.fim-a.fim),'tempo médio de cada uma, da edição pronta até o feito'):null).attr('tabindex',r.n?0:null).attr('role',r.n?'button':null).attr('aria-label',r.n?`${r.p.nome}: ver as ${r.n} entregas`:null);
+    g.append('rect').attr('x',0).attr('y',y-4).attr('width',W).attr('height',bh+24).attr('fill','transparent');
+    g.append('text').attr('x',0).attr('y',y+bh/2+5).attr('fill',C.fg).attr('font-weight',700).attr('font-size',12.5).text(r.p.curto);
+    g.append('rect').attr('class','bg').attr('x',left).attr('y',y).attr('width',W-left-56).attr('height',bh).attr('rx',4).attr('fill',C.line);
+    grupos.forEach(([k,l,c])=>{const v=r.m[k];if(v<=0)return;g.append('rect').attr('x',left+x(acc)).attr('y',y).attr('width',Math.max(1,x(v)-1)).attr('height',bh).attr('rx',3).attr('fill',c).on('mousemove',ev=>tip(ev,`<b>${esc(r.p.nome)}</b><br>${l}: ${fmtH(v)} em média`)).on('mouseleave',untip);acc+=v});
+    g.append('text').attr('x',left+x(acc)+6).attr('y',y+bh/2+5).attr('fill',C.soft).attr('font-size',12).text(r.n?fmtH(acc):'—');
+    g.append('text').attr('x',left).attr('y',y+bh+14).attr('fill',C.faint).attr('font-size',11).text(r.n?`${r.n} entregas · ${Math.round(r.usaFazendo/r.n*100)}% passaram por "fazendo"`:'sem entregas no período');
   });
   const lg=svg.append('g').attr('transform',`translate(${left},${Hh-6})`);let lx=0;
   grupos.forEach(([,l,c])=>{lg.append('rect').attr('x',lx).attr('y',-9).attr('width',10).attr('height',10).attr('rx',2).attr('fill',c);lg.append('text').attr('x',lx+14).attr('y',0).attr('fill',C.soft).attr('font-size',11).text(l);lx+=l.length*6.3+28});
