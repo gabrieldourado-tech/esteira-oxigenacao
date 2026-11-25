@@ -88,7 +88,7 @@
   const NICHO_PT = {
     lung: 'Pulmão', lungs: 'Pulmão', 'memory loss': 'Memória', memory: 'Memória', 'weight loss': 'Emagrecimento', skin: 'Pele',
     'male enhancement': 'Masculino', diabetes: 'Diabetes', vision: 'Visão', 'hair loss': 'Cabelo', 'joint pain': 'Articulações',
-    'blood pressure': 'Pressão', hooks: 'Hooks', prostate: 'Próstata', tinnitus: 'Zumbido', neuropathy: 'Neuropatia', 'gut health': 'Intestino',
+    'blood pressure': 'Pressão', 'blood sugar': 'Glicemia', rejuvenation: 'Rejuvenescimento', 'anti aging': 'Rejuvenescimento', 'teeth': 'Dentes', 'dental': 'Dentes', 'sleep': 'Sono', 'liver': 'Fígado', 'hearing': 'Audição', 'energy': 'Energia', 'nail fungus': 'Fungos', 'fungus': 'Fungos', 'kidney': 'Rins', 'heart': 'Coração', 'brain': 'Cérebro', 'cholesterol': 'Colesterol', hooks: 'Hooks', prostate: 'Próstata', tinnitus: 'Zumbido', neuropathy: 'Neuropatia', 'gut health': 'Intestino',
   };
   const nicho = (x) => (x ? NICHO_PT[semAcento(x)] || x : null);
   const nomeProduto = (p) => {
