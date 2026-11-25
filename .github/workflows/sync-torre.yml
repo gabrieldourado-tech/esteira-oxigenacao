@@ -1,0 +1,38 @@
+name: Atualizar Torre de Controle
+
+# Atualiza os dados da Torre de Controle a cada 30 minutos, das 6h à meia-noite (Fortaleza = UTC-3).
+on:
+  schedule:
+    - cron: '17,47 9-23 * * *'
+    - cron: '17,47 0-2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-torre
+  cancel-in-progress: false
+
+jobs:
+  sync-torre:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Puxar dados do ClickUp
+        run: node torre/sync-torre.js
+        env:
+          CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
+      - name: Salvar dados
+        run: |
+          git add torre/data.json
+          if git diff --cached --quiet; then echo "Sem mudanças"; exit 0; fi
+          git config user.name "esteira-bot"
+          git config user.email "esteira-bot@users.noreply.github.com"
+          git commit -m "Atualiza dados da Torre de Controle"
+          for i in 1 2 3 4; do git pull --rebase -X theirs && git push && exit 0; sleep 7; done
+          exit 1
