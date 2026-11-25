@@ -327,8 +327,9 @@ function render(D){
   $('#fontes').textContent='Fontes: ClickUp (squads, esteiras, pedidos CX) · Funnel Ops (infra)'+(D.vendas?' · Looker (vendas)':'');
 }
 
+function semanasEsteira(D){const s=D.esteira.semanal;let k=s.findIndex(d=>d.ads+d.lead+d.pote>0);if(k<0)k=0;return s.slice(Math.min(k,s.length-2));}
 function heroTrend(D){
-  const dados=D.esteira.semanal.map(d=>d.ads+d.lead+d.pote), n=dados.length, W=420,H=92,max=Math.max(1,...dados)*1.15;
+  const sem=semanasEsteira(D), dados=sem.map(d=>d.ads+d.lead+d.pote), n=dados.length, W=420,H=92,max=Math.max(1,...dados)*1.15;
   const step=W/(n-1||1), y=v=>H-6-(v/max)*(H-22);
   const pts=dados.map((v,i)=>[i*step,y(v)]);
   const svg=el('svg',{viewBox:`-6 0 ${W+12} ${H+16}`,class:'chart',role:'img','aria-label':'Materiais prontos por semana'});svg.setAttribute('viewBox',`-24 0 ${W+48} ${H+16}`);
@@ -339,8 +340,8 @@ function heroTrend(D){
   el('path',{d:`M${pts[n-2][0]},${pts[n-2][1]}L${pts[n-1][0]},${pts[n-1][1]}`,fill:'none',stroke:'var(--series-1)','stroke-width':2,'stroke-dasharray':'4 4'},svg);
   pts.forEach((p,i)=>{const g=el('g',{tabindex:0},svg);el('circle',{cx:p[0],cy:p[1],r:i===n-2?5:3.5,fill:i===n-1?'var(--surface-1)':'var(--series-1)',stroke:'var(--series-1)','stroke-width':2},g);
     el('rect',{x:p[0]-step/2,y:0,width:step,height:H,fill:'transparent'},g);
-    const t=el('text',{x:p[0],y:H+13,'text-anchor':'middle',fill:'var(--text-muted)','font-size':11},svg);t.textContent=D.semanas[i]+(i===n-1?'*':'');
-    bindTip(g,`<b>Semana de ${D.semanas[i]}${i===n-1?' (em andamento)':''}</b><div class="r">Materiais prontos: <b>${fmt(dados[i])}</b></div>`);});
+    const t=el('text',{x:p[0],y:H+13,'text-anchor':'middle',fill:'var(--text-muted)','font-size':11},svg);t.textContent=sem[i].rotulo+(i===n-1?'*':'');
+    bindTip(g,`<b>Semana de ${sem[i].rotulo}${i===n-1?' (em andamento)':''}</b><div class="r">Materiais prontos: <b>${fmt(dados[i])}</b></div>`);});
   const b=$('#hero-t');b.innerHTML='<p class="sub" style="margin:0 0 4px">Materiais prontos por semana</p>';b.appendChild(svg);
 }
 
@@ -348,7 +349,7 @@ function chartEsteira(D){
   const box=$('#ch-est'); box.innerHTML='';
   $('#leg-est').innerHTML=TIPOS.map(t=>`<span><i class="sw" style="background:${t.c}"></i>${t.n}</span>`).join('');
   const W=760,H=270,m={t:26,r:8,b:28,l:34};
-  const dados=D.esteira.semanal; const tot=dados.map(d=>d.ads+d.lead+d.pote);
+  const dados=semanasEsteira(D); const tot=dados.map(d=>d.ads+d.lead+d.pote);
   const E=eixo(Math.max(...tot,1)), max=E.max; const iw=W-m.l-m.r, ih=H-m.t-m.b;
   const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,class:'chart',role:'img','aria-label':'Materiais prontos por semana, por tipo'});
   svg.innerHTML='<defs><pattern id="hach" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="7" fill="rgba(15,15,14,.45)"/></pattern></defs>';
