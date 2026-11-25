@@ -1,0 +1,8 @@
+{
+  "_leia": "Configuração da Torre de Controle. IDs das listas do ClickUp que alimentam o painel. Pode editar direto no GitHub.",
+  "semanas": 8,
+  "esteiras": { "ads": "901329157823", "lead": "901329213413", "pote": "901329213562" },
+  "squads_listas": { "S1": "901329177364", "S2": "901329177473", "S3": "901329177474", "S4": "901329176656" },
+  "pasta_aov": "901315115212",
+  "lista_cx": "1400720000005166"
+}
