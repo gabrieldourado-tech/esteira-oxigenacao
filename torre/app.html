@@ -11,7 +11,6 @@
   --text-primary:#f0efec; --text-secondary:#c3c2b7; --text-muted:#8f8e85;
   --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70;
   --good:#0ca30c; --warning:#fab219; --critical:#d03b3b;
-  --accent:#3987e5;
   --r:14px;
 }
 *{box-sizing:border-box}
@@ -21,26 +20,64 @@ a{color:inherit}
 .wrap{max-width:1320px;margin:0 auto;padding:22px 24px 40px}
 
 /* topo */
-.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
 .brand{display:flex;align-items:center;gap:12px}
 .mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(140deg,#2a2a26,#151513);border:1px solid var(--line-2);display:grid;place-items:center}
 .brand h1{margin:0;font-size:19px;letter-spacing:.2px;font-weight:700}
 .brand p{margin:1px 0 0;color:var(--text-muted);font-size:12.5px}
 .top .sp{flex:1}
 .pill{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--line-2);border-radius:999px;background:var(--surface-1);color:var(--text-secondary);font-size:12.5px;white-space:nowrap}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px rgba(12,163,12,.18)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px rgba(12,163,12,.18);flex:none}
 .dot.velho{background:var(--warning);box-shadow:0 0 0 3px rgba(250,178,25,.18)}
-.dot.exemplo{background:var(--text-muted);box-shadow:none}
+.btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface-1);color:var(--text-primary);font-size:13px;font-weight:600;white-space:nowrap}
+.btn:hover,.btn:focus-visible{border-color:var(--text-secondary)}
+.btn.pri{background:#1f3b5f;border-color:#3987e5}
+.btn svg{flex:none}
+.btn.gira svg{animation:gira .8s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.sub-top{color:var(--text-muted);font-size:12.5px;margin:0 0 18px;display:flex;gap:6px 14px;flex-wrap:wrap}
+.sub-top b{color:var(--text-secondary);font-weight:600}
+
+/* filtro de data (estilo Looker Studio) */
+.dp{position:relative}
+.dp-btn small{color:var(--text-muted);font-weight:500}
+.dp-pop{position:absolute;top:calc(100% + 6px);right:0;z-index:40;display:flex;background:#fff;color:#202124;border-radius:8px;box-shadow:0 10px 32px rgba(0,0,0,.55);font-size:12px;overflow:hidden}
+.dp-pop[hidden]{display:none}
+.dp-presets{display:flex;flex-direction:column;padding:6px 0;border-right:1px solid #e3e3e3;min-width:200px}
+.dp-presets hr{border:0;border-top:1px solid #e3e3e3;margin:5px 0}
+.dp-presets button{all:unset;cursor:pointer;padding:5px 14px;color:#202124;font-size:12.5px}
+.dp-presets button:hover{background:#f1f3f4}
+.dp-presets button[aria-pressed="true"]{background:#e8f0fe;color:#1a73e8;font-weight:600}
+.dp-main{padding:8px 12px 10px}
+.dp-head{display:flex;justify-content:space-between;align-items:center;height:22px}
+.dp-nav{all:unset;cursor:pointer;font-size:18px;line-height:1;padding:0 8px;border-radius:50%;color:#5f6368}
+.dp-nav:hover{background:#f1f3f4}
+.dp-cals{display:flex;gap:14px}
+.dp-cal h4{margin:0 0 4px;text-align:center;font-size:12.5px;font-weight:600}
+.dp-grid{display:grid;grid-template-columns:repeat(7,28px);row-gap:2px}
+.dp-grid .wd{color:#70757a;font-size:10.5px;text-align:center;padding:2px 0}
+.dp-grid button{all:unset;box-sizing:border-box;height:26px;line-height:26px;text-align:center;cursor:pointer;font-size:12px;color:#202124}
+.dp-grid button:hover{outline:1px solid #1a73e8;border-radius:50%}
+.dp-grid button.in{background:#e8f0fe}
+.dp-grid button.ed{background:#1a73e8;color:#fff;border-radius:50%}
+.dp-grid button.today{font-weight:700;color:#1a73e8}
+.dp-grid button.ed.today{color:#fff}
+.dp-grid button:disabled{color:#c4c7c5;cursor:default;outline:0}
+.dp-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;border-top:1px solid #e3e3e3;padding-top:8px}
+.dp-foot #dp-sel{color:#5f6368;font-size:11.5px}
+.dp-act{all:unset;cursor:pointer;padding:5px 12px;border-radius:4px;color:#1a73e8;font-weight:600;font-size:12.5px}
+.dp-act:hover{background:#f1f3f4}
+.dp-act.pri{background:#1a73e8;color:#fff;margin-left:4px}
+@media (max-width:760px){.dp-pop{flex-direction:column;right:auto;left:0}.dp-presets{flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid #e3e3e3}.dp-presets hr{display:none}.dp-cals .dp-cal:nth-child(2){display:none}}
 
 /* grade */
 .g{display:grid;gap:16px;margin-bottom:16px}
-.g-hero{grid-template-columns:1.35fr 1fr}
-.g-5{grid-template-columns:repeat(5,1fr)}
-.g-2{grid-template-columns:1.6fr 1fr}
-.g-3{grid-template-columns:1fr 1fr 1fr}
+.g-4{grid-template-columns:repeat(4,1fr)}
 .g-2e{grid-template-columns:1fr 1fr}
-@media (max-width:1100px){.g-5{grid-template-columns:repeat(3,1fr)}.g-hero,.g-2,.g-3{grid-template-columns:1fr}}
-@media (max-width:640px){.g-5,.g-2e{grid-template-columns:1fr}.wrap{padding:16px}}
+.g-hero{grid-template-columns:1fr 1.05fr;gap:0}
+@media (max-width:1100px){.g-4{grid-template-columns:repeat(2,1fr)}.g-2e{grid-template-columns:1fr}}
+@media (max-width:900px){.g-hero{grid-template-columns:1fr}.g-hero>.lado+.lado{border-left:0!important;border-top:1px solid var(--line);padding-left:0!important;padding-top:18px;margin-top:18px}}
+@media (max-width:640px){.g-4{grid-template-columns:1fr}.wrap{padding:16px}}
 
 .card{background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 16px;position:relative;min-width:0}
 .card h2{margin:0;font-size:12px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--text-secondary);display:flex;align-items:center;gap:8px}
@@ -49,36 +86,42 @@ a{color:inherit}
 .hd .sp{flex:1}
 .ib{all:unset;cursor:pointer;width:18px;height:18px;border-radius:50%;border:1px solid var(--line-2);display:inline-grid;place-items:center;font-size:11px;color:var(--text-muted);flex:none}
 .ib:hover,.ib:focus-visible{color:var(--text-primary);border-color:var(--text-secondary)}
-.tg{all:unset;cursor:pointer;font-size:12px;color:var(--text-muted);padding:3px 8px;border:1px solid var(--line-2);border-radius:6px}
+.tg{all:unset;cursor:pointer;font-size:12px;color:var(--text-muted);padding:3px 8px;border:1px solid var(--line-2);border-radius:6px;white-space:nowrap}
 .tg:hover,.tg:focus-visible{color:var(--text-primary)}
-
-/* narrativa */
-.story{background:linear-gradient(160deg,#1f1f1c 0%,#1a1a19 55%);}
-.story ol{margin:6px 0 0;padding:0;list-style:none;counter-reset:n}
-.story li{counter-increment:n;position:relative;padding:9px 0 9px 34px;border-top:1px solid var(--line);color:var(--text-secondary);font-size:14.5px}
-.story li:first-child{border-top:0}
-.story li::before{content:counter(n);position:absolute;left:0;top:10px;width:22px;height:22px;border-radius:7px;background:var(--surface-2);border:1px solid var(--line-2);color:var(--text-primary);font-size:12px;font-weight:700;display:grid;place-items:center}
-.story b{color:var(--text-primary);font-weight:650}
+.clic{cursor:pointer}
+.clic:hover .v,.clic:hover .big{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px;text-decoration-color:var(--line-2)}
+.ver{font-size:12px;color:#8ab8f0;margin-top:8px;display:inline-block}
 
 /* destaque */
-.hero{display:flex;flex-direction:column;justify-content:space-between}
-.hero .big{font-size:76px;line-height:.95;font-weight:800;letter-spacing:-2px;margin:8px 0 4px}
+.hero .lado{min-width:0}
+.hero .lado+.lado{border-left:1px solid var(--line);padding-left:22px;margin-left:22px}
+.hero .big{font-size:76px;line-height:.95;font-weight:800;letter-spacing:-2px;margin:10px 0 4px;display:inline-block}
 .hero .lbl{font-size:15px;color:var(--text-secondary)}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);font-size:12.5px;color:var(--text-secondary)}
-.sw{width:10px;height:10px;border-radius:3px;flex:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);font-size:12.5px;color:var(--text-secondary)}
+.chip:hover,.chip:focus-visible{border-color:var(--line-2);color:var(--text-primary)}
+.sw{width:10px;height:10px;border-radius:3px;flex:none;display:inline-block}
+
+/* ranking de afiliados */
+.top10{display:grid;gap:4px}
+.af{display:grid;grid-template-columns:26px minmax(0,1fr) 120px 44px;align-items:center;gap:10px;padding:6px 6px;border-radius:8px;font-size:13.5px}
+.af:hover{background:var(--surface-2)}
+.af .pos{color:var(--text-muted);font-weight:700;font-size:12px;text-align:right}
+.af .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-primary);text-decoration:none}
+.af .nm:hover{text-decoration:underline}
+.af .nm small{color:var(--text-muted)}
+.af .bar{height:10px;border-radius:0 4px 4px 0;background:var(--series-1);min-width:2px}
+.af .q{all:unset;cursor:pointer;text-align:right;font-weight:700}
+.af .q:hover{text-decoration:underline}
+.af:first-child .pos{color:#f6c860}
 
 /* kpis */
-.kpi .v{font-size:34px;font-weight:800;letter-spacing:-1px;margin:10px 0 2px;line-height:1}
-.kpi .v small{font-size:17px;font-weight:700;color:var(--text-secondary);margin-left:2px}
+.kpi .v{font-size:34px;font-weight:800;letter-spacing:-1px;margin:10px 0 2px;line-height:1;display:inline-block}
 .kpi .d{font-size:12.5px;color:var(--text-muted);margin-top:8px;min-height:34px}
 .delta{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:650;padding:2px 7px;border-radius:6px;margin-top:6px}
 .delta.up{color:#7bd67b;background:rgba(12,163,12,.12)}
 .delta.down{color:#f08a8a;background:rgba(208,59,59,.13)}
 .delta.flat{color:var(--text-secondary);background:var(--surface-2)}
-.meta-bar{height:6px;border-radius:4px;background:var(--surface-2);margin-top:12px;position:relative;overflow:visible}
-.meta-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
-.meta-bar u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--text-secondary);border-radius:2px}
 
 /* gráficos */
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--text-secondary)}
@@ -86,8 +129,9 @@ a{color:inherit}
 svg text{font-family:inherit}
 .chart{width:100%;height:auto;display:block}
 .axis text{fill:var(--text-muted);font-size:11px}
+.axis text.sel{fill:var(--text-primary);font-weight:650}
 .grid line{stroke:var(--line);stroke-width:1}
-.tip{position:fixed;z-index:50;pointer-events:none;background:#0b0b0a;border:1px solid var(--line-2);border-radius:10px;padding:9px 11px;font-size:12.5px;color:var(--text-secondary);box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .12s;max-width:260px}
+.tip{position:fixed;z-index:70;pointer-events:none;background:#0b0b0a;border:1px solid var(--line-2);border-radius:10px;padding:9px 11px;font-size:12.5px;color:var(--text-secondary);box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .12s;max-width:280px}
 .tip b{color:var(--text-primary)}
 .tip .r{display:flex;align-items:center;gap:7px;margin-top:3px}
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
@@ -96,56 +140,63 @@ svg text{font-family:inherit}
 .tbl th{color:var(--text-muted);font-weight:600;font-size:12px}
 
 /* squads */
-.sq{display:grid;grid-template-columns:150px 64px 1fr 190px;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.sq{display:grid;grid-template-columns:150px 64px 1fr 230px;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
 .sq:first-of-type{border-top:0}
-.sq .nm b{display:block;font-size:14.5px}
-.sq .nm span{font-size:12px;color:var(--text-muted)}
-.sq .n{font-size:26px;font-weight:800;letter-spacing:-.5px}
-.mixbar{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;background:transparent}
+.sq .nm a{display:block;font-size:14.5px;font-weight:700;text-decoration:none}
+.sq .nm a:hover{text-decoration:underline}
+.sq .nm span{font-size:12px;color:var(--text-muted);display:block}
+.sq .n{all:unset;cursor:pointer;font-size:26px;font-weight:800;letter-spacing:-.5px}
+.sq .n:hover{text-decoration:underline}
+.mixbar{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px}
 .mixbar i{display:block;height:100%}
 .mixlbl{font-size:12px;color:var(--text-muted);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:760px){.sq{grid-template-columns:1fr 60px}.sq .mx,.sq .sk{grid-column:1/-1}}
 
 /* listas */
-.rank{display:grid;gap:9px}
-.rk{display:grid;grid-template-columns:120px 1fr 34px;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary)}
+.rank{display:grid;gap:4px}
+.rk{all:unset;cursor:pointer;display:grid;grid-template-columns:130px 1fr 34px;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary);padding:4px 6px;border-radius:7px}
+.rk:hover,.rk:focus-visible{background:var(--surface-2);color:var(--text-primary)}
+.rk span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rk .bar{height:12px;border-radius:0 4px 4px 0;background:var(--series-2);min-width:2px}
 .rk.ads .bar{background:var(--series-1)}
+.rk.cx .bar{background:#d55181}
 .rk b{color:var(--text-primary);text-align:right}
-.est{display:grid;gap:8px;max-height:260px;overflow:auto}
+.est{display:grid;gap:8px;max-height:330px;overflow:auto;padding-right:2px}
 .it{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;font-size:13px}
-.it .p{flex:1;color:var(--text-primary)}
-.it .t{font-size:11.5px;color:var(--text-muted)}
+.it .p{flex:1;min-width:0}
+.it .p>a{color:var(--text-primary);text-decoration:none;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .p>a:hover{text-decoration:underline}
+.it .t{font-size:11.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .t a{color:#8ab8f0;text-decoration:none}
+.it .t a:hover{text-decoration:underline}
+.lk{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:#8ab8f0;text-decoration:none;padding:3px 7px;border:1px solid var(--line-2);border-radius:6px;white-space:nowrap}
+.lk:hover{border-color:#8ab8f0}
 .age{font-size:12px;padding:2px 7px;border-radius:6px;background:#2b2b27;color:var(--text-secondary);white-space:nowrap}
 .age.velho{background:rgba(250,178,25,.14);color:#f6c860}
-
-.ring{display:flex;align-items:center;gap:18px}
-.ring .info .v{font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1}
-.ring .info p{margin:6px 0 0;color:var(--text-muted);font-size:12.5px}
-.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:650;padding:3px 8px;border-radius:6px;margin-top:8px}
-.status.crit{color:#f08a8a;background:rgba(208,59,59,.13)}
-.status.warn{color:#f6c860;background:rgba(250,178,25,.13)}
-.status.ok{color:#7bd67b;background:rgba(12,163,12,.12)}
+.bignum{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.bignum .v{font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1}
+.bignum p{margin:0;color:var(--text-muted);font-size:12.5px}
+.subt{font-size:11.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text-muted);margin:14px 0 6px}
+.nota{font-size:12px;color:var(--text-muted);margin-top:10px}
 
 .lock{display:flex;gap:16px;align-items:center;padding:18px;border:1px dashed var(--line-2);border-radius:12px;background:repeating-linear-gradient(135deg,transparent 0 10px,rgba(255,255,255,.015) 10px 20px)}
 .lock .ic{width:44px;height:44px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center;flex:none;border:1px solid var(--line-2)}
 .lock b{display:block;font-size:15px}
 .lock p{margin:4px 0 0;color:var(--text-muted);font-size:13px}
-.ghost{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px;opacity:.45}
-.ghost div{background:var(--surface-2);border-radius:10px;padding:12px;border:1px solid var(--line)}
-.ghost small{color:var(--text-muted);font-size:11.5px;display:block}
-.ghost span{display:block;height:20px;width:60%;background:#2d2d29;border-radius:5px;margin-top:8px}
-
 .foot{color:var(--text-muted);font-size:12px;display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;margin-top:6px}
 
-/* modal de ajuda */
+/* modais (ajuda e listas clicáveis) */
 .mdl{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
 .mdl.on{display:flex}
-.mdl .bx{background:var(--surface-1);border:1px solid var(--line-2);border-radius:14px;max-width:520px;width:100%;padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-.mdl h3{margin:0 0 8px;font-size:15px}
-.mdl .tx{color:var(--text-secondary);font-size:13.5px}
+.mdl .bx{background:var(--surface-1);border:1px solid var(--line-2);border-radius:14px;max-width:560px;width:100%;padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.6);max-height:86vh;display:flex;flex-direction:column}
+.mdl.lista .bx{max-width:760px}
+.mdl h3{margin:0 0 4px;font-size:15px;padding-right:30px}
+.mdl .msub{color:var(--text-muted);font-size:12.5px;margin-bottom:12px}
+.mdl .tx{color:var(--text-secondary);font-size:13.5px;overflow:auto}
 .mdl .tx li{margin:4px 0}
-.mdl button{all:unset;cursor:pointer;float:right;color:var(--text-muted);font-size:20px;line-height:1}
+.mdl .x{all:unset;cursor:pointer;position:absolute;right:16px;top:12px;color:var(--text-muted);font-size:22px;line-height:1}
+.mdl .bx{position:relative}
+.lst{display:grid;gap:6px}
 .aviso{background:rgba(250,178,25,.08);border:1px solid rgba(250,178,25,.3);color:#f6c860;border-radius:10px;padding:9px 12px;font-size:12.5px;margin-bottom:16px;display:none}
 @media (forced-colors:active){.mixbar i,.bar,.sw{forced-color-adjust:none}}
 </style>
@@ -158,109 +209,125 @@ svg text{font-family:inherit}
       <div><h1>Torre de Controle</h1><p>Operação de Afiliados · GEX</p></div>
     </div>
     <div class="sp"></div>
-    <span class="pill num" id="periodo">—</span>
-    <span class="pill" id="frescor"><span class="dot exemplo" id="frescor-dot"></span><span id="frescor-tx">carregando…</span></span>
+    <span class="pill" id="frescor"><span class="dot" id="frescor-dot"></span><span id="frescor-tx">carregando…</span></span>
+    <button class="btn" id="sync" title="Busca agora a leitura mais nova do ClickUp"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 4a8 8 0 0 1 7.4 5H17v2h6V5h-2v2.3A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8zm8 8a8 8 0 0 1-15.4 3H7v-2H1v6h2v-2.3A10 10 0 0 0 22 12z"/></svg><span>Sincronizar</span></button>
+    <div class="dp" id="dp">
+      <button class="btn pri dp-btn" id="dp-btn" aria-haspopup="dialog" aria-expanded="false"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2h2v2h6V2h2v2h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3zm12 8H5v9h14zM5 6v2h14V6z"/></svg><span id="dp-label">—</span><svg width="10" height="10" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg></button>
+      <div class="dp-pop" id="dp-pop" role="dialog" aria-label="Escolher período" hidden>
+        <div class="dp-presets" id="dp-presets"></div>
+        <div class="dp-main">
+          <div class="dp-head"><button class="dp-nav" id="dp-prev" aria-label="Mês anterior">‹</button><button class="dp-nav" id="dp-next" aria-label="Próximo mês">›</button></div>
+          <div class="dp-cals" id="dp-cals"></div>
+          <div class="dp-foot"><span id="dp-sel"></span><span><button class="dp-act" id="dp-cancel">Cancelar</button><button class="dp-act pri" id="dp-apply">Aplicar</button></span></div>
+        </div>
+      </div>
+    </div>
   </header>
+  <p class="sub-top" id="subtop"></p>
   <div class="aviso" id="aviso"></div>
 
-  <section class="g g-hero">
-    <article class="card story" aria-labelledby="h-story">
-      <div class="hd"><h2 id="h-story">A semana em 5 linhas</h2><div class="sp"></div><button class="ib" data-ajuda="story" aria-label="Como ler este quadro">?</button></div>
-      <ol id="story"></ol>
-    </article>
-    <article class="card hero" aria-labelledby="h-hero">
-      <div>
+  <section class="g">
+    <article class="card hero g g-hero" style="margin:0" aria-labelledby="h-hero">
+      <div class="lado">
         <div class="hd" style="margin-bottom:0"><h2 id="h-hero">Materiais prontos pros afiliados</h2><div class="sp"></div><button class="ib" data-ajuda="hero" aria-label="Como ler este quadro">?</button></div>
-        <div class="big num" id="hero-n">—</div>
-        <div class="lbl" id="hero-l">nos últimos 7 dias</div>
+        <div class="clic" id="hero-clic" role="button" tabindex="0" aria-label="Ver os materiais do período"><div class="big num" id="hero-n">—</div></div>
+        <div class="lbl" id="hero-l"></div>
         <div id="hero-d"></div>
+        <div class="chips" id="hero-chips"></div>
+        <div id="hero-t" style="margin-top:16px"></div>
       </div>
-      <div id="hero-t" style="margin-top:14px"></div>
-      <div class="chips" id="hero-chips"></div>
+      <div class="lado">
+        <div class="hd"><div><h2>Top 10 afiliados</h2><p class="sub" id="top-sub">Quem mais recebeu material no período</p></div><div class="sp"></div><button class="ib" data-ajuda="top" aria-label="Como ler este quadro">?</button></div>
+        <div class="top10" id="top10"></div>
+        <p class="nota" id="top-nota"></p>
+      </div>
     </article>
   </section>
 
-  <section class="g g-5" id="kpis" aria-label="Indicadores da semana"></section>
+  <section class="g g-4" id="kpis" aria-label="Indicadores do período"></section>
 
-  <section class="g g-2">
+  <section class="g g-2e">
     <article class="card" aria-labelledby="h-est">
-      <div class="hd"><div><h2 id="h-est">Materiais prontos por semana</h2><p class="sub">Tudo que saiu da produção e entrou nas esteiras de Ads, Lead/Microlead e Troca de Pote</p></div><div class="sp"></div><button class="tg" id="tg-est" aria-pressed="false">Ver tabela</button><button class="ib" data-ajuda="est" aria-label="Como ler este quadro">?</button></div>
+      <div class="hd"><div><h2 id="h-est">Materiais prontos por semana</h2><p class="sub">Esteiras de Ads, Lead/Microlead e Troca de Pote · semanas de segunda a domingo</p></div><div class="sp"></div><button class="tg" id="tg-est" aria-pressed="false">Ver tabela</button><button class="ib" data-ajuda="est" aria-label="Como ler este quadro">?</button></div>
       <div class="legend" id="leg-est"></div>
       <div id="ch-est"></div>
     </article>
     <article class="card" aria-labelledby="h-cri">
-      <div class="hd"><div><h2 id="h-cri">Criativos produzidos</h2><p class="sub">Anúncios, hooks e vídeos-review entregues por semana</p></div><div class="sp"></div><button class="ib" data-ajuda="cri" aria-label="Como ler este quadro">?</button></div>
+      <div class="hd"><div><h2 id="h-cri">Criativos produzidos por semana</h2><p class="sub">Anúncios, hooks e vídeos-review entregues pelos squads</p></div><div class="sp"></div><button class="ib" data-ajuda="cri" aria-label="Como ler este quadro">?</button></div>
       <div id="ch-cri"></div>
     </article>
   </section>
 
-  <section class="g" style="grid-template-columns:1fr">
+  <section class="g">
     <article class="card" aria-labelledby="h-sq">
-      <div class="hd"><div><h2 id="h-sq">Squads nos últimos 7 dias</h2><p class="sub">Demandas concluídas, tendência semanal e no que cada squad gastou o tempo</p></div><div class="sp"></div><div class="legend" id="leg-mix"></div><button class="ib" data-ajuda="sq" aria-label="Como ler este quadro">?</button></div>
+      <div class="hd"><div><h2 id="h-sq">Squads</h2><p class="sub" id="sq-sub">Demandas concluídas no período, no que cada squad gastou o tempo e a tendência por semana</p></div><div class="sp"></div><div class="legend" id="leg-mix"></div><button class="ib" data-ajuda="sq" aria-label="Como ler este quadro">?</button></div>
       <div id="squads"></div>
     </article>
   </section>
 
-  <section class="g g-3">
-    <article class="card" aria-labelledby="h-inf">
-      <div class="hd"><div><h2 id="h-inf">Infra: edição → entrega</h2><p class="sub">Demandas entregues em até 24 h depois da edição pronta</p></div><div class="sp"></div><button class="ib" data-ajuda="inf" aria-label="Como ler este quadro">?</button></div>
-      <div class="ring" id="inf-ring"></div>
-      <div id="ch-inf" style="margin-top:14px"></div>
-    </article>
+  <section class="g g-2e">
     <article class="card" aria-labelledby="h-ab">
-      <div class="hd"><div><h2 id="h-ab">Prontos esperando envio</h2><p class="sub">Materiais na esteira que ainda não foram pros afiliados</p></div><div class="sp"></div><button class="ib" data-ajuda="ab" aria-label="Como ler este quadro">?</button></div>
+      <div class="hd"><div><h2 id="h-ab">Prontos esperando envio</h2><p class="sub">Agora, na esteira: materiais em "materiais prontos" que ainda não foram enviados</p></div><div class="sp"></div><button class="ib" data-ajuda="ab" aria-label="Como ler este quadro">?</button></div>
       <div id="ab"></div>
     </article>
     <article class="card" aria-labelledby="h-cx">
-      <div class="hd"><div><h2 id="h-cx">CX no piloto automático</h2><p class="sub">Pedidos das analistas que viraram task sozinhos</p></div><div class="sp"></div><button class="ib" data-ajuda="cx" aria-label="Como ler este quadro">?</button></div>
+      <div class="hd"><div><h2 id="h-cx">Pedidos da CX</h2><p class="sub">Pedidos que as analistas fizeram e viraram task sozinhos, sem passar pela gestão</p></div><div class="sp"></div><button class="ib" data-ajuda="cx" aria-label="Como ler este quadro">?</button></div>
       <div id="cx"></div>
     </article>
   </section>
 
   <section class="g g-2e">
     <article class="card" aria-labelledby="h-pr">
-      <div class="hd"><div><h2 id="h-pr">Onde a produção está indo</h2><p class="sub">Leads, microleads e trocas de pote por produto · últimas 4 semanas</p></div><div class="sp"></div><button class="ib" data-ajuda="pr" aria-label="Como ler este quadro">?</button></div>
+      <div class="hd"><div><h2 id="h-pr">Onde a produção está indo</h2><p class="sub">Leads, microleads e trocas de pote prontas por produto, no período</p></div><div class="sp"></div><button class="ib" data-ajuda="pr" aria-label="Como ler este quadro">?</button></div>
       <div class="rank" id="prod"></div>
     </article>
     <article class="card" aria-labelledby="h-ni">
-      <div class="hd"><div><h2 id="h-ni">Packs de ads por nicho</h2><p class="sub">Últimas 4 semanas</p></div><div class="sp"></div><button class="ib" data-ajuda="ni" aria-label="Como ler este quadro">?</button></div>
+      <div class="hd"><div><h2 id="h-ni">Packs de ads por nicho</h2><p class="sub">Packs de criativos prontos por nicho, no período</p></div><div class="sp"></div><button class="ib" data-ajuda="ni" aria-label="Como ler este quadro">?</button></div>
       <div class="rank" id="nich"></div>
     </article>
   </section>
 
-  <section class="g" style="grid-template-columns:1fr">
+  <section class="g">
     <article class="card" aria-labelledby="h-vd">
       <div class="hd"><div><h2 id="h-vd">Resultado financeiro</h2><p class="sub">Vendas, receita, AOV e ROAS por produto e afiliado</p></div></div>
-      <div id="vendas"></div>
+      <div class="lock"><div class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#c3c2b7" d="M12 2a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v3h6V7a3 3 0 0 0-3-3z"/></svg></div><div><b>Aguardando acesso de leitura à base de vendas</b><p>As vendas por afiliado e produto estão no CRM (Affiliate Center). Com um acesso de leitura liberado para o robô, esta faixa mostra vendas, receita e os afiliados que mais cresceram e caíram no período escolhido.</p></div></div>
     </article>
   </section>
 
-  <div class="foot"><span id="fontes"></span><span>Torre de Controle · atualizada automaticamente a partir do ClickUp</span></div>
+  <div class="foot"><span id="fontes">Fontes: ClickUp (esteiras, squads, Affiliates CRM, pedidos da CX)</span><span>Torre de Controle · semanas de segunda a domingo, horário de Brasília</span></div>
 </div>
 
 <div class="tip" id="tip" role="status" aria-live="polite"></div>
-<div class="mdl" id="mdl" role="dialog" aria-modal="true" aria-labelledby="mdl-h"><div class="bx"><button id="mdl-x" aria-label="Fechar">×</button><h3 id="mdl-h"></h3><div class="tx" id="mdl-tx"></div></div></div>
+<div class="mdl" id="mdl" role="dialog" aria-modal="true" aria-labelledby="mdl-h"><div class="bx"><button class="x" id="mdl-x" aria-label="Fechar">×</button><h3 id="mdl-h"></h3><div class="msub" id="mdl-sub"></div><div class="tx" id="mdl-tx"></div></div></div>
 
+<script src="compute.js"></script>
 <script>
+const T=window.Torre;
+const REPO='gabrieldourado-tech/esteira-oxigenacao', RAMO='dados-torre', ARQ='torre-data.json';
 const AJUDA={
-  story:['A semana em 5 linhas','<p>Resumo escrito automaticamente a partir dos números da página. Compara os <b>últimos 7 dias</b> com os 7 dias anteriores.</p><p>Os trechos em negrito são os números que mais importam para a decisão.</p>'],
-  hero:['Materiais prontos pros afiliados','<p>Quantos materiais ficaram prontos para envio nos últimos 7 dias: packs de ads, leads/microleads e trocas de pote.</p><ul><li>Um material conta quando o editor conclui a edição e ele entra na esteira.</li><li>A seta compara com os 7 dias anteriores.</li></ul>'],
-  est:['Materiais prontos por semana','<p>Cada barra é uma semana (segunda a domingo). As cores separam o tipo de material.</p><ul><li>A última barra é a semana atual, ainda em andamento.</li><li>Passe o mouse para ver os números. "Ver tabela" mostra os mesmos dados em tabela.</li></ul>'],
-  cri:['Criativos produzidos','<p>Soma das peças das levas de criativos concluídas na semana (ex.: "Leva de 15 Novos Ads" conta 15).</p><ul><li>O número vem do nome da task mãe concluída nos squads.</li><li>A última barra é a semana atual, ainda em andamento.</li></ul>'],
-  sq:['Squads nos últimos 7 dias','<p>Uma linha por squad.</p><ul><li><b>Número grande:</b> tasks mãe concluídas nos últimos 7 dias. A seta compara com os 7 dias anteriores.</li><li><b>Minibarras:</b> concluídas por semana, da mais antiga para a atual.</li><li><b>Barra colorida:</b> o tipo de trabalho das demandas concluídas (criativos, leads, troca de pote, upsell, afiliado, preço e oferta, páginas).</li></ul>'],
-  inf:['Infra: edição → entrega','<p>De cada 100 demandas que tinham edição, quantas a infra entregou <b>em até 24 horas</b> depois da edição pronta. A meta é 80%.</p><ul><li>Vermelho = abaixo de 60%, amarelo = 60 a 79%, verde = 80% ou mais.</li><li>A linha mostra a % por semana, com a linha da meta tracejada.</li><li>Fonte: o mesmo cálculo do painel Funnel Ops.</li></ul>'],
-  ab:['Prontos esperando envio','<p>Materiais que estão em "materiais prontos" nas esteiras e ainda não foram enviados aos afiliados.</p><ul><li>A etiqueta mostra há quantos dias cada um está parado. Amarelo = 3 dias ou mais.</li><li>Material parado é produção que ainda não está gerando venda.</li></ul>'],
-  cx:['CX no piloto automático','<p>Pedidos que as analistas de CX fizeram pelo CRM e que viraram task no squad certo <b>sem passar pela gestão</b>.</p><ul><li>Contagem desde o lançamento do fluxo (10/11/2026).</li><li>Cancelados são pedidos recusados pelo líder.</li></ul>'],
-  pr:['Onde a produção está indo','<p>Quantas leads, microleads e trocas de pote ficaram prontas por produto nas últimas 4 semanas.</p><p>Mostra em quais produtos a operação está investindo tempo de copy e edição.</p>'],
-  ni:['Packs de ads por nicho','<p>Quantos packs de criativos ficaram prontos por nicho nas últimas 4 semanas.</p>'],
+  hero:['Materiais prontos pros afiliados','<p>Quantos materiais ficaram prontos para os afiliados no período escolhido: packs de ads, leads/microleads e trocas de pote.</p><ul><li>Um material conta quando entra na esteira (edição concluída).</li><li>A seta compara com o período anterior: semana com a semana anterior; se a semana ainda está em andamento, compara com o mesmo trecho da semana passada.</li><li>Clique no número ou nos tipos para ver cada material, com link da task e do Drive.</li></ul>'],
+  top:['Top 10 afiliados','<p>Os afiliados que mais receberam material no período, pelo campo 🤝 Afiliados dos cards da esteira (os mesmos nomes do Affiliates CRM).</p><ul><li>Clique no nome para abrir o afiliado no CRM do ClickUp.</li><li>Clique no número para ver os materiais dele, com link da task e do Drive.</li><li>Material sem afiliado marcado na esteira não entra no ranking.</li></ul>'],
+  est:['Materiais prontos por semana','<p>Cada barra é uma semana fechada de segunda a domingo. As cores separam o tipo de material.</p><ul><li><b>Esta semana</b> está em andamento (barra hachurada) e muda em tempo real.</li><li>As semanas dentro do período escolhido ficam em destaque.</li><li>"Ver tabela" mostra os mesmos números.</li></ul>'],
+  cri:['Criativos produzidos por semana','<p>Soma das peças das levas de criativos concluídas na semana (ex.: "Leva de 15 Novos Ads" conta 15).</p><ul><li>O número vem do nome da task mãe concluída nos squads.</li><li>Esta semana está em andamento (barra hachurada).</li></ul>'],
+  sq:['Squads','<p>Uma linha por squad.</p><ul><li><b>Número:</b> tasks mãe concluídas no período. Clique para ver a lista.</li><li><b>Barra colorida:</b> o tipo de trabalho dessas demandas.</li><li><b>Minibarras:</b> concluídas por semana, da mais antiga até esta semana.</li><li>Clique no nome do squad para abrir a lista dele no ClickUp.</li></ul>'],
+  ab:['Prontos esperando envio','<p>Retrato de agora (não depende do filtro): cards que estão em "materiais prontos" nas esteiras e ainda não foram para "enviado pros afiliados".</p><ul><li>A etiqueta mostra há quantos dias o material está pronto. Amarelo = 3 dias ou mais.</li><li>Cada item abre a task; "Drive" abre o arquivo; o nome do afiliado abre o CRM.</li><li>Conferência com os envios registrados no Affiliate Center: pendente de acesso de leitura ao CRM.</li></ul>'],
+  cx:['Pedidos da CX','<p>Pedidos que as analistas de CX fizeram no fluxo novo e que viraram task no squad certo sem passar pela gestão.</p><ul><li>O nome da analista vem do "Solicitado por" da descrição do pedido.</li><li>Clique numa analista ou num tipo para ver os pedidos, com link de cada task.</li><li>Cancelados são pedidos recusados pelo líder.</li></ul>'],
+  pr:['Onde a produção está indo','<p>Quantas leads, microleads e trocas de pote ficaram prontas por produto no período. Clique num produto para ver os materiais.</p>'],
+  ni:['Packs de ads por nicho','<p>Quantos packs de criativos ficaram prontos por nicho no período. Clique num nicho para ver os packs.</p>'],
 };
 const TIPOS=[{k:'ads',n:'Packs de ads',c:'var(--series-1)'},{k:'lead',n:'Leads e microleads',c:'var(--series-2)'},{k:'pote',n:'Trocas de pote',c:'var(--series-3)'}];
+const TIPO1={ads:'Pack de ads',lead:'Lead/microlead',pote:'Troca de pote'};
 const MIXC={'Criativos':'#3987e5','Leads':'#d95926','Troca de pote':'#199e70','Upsell':'#c98500','Afiliado':'#d55181','Preço e oferta':'#9085e9','Páginas':'#e66767','Outros':'#55554f'};
+const SQN={S1:'Squad 1',S2:'Squad 2',S3:'Squad 3',S4:'Squad 4',AOV:'Squad AOV'};
 const $=s=>document.querySelector(s);
 const fmt=(n,d=0)=>n==null||isNaN(n)?'—':Number(n).toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d});
-const fmtH=h=>h==null?'—':h<48?fmt(h,0)+' h':fmt(h/24,1)+' dias';
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const negrito=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const url=u=>/^https?:\/\//.test(u||'')?esc(u):'';
+const lnk=(u,tx,cls='')=>url(u)?`<a href="${url(u)}" target="_blank" rel="noopener"${cls?` class="${cls}"`:''}>${tx}</a>`:tx;
+const curtoAf=n=>String(n||'').replace(/\s*<>\s*Experience Group\s*$/i,'').replace(/\s*<>\s*GEX\s*$/i,'');
+const TZ='America/Sao_Paulo';
+const dataHora=ms=>new Date(ms).toLocaleString('pt-BR',{timeZone:TZ,day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+const dia=ms=>new Date(ms).toLocaleDateString('pt-BR',{timeZone:TZ,day:'2-digit',month:'2-digit'});
 
 // ---------- tooltip ----------
 const tip=$('#tip');
@@ -269,201 +336,311 @@ function moveTip(e){const r=tip.getBoundingClientRect();let x=e.clientX+14,y=e.c
 function hideTip(){tip.style.opacity=0}
 function bindTip(el,html){el.addEventListener('mouseenter',e=>showTip(e,html));el.addEventListener('mousemove',moveTip);el.addEventListener('mouseleave',hideTip);el.addEventListener('focus',()=>{const r=el.getBoundingClientRect();showTip({clientX:r.right,clientY:r.top},html)});el.addEventListener('blur',hideTip)}
 
-// ---------- modal ----------
-const mdl=$('#mdl');
-document.addEventListener('click',e=>{const b=e.target.closest('[data-ajuda]');if(b){const[a,t]=AJUDA[b.dataset.ajuda];$('#mdl-h').textContent=a;$('#mdl-tx').innerHTML=t;mdl.classList.add('on');$('#mdl-x').focus()}});
-$('#mdl-x').onclick=()=>mdl.classList.remove('on');mdl.addEventListener('click',e=>{if(e.target===mdl)mdl.classList.remove('on')});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')mdl.classList.remove('on')});
+// ---------- modais ----------
+const mdl=$('#mdl'); let ultimoFoco=null;
+function abreModal(titulo,sub,html,lista){ultimoFoco=document.activeElement;$('#mdl-h').textContent=titulo;$('#mdl-sub').innerHTML=sub||'';$('#mdl-tx').innerHTML=html;mdl.classList.toggle('lista',!!lista);mdl.classList.add('on');$('#mdl-x').focus()}
+function fechaModal(){mdl.classList.remove('on');if(ultimoFoco)ultimoFoco.focus()}
+$('#mdl-x').onclick=fechaModal;mdl.addEventListener('click',e=>{if(e.target===mdl)fechaModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mdl.classList.contains('on'))fechaModal()});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-ajuda]');if(b){const[a,t]=AJUDA[b.dataset.ajuda];abreModal(a,'',t)}});
+// listas clicáveis: cada item leva à task (e ao Drive / CRM quando houver)
+let LISTAS={}; let NL=0;
+const registra=(titulo,itens,tipo)=>{const id='L'+(++NL);LISTAS[id]={titulo,itens,tipo};return id};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-lista]');if(!b)return;e.preventDefault();hideTip();mostraLista(b.dataset.lista)});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-lista][role="button"]')){e.preventDefault();mostraLista(e.target.dataset.lista)}});
+function itemHtml(x,tipo){
+  if(tipo==='esteira'){
+    const afs=(x.afiliados||[]).map(a=>lnk(a.url,esc(curtoAf(a.nome)))).join(', ')||'<span>sem afiliado marcado</span>';
+    return `<div class="it"><i class="sw" style="background:${TIPOS.find(t=>t.k===x.tipo).c}"></i><div class="p">${lnk(x.url,esc(x.nome))}<div class="t">${TIPO1[x.tipo]} · ${afs} · pronto em ${dataHora(x.criado)}${x.aberto?' · <b style="color:#f6c860">ainda não enviado</b>':''}</div></div>${url(x.drive)?`<a class="lk" href="${url(x.drive)}" target="_blank" rel="noopener">Drive ↗</a>`:''}<a class="lk" href="${url(x.url)}" target="_blank" rel="noopener">Task ↗</a></div>`;
+  }
+  if(tipo==='squad'){
+    return `<div class="it"><i class="sw" style="background:${MIXC[x.cat]||'#55554f'}"></i><div class="p">${lnk(x.url,esc(x.nome))}<div class="t">${SQN[x.squad]||x.squad} · ${esc(x.cat)}${x.qtd?` · ${x.qtd} peças`:''} · concluída em ${dataHora(x.fechado)}</div></div><a class="lk" href="${url(x.url)}" target="_blank" rel="noopener">Task ↗</a></div>`;
+  }
+  if(tipo==='cx'){
+    const st=/cancel/.test(x.status)?'<span class="age">recusado</span>':/criad/.test(x.status)?'<span class="age" style="color:#7bd67b">virou task</span>':`<span class="age velho">${esc(x.status)}</span>`;
+    return `<div class="it"><i class="sw" style="background:#d55181"></i><div class="p">${lnk(x.url,esc(x.nome))}<div class="t">por <b style="color:var(--text-secondary)">${esc(x.solicitante||'sem nome na descrição')}</b> · ${x.afiliado_url?lnk(x.afiliado_url,esc(curtoAf(x.afiliado))):esc(curtoAf(x.afiliado))} · ${dataHora(x.criado)}</div></div>${st}<a class="lk" href="${url(x.url)}" target="_blank" rel="noopener">Task ↗</a></div>`;
+  }
+  return '';
+}
+function mostraLista(id){
+  const L=LISTAS[id]; if(!L)return;
+  const ord=[...L.itens].sort((a,b)=>(b.criado||b.fechado||0)-(a.criado||a.fechado||0));
+  abreModal(L.titulo,`${fmt(ord.length)} ${ord.length===1?'item':'itens'} · ${esc(PERIODO_TX)} · clique para abrir no ClickUp`,ord.length?`<div class="lst">${ord.map(x=>itemHtml(x,L.tipo)).join('')}</div>`:'<p>Nenhum item no período.</p>',true);
+}
 
 // ---------- helpers de SVG ----------
 const NS='http://www.w3.org/2000/svg';
 const el=(t,a={},p)=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);if(p)p.appendChild(n);return n};
 const niceStep=v=>{const p=Math.pow(10,Math.floor(Math.log10(v)));const f=v/p;return(f<=1?1:f<=2?2:f<=5?5:10)*p};
 const eixo=v=>{const st=niceStep(Math.max(v,1)/4);const n=Math.max(1,Math.ceil(v/st));return{max:st*n,st,n}};
-// barra com topo arredondado (4px) e base reta na linha de base
 function barPath(x,y,w,h,r=4){if(h<=0)return'';r=Math.min(r,w/2,h);return`M${x},${y+h}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h}Z`}
+const curtoSem=n=>n==='Semana passada'?'Passada':n==='Semana retrasada'?'Retrasada':n.replace(' semanas',' sem.');
+function rotuloX(ax,x,y,w){const t=el('text',{x,y,'text-anchor':'middle',class:w.sel?'sel':''},ax);t.textContent=curtoSem(w.nome)+(w.parcial?'*':'');const t2=el('text',{x,y:y+13,'text-anchor':'middle'},ax);t2.textContent=w.datas}
 
-function delta(atual,ant,{inverso=false,unidade='',curto=false}={}){
+let CMP_TX='', CMP_CURTO='';
+function delta(atual,ant,{curto=false}={}){
   if(atual==null||ant==null)return'';
-  const dif=unidade==='%'?atual-ant:(ant?((atual-ant)/ant)*100:null);
-  if(dif==null)return'';
-  const bom=inverso?dif<0:dif>0; const cls=Math.abs(dif)<0.5?'flat':bom?'up':'down';
-  const seta=dif>0?'▲':dif<0?'▼':'■';
-  const txt=unidade==='%'?`${dif>0?'+':''}${fmt(dif,0)} p.p.`:`${dif>0?'+':''}${fmt(dif,0)}%`;
-  return `<span class="delta ${cls}" title="Comparado com os 7 dias anteriores">${seta} ${txt}${curto?'':' <span style="font-weight:500;opacity:.8">vs. 7 dias antes</span>'}</span>`;
+  const tit=`Antes: ${fmt(ant)} ${CMP_TX}`;
+  const resto=curto?'':` <span style="font-weight:500;opacity:.8">vs. ${fmt(ant)} ${esc(CMP_CURTO)}</span>`;
+  if(!ant&&!atual)return `<span class="delta flat" title="${esc(tit)}">■ 0%${resto}</span>`;
+  if(!ant)return `<span class="delta up" title="${esc(tit)}">▲ novo${resto}</span>`;
+  const dif=((atual-ant)/ant)*100;
+  const cls=Math.abs(dif)<0.5?'flat':dif>0?'up':'down';
+  return `<span class="delta ${cls}" title="${esc(tit)}">${dif>0?'▲':dif<0?'▼':'■'} ${dif>0?'+':''}${fmt(dif,0)}%${resto}</span>`;
 }
 
-// ---------- seções ----------
-function render(D){
-  const fim=new Date(D.janela.fim), ini=new Date(D.janela.ini7);
-  const dd=d=>d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',timeZone:'America/Fortaleza'});
-  $('#periodo').textContent=`Últimos 7 dias · ${dd(ini)} a ${dd(fim)}`;
-  const min=(Date.now()-Date.parse(D.gerado_em))/6e4;
-  const dot=$('#frescor-dot');
-  if(D.exemplo){dot.className='dot exemplo';$('#frescor-tx').textContent='Prévia com dados reais de '+new Date(D.referencia).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Fortaleza'});}
-  else{dot.className='dot'+(min>90?' velho':'');$('#frescor-tx').textContent=min<2?'Atualizado agora':min<60?`Atualizado há ${Math.round(min)} min`:`Atualizado há ${fmt(min/60,0)} h`;}
+// ---------- período ----------
+const ATALHO_PADRAO='passada';
+let F={k:ATALHO_PADRAO,ini:null,fim:null};
+let PERIODO_TX='';
+function lePeriodo(){try{const h=new URLSearchParams(location.hash.slice(1));if(h.get('p')==='custom'&&h.get('de')&&h.get('ate'))return{k:'custom',ini:+h.get('de'),fim:+h.get('ate')};if(h.get('p'))return{k:h.get('p')};}catch(e){}return{k:ATALHO_PADRAO}}
+function salvaPeriodo(){try{history.replaceState(null,'',F.k==='custom'?`#p=custom&de=${F.ini}&ate=${F.fim}`:`#p=${F.k}`)}catch(e){}}
+function resolve(agora){
+  if(F.k!=='custom'){const a=T.atalhos(agora).find(x=>x.k===F.k)||T.atalhos(agora).find(x=>x.k===ATALHO_PADRAO);F.k=a.k;return{ini:a.r[0],fim:a.r[1],nome:a.n}}
+  const fimR=Math.min(F.fim,agora);return{ini:F.ini,fim:fimR,nome:null};
+}
+const MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const dCurta=ms=>{const p=T.partes(ms);return `${p.d} ${T.MESC[p.m]}.`};
+const faixa=(a,bEx)=>{const b=bEx-1;const pa=T.partes(a),pb=T.partes(b);return T.inicioDia(a)===T.inicioDia(b)?dCurta(a):pa.a===pb.a?`${dCurta(a)} – ${dCurta(b)}`:`${dCurta(a)} ${pa.a} – ${dCurta(b)} ${pb.a}`};
+function nomeCmp(ci,cf,agora){
+  if(ci===T.inicioSemana(ci)&&cf-ci<=T.SEM){const n=T.nomeSemana(ci,agora).toLowerCase();const c=cf-ci<T.SEM?`no mesmo trecho da ${n}`:`na ${n}`;return [c+` (${faixa(ci,cf)})`,c]}
+  return [`no período anterior (${faixa(ci,cf)})`,'no período anterior'];
+}
 
-  // narrativa
-  $('#story').innerHTML=D.narrativa.map(l=>`<li>${negrito(l)}</li>`).join('');
-
-  // destaque
-  const k0=D.kpis[0];
-  $('#hero-n').textContent=fmt(k0.valor);
-  $('#hero-d').innerHTML=delta(k0.valor,k0.anterior);
-  const s=D.esteira.semana;
-  heroTrend(D);
-  $('#hero-chips').innerHTML=TIPOS.map(t=>`<span class="chip"><i class="sw" style="background:${t.c}"></i>${fmt(s[t.k])} ${t.n.toLowerCase()}</span>`).join('');
-
-  // KPIs
-  $('#kpis').innerHTML=D.kpis.slice(1).concat([{rotulo:'Pedidos da CX automáticos',valor:D.cx.criadas,detalhe:`viraram task sozinhos · ${D.cx.afiliados} afiliados atendidos`}]).map(k=>{
-    if(k.unidade==='%'){
-      const v=k.valor; const cor=v==null?'var(--text-muted)':v>=k.meta?'var(--good)':v>=60?'var(--warning)':'var(--critical)';
-      return `<article class="card kpi"><h2>${esc(k.rotulo)}</h2><div class="v num">${fmt(v)}<small>%</small></div>${delta(v,k.anterior,{unidade:'%'})}<div class="meta-bar" role="img" aria-label="${fmt(v)}% de 80% de meta"><i style="width:${Math.min(100,v||0)}%;background:${cor}"></i><u style="left:${k.meta}%"></u></div><div class="d">${esc(k.detalhe)} · meta ${k.meta}%</div></article>`;
+// Calendário: semanas de segunda a domingo, dias no fuso de Brasília
+let DP=null;
+function montaPeriodo(){
+  const btn=$('#dp-btn'),pop=$('#dp-pop');
+  const abre=()=>{const agora=Date.now();const r=resolve(agora);const pf=T.partes(r.fim-1);DP={k:F.k,a:T.inicioDia(r.ini),b:T.inicioDia(r.fim-1),vis:T.diaIni(pf.a,pf.m-1,1)};pop.hidden=false;btn.setAttribute('aria-expanded','true');desenhaDP()};
+  const fecha=()=>{pop.hidden=true;btn.setAttribute('aria-expanded','false')};
+  btn.onclick=()=>pop.hidden?abre():fecha();
+  $('#dp-cancel').onclick=fecha;
+  $('#dp-apply').onclick=()=>{if(DP.a==null)return;
+    if(DP.k&&DP.k!=='custom'){F={k:DP.k}}else{const b=DP.b==null?DP.a:DP.b;F={k:'custom',ini:Math.min(DP.a,b),fim:Math.max(DP.a,b)+T.DIA}}
+    fecha();salvaPeriodo();desenha()};
+  const muda=n=>{const p=T.partes(DP.vis);DP.vis=T.diaIni(p.a,p.m+n,1);desenhaDP()};
+  $('#dp-prev').onclick=()=>muda(-1);$('#dp-next').onclick=()=>muda(1);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!pop.hidden)fecha()});
+  document.addEventListener('mousedown',e=>{if(!pop.hidden&&!$('#dp').contains(e.target))fecha()});
+}
+function desenhaDP(){
+  const agora=Date.now(), at=T.atalhos(agora);
+  const pr=$('#dp-presets');
+  pr.innerHTML=at.map((a,i)=>(i===5?'<hr>':'')+`<button data-k="${a.k}" aria-pressed="${DP.k===a.k}">${a.n}</button>`).join('')+`<hr><button data-k="custom" aria-pressed="${DP.k==='custom'}">Personalizado</button>`;
+  pr.querySelectorAll('button').forEach(b=>b.onclick=()=>{const a=at.find(x=>x.k===b.dataset.k);DP.k=b.dataset.k;if(a){DP.a=T.inicioDia(a.r[0]);DP.b=T.inicioDia(a.r[1]-1);const p=T.partes(a.r[1]-1);DP.vis=T.diaIni(p.a,p.m-1,1)}desenhaDP()});
+  const cals=$('#dp-cals');cals.innerHTML='';
+  const hoje=T.inicioDia(agora),lo=DP.a,hi=DP.b==null?DP.a:DP.b,mn=Math.min(lo,hi),mx=Math.max(lo,hi);
+  for(let k=0;k<2;k++){
+    const pv=T.partes(DP.vis);const m0=T.diaIni(pv.a,pv.m+k,1);const pm=T.partes(m0);
+    const div=document.createElement('div');div.className='dp-cal';
+    div.innerHTML=`<h4>${MES[pm.m][0].toUpperCase()+MES[pm.m].slice(1)} de ${pm.a}</h4>`;
+    const g=document.createElement('div');g.className='dp-grid';
+    g.innerHTML=['S','T','Q','Q','S','S','D'].map(x=>`<span class="wd">${x}</span>`).join('');
+    for(let i=0;i<pm.dow;i++)g.appendChild(document.createElement('span'));
+    const prox=T.diaIni(pm.a,pm.m+1,1);
+    for(let ms=m0;ms<prox;ms+=T.DIA){
+      const d=T.partes(ms);const b=document.createElement('button');b.type='button';b.textContent=d.d;
+      if(ms>hoje)b.disabled=true;
+      if(ms>=mn&&ms<=mx)b.classList.add('in');if(ms===mn||ms===mx)b.classList.add('ed');if(ms===hoje)b.classList.add('today');
+      b.setAttribute('aria-label',`${d.d} de ${MES[d.m]} de ${d.a}`);
+      b.onclick=()=>{DP.k='custom';if(DP.b!=null||DP.a==null){DP.a=ms;DP.b=null}else{DP.b=ms}desenhaDP()};
+      g.appendChild(b);
     }
-    return `<article class="card kpi"><h2>${esc(k.rotulo)}</h2><div class="v num">${fmt(k.valor)}</div>${delta(k.valor,k.anterior)}<div class="d">${esc(k.detalhe)}</div></article>`;
-  }).join('');
-
-  chartEsteira(D); chartCriativos(D); squads(D); infra(D); abertos(D); cx(D); ranks(D); vendas(D);
-  $('#fontes').textContent='Fontes: ClickUp (squads, esteiras, pedidos CX) · Funnel Ops (infra)'+(D.vendas?' · Looker (vendas)':'');
+    div.appendChild(g);cals.appendChild(div);
+  }
+  $('#dp-sel').textContent=DP.a==null?'':DP.b==null?`${dCurta(DP.a)} – escolha o fim`:`${dCurta(mn)} – ${dCurta(mx)}`;
 }
 
-function semanasEsteira(D){const s=D.esteira.semanal;let k=s.findIndex(d=>d.ads+d.lead+d.pote>0);if(k<0)k=0;return s.slice(Math.min(k,s.length-2));}
-function heroTrend(D){
-  const sem=semanasEsteira(D), dados=sem.map(d=>d.ads+d.lead+d.pote), n=dados.length, W=420,H=92,max=Math.max(1,...dados)*1.15;
-  const step=W/(n-1||1), y=v=>H-6-(v/max)*(H-22);
-  const pts=dados.map((v,i)=>[i*step,y(v)]);
-  const svg=el('svg',{viewBox:`-6 0 ${W+12} ${H+16}`,class:'chart',role:'img','aria-label':'Materiais prontos por semana'});svg.setAttribute('viewBox',`-24 0 ${W+48} ${H+16}`);
+// ---------- desenho ----------
+let RAW=null, C=null;
+function desenha(){
+  if(!RAW)return;
+  const agora=Date.now(); const r=resolve(agora);
+  C=T.calcula(RAW,{ini:r.ini,fim:r.fim,agora});
+  LISTAS={};NL=0;
+  [CMP_TX,CMP_CURTO]=nomeCmp(C.periodo.cIni,C.periodo.cFim,agora);
+  const fx=faixa(r.ini,r.fim);
+  PERIODO_TX=r.nome?`${r.nome} · ${fx}`:fx;
+  $('#dp-label').textContent=r.nome?`${r.nome} · ${fx}`:fx;
+  $('#subtop').innerHTML=`<span>Período: <b>${esc(PERIODO_TX)}</b></span><span>Setas comparam com o que foi feito <b>${esc(CMP_TX)}</b></span><span>Semanas fecham no domingo às 23h59</span>`;
+  hero(); kpis(); chartEsteira(); chartCriativos(); squads(); abertos(); cx(); ranks();
+}
+
+function hero(){
+  const M=C.materiais;
+  $('#hero-n').textContent=fmt(M.valor);
+  $('#hero-clic').dataset.lista=registra('Materiais prontos pros afiliados',M.itens,'esteira');
+  $('#hero-l').textContent=`materiais prontos · ${PERIODO_TX}`;
+  $('#hero-d').innerHTML=delta(M.valor,M.anterior);
+  $('#hero-chips').innerHTML=TIPOS.map(t=>`<button class="chip" data-lista="${registra(t.n+' prontos',M.itens.filter(e=>e.tipo===t.k),'esteira')}"><i class="sw" style="background:${t.c}"></i><b class="num" style="color:var(--text-primary)">${fmt(M.tipos[t.k])}</b> ${t.n.toLowerCase()}</button>`).join('');
+  heroTrend();
+  // top 10 afiliados
+  const top=M.afiliados.slice(0,10), max=Math.max(1,...top.map(a=>a.n));
+  $('#top10').innerHTML=top.length?top.map((a,i)=>`<div class="af"><span class="pos num">${i+1}º</span>${url(a.url)?`<a class="nm" href="${url(a.url)}" target="_blank" rel="noopener" title="Abrir ${esc(a.nome)} no CRM">${esc(curtoAf(a.nome))}</a>`:`<span class="nm">${esc(curtoAf(a.nome))}</span>`}<div class="bar" style="width:${a.n/max*100}%"></div><button class="q num" data-lista="${registra('Materiais de '+curtoAf(a.nome),a.itens,'esteira')}" title="Ver os materiais">${fmt(a.n)}</button></div>`).join(''):'<p class="sub">Nenhum material com afiliado marcado no período.</p>';
+  $('#top-nota').innerHTML=`${fmt(M.afiliados.length)} afiliados receberam material no período${M.semAfiliado?` · <button class="tg" data-lista="${registra('Materiais sem afiliado marcado',M.itens.filter(e=>!(e.afiliados||[]).length),'esteira')}">${fmt(M.semAfiliado)} sem afiliado marcado</button>`:''}`;
+}
+function heroTrend(){
+  const sem=C.materiais.semanal, dados=sem.map(d=>d.ads+d.lead+d.pote), n=dados.length;
+  const box=$('#hero-t'); box.innerHTML='';
+  if(n<2)return;
+  const W=520,H=96,m={l:38,r:38}, max=Math.max(1,...dados)*1.18;
+  const step=(W-m.l-m.r)/(n-1), y=v=>H-8-(v/max)*(H-26), xs=i=>m.l+i*step;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H+30}`,class:'chart',role:'img','aria-label':'Materiais prontos por semana'});
   svg.innerHTML='<defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3987e5" stop-opacity=".28"/><stop offset="1" stop-color="#3987e5" stop-opacity="0"/></linearGradient></defs>';
-  const full=pts.slice(0,n-1), line=full.map((p,i)=>(i?'L':'M')+p[0]+','+p[1]).join('');
-  el('path',{d:line+`L${full[full.length-1][0]},${H}L0,${H}Z`,fill:'url(#ar)'},svg);
-  el('path',{d:line,fill:'none',stroke:'var(--series-1)','stroke-width':2,'stroke-linejoin':'round'},svg);
-  el('path',{d:`M${pts[n-2][0]},${pts[n-2][1]}L${pts[n-1][0]},${pts[n-1][1]}`,fill:'none',stroke:'var(--series-1)','stroke-width':2,'stroke-dasharray':'4 4'},svg);
-  pts.forEach((p,i)=>{const g=el('g',{tabindex:0},svg);el('circle',{cx:p[0],cy:p[1],r:i===n-2?5:3.5,fill:i===n-1?'var(--surface-1)':'var(--series-1)',stroke:'var(--series-1)','stroke-width':2},g);
+  const pts=dados.map((v,i)=>[xs(i),y(v)]);
+  const ult=sem[n-1].parcial?n-1:n; const fech=pts.slice(0,ult);
+  if(fech.length>1){const line=fech.map((p,i)=>(i?'L':'M')+p[0]+','+p[1]).join('');
+    el('path',{d:line+`L${fech[fech.length-1][0]},${H}L${fech[0][0]},${H}Z`,fill:'url(#ar)'},svg);
+    el('path',{d:line,fill:'none',stroke:'var(--series-1)','stroke-width':2,'stroke-linejoin':'round'},svg);}
+  if(ult<n)el('path',{d:`M${pts[n-2][0]},${pts[n-2][1]}L${pts[n-1][0]},${pts[n-1][1]}`,fill:'none',stroke:'var(--series-1)','stroke-width':2,'stroke-dasharray':'4 4'},svg);
+  const ax=el('g',{class:'axis'},svg);
+  pts.forEach((p,i)=>{const w=sem[i];const g=el('g',{tabindex:0},svg);
+    el('circle',{cx:p[0],cy:p[1],r:w.sel?5:3.5,fill:w.parcial?'var(--surface-1)':'var(--series-1)',stroke:'var(--series-1)','stroke-width':2},g);
     el('rect',{x:p[0]-step/2,y:0,width:step,height:H,fill:'transparent'},g);
-    const t=el('text',{x:p[0],y:H+13,'text-anchor':'middle',fill:'var(--text-muted)','font-size':11},svg);t.textContent=sem[i].rotulo+(i===n-1?'*':'');
-    bindTip(g,`<b>Semana de ${sem[i].rotulo}${i===n-1?' (em andamento)':''}</b><div class="r">Materiais prontos: <b>${fmt(dados[i])}</b></div>`);});
-  const b=$('#hero-t');b.innerHTML='<p class="sub" style="margin:0 0 4px">Materiais prontos por semana</p>';b.appendChild(svg);
+    if(w.sel){const t=el('text',{x:p[0],y:p[1]-10,'text-anchor':'middle',fill:'var(--text-primary)','font-size':12,'font-weight':700},svg);t.textContent=fmt(dados[i])}
+    rotuloX(ax,p[0],H+14,w);
+    bindTip(g,`<b>${w.parcial?'Esta semana (tempo real)':esc(w.nome)}</b> · ${w.datas}<div class="r">Materiais prontos: <b>${fmt(dados[i])}</b></div>`);});
+  box.appendChild(svg);
 }
 
-function chartEsteira(D){
+function kpis(){
+  $('#kpis').innerHTML=C.kpis.map(k=>{
+    const tipo=k.id==='cx'?'cx':'squad';
+    const id=registra(k.rotulo,k.itens,tipo);
+    return `<article class="card kpi clic" data-lista="${id}" role="button" tabindex="0" aria-label="${esc(k.rotulo)}: ${fmt(k.valor)}. Ver a lista"><h2>${esc(k.rotulo)}</h2><div class="v num">${fmt(k.valor)}</div><br>${delta(k.valor,k.anterior)}<div class="d">${esc(k.detalhe)}</div><span class="ver">Ver lista →</span></article>`;
+  }).join('');
+}
+
+function barras(box,sem,series,{W=600,H=280,ariaLabel,tipoLista,itensSemana}){
+  const m={t:26,r:8,b:42,l:34}, iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const tot=sem.map((_,i)=>series.reduce((s,se)=>s+se.v[i],0));
+  const E=eixo(Math.max(...tot,1)), max=E.max;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,class:'chart',role:'img','aria-label':ariaLabel});
+  const hid='h'+Math.random().toString(36).slice(2,7);
+  svg.innerHTML=`<defs><pattern id="${hid}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="7" fill="rgba(15,15,14,.5)"/></pattern></defs>`;
+  const g=el('g',{class:'grid'},svg), ax=el('g',{class:'axis'},svg);
+  for(let i=0;i<=E.n;i++){const y=m.t+ih-ih*i/E.n;el('line',{x1:m.l,x2:W-m.r,y1:y,y2:y},g);const t=el('text',{x:m.l-8,y:y+4,'text-anchor':'end'},ax);t.textContent=fmt(E.st*i)}
+  const bw=iw/sem.length, w=Math.min(50,bw*.58);
+  sem.forEach((s,i)=>{
+    const x=m.l+bw*i+(bw-w)/2; let y=m.t+ih;
+    const grp=el('g',{tabindex:0,role:'button','aria-label':`${s.nome} (${s.datas}): ${tot[i]}. Ver a lista`,style:'cursor:pointer',opacity:s.sel?1:.4},svg);
+    const pres=series.filter(se=>se.v[i]>0);
+    pres.forEach((se,j)=>{const h=se.v[i]/max*ih;const topo=j===pres.length-1;const yy=y-h;
+      const d=topo?barPath(x,yy,w,h-(j?2:0)):`M${x},${yy+(j?2:0)}H${x+w}V${y}H${x}Z`;
+      el('path',{d,fill:se.c},grp); if(s.parcial)el('path',{d,fill:`url(#${hid})`},grp); y=yy;});
+    const tl=el('text',{x:x+w/2,y:y-7,'text-anchor':'middle',fill:s.sel?'var(--text-primary)':'var(--text-muted)','font-size':12,'font-weight':700},svg);tl.textContent=fmt(tot[i]);
+    rotuloX(ax,x+w/2,H-22,s);
+    el('rect',{x:m.l+bw*i,y:m.t,width:bw,height:ih,fill:'transparent'},grp);
+    bindTip(grp,`<b>${s.parcial?'Esta semana (tempo real)':esc(s.nome)}</b> · ${s.datas}${series.length>1?series.map(se=>`<div class="r"><i class="sw" style="background:${se.c}"></i>${se.n}: <b>${fmt(se.v[i])}</b></div>`).join(''):''}<div class="r" style="margin-top:4px">Total: <b>${fmt(tot[i])}</b></div><div class="r" style="color:var(--text-muted)">clique para ver a lista</div>`);
+    const lid=registra(`${s.parcial?'Esta semana (tempo real)':s.nome} · ${s.datas}`,itensSemana(s),tipoLista);
+    grp.dataset.lista=lid;
+  });
+  box.appendChild(svg);
+  return {svg,tot};
+}
+function chartEsteira(){
   const box=$('#ch-est'); box.innerHTML='';
   $('#leg-est').innerHTML=TIPOS.map(t=>`<span><i class="sw" style="background:${t.c}"></i>${t.n}</span>`).join('');
-  const W=760,H=270,m={t:26,r:8,b:28,l:34};
-  const dados=semanasEsteira(D); const tot=dados.map(d=>d.ads+d.lead+d.pote);
-  const E=eixo(Math.max(...tot,1)), max=E.max; const iw=W-m.l-m.r, ih=H-m.t-m.b;
-  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,class:'chart',role:'img','aria-label':'Materiais prontos por semana, por tipo'});
-  svg.innerHTML='<defs><pattern id="hach" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="7" fill="rgba(15,15,14,.45)"/></pattern></defs>';
-  const g=el('g',{class:'grid'},svg); const ax=el('g',{class:'axis'},svg);
-  for(let i=0;i<=E.n;i++){const y=m.t+ih-ih*i/E.n;el('line',{x1:m.l,x2:W-m.r,y1:y,y2:y},g);const t=el('text',{x:m.l-8,y:y+4,'text-anchor':'end'},ax);t.textContent=fmt(E.st*i)}
-  const bw=iw/dados.length, w=Math.min(54,bw*.56);
-  dados.forEach((d,i)=>{
-    const x=m.l+bw*i+(bw-w)/2; let y=m.t+ih; const grp=el('g',{tabindex:0,role:'img','aria-label':`Semana de ${d.rotulo}: ${tot[i]} materiais`},svg);
-    const pres=TIPOS.filter(t=>d[t.k]>0);
-    pres.forEach((t,j)=>{const h=d[t.k]/max*ih; const topo=j===pres.length-1; const yy=y-h;
-      const r=el('path',{d:topo?barPath(x,yy,w,h-(j?2:0)):`M${x},${yy+(j?2:0)}H${x+w}V${y}H${x}Z`,fill:t.c},grp); if(d.parcial)el('path',{d:r.getAttribute('d'),fill:'url(#hach)'},grp); y=yy;});
-    const tl=el('text',{x:x+w/2,y:y-7,'text-anchor':'middle',fill:'var(--text-primary)','font-size':12,'font-weight':700},svg); tl.textContent=fmt(tot[i]);
-    const lb=el('text',{x:x+w/2,y:H-8,'text-anchor':'middle'},ax); lb.textContent=d.rotulo+(d.parcial?'*':'');
-    const hit=el('rect',{x:m.l+bw*i,y:m.t,width:bw,height:ih,fill:'transparent'},grp);
-    bindTip(grp,`<b>Semana de ${d.rotulo}${d.parcial?' (em andamento)':''}</b>${TIPOS.map(t=>`<div class="r"><i class="sw" style="background:${t.c}"></i>${t.n}: <b>${fmt(d[t.k])}</b></div>`).join('')}<div class="r" style="margin-top:6px">Total: <b>${fmt(tot[i])}</b></div>`);
-  });
-  box.appendChild(svg);
-  const nota=document.createElement('p');nota.className='sub';nota.textContent='* semana atual, ainda em andamento (barra hachurada)';box.appendChild(nota);
-  // tabela
+  const sem=C.materiais.semanal;
+  const {svg,tot}=barras(box,sem,TIPOS.map(t=>({n:t.n,c:t.c,v:sem.map(s=>s[t.k])})),{ariaLabel:'Materiais prontos por semana, por tipo',tipoLista:'esteira',itensSemana:s=>RAW.esteira.filter(e=>e.criado>=s.ini&&e.criado<s.fim)});
+  const nota=document.createElement('p');nota.className='sub';nota.textContent='* esta semana, ainda em andamento (barra hachurada) · semanas fora do período ficam apagadas';box.appendChild(nota);
   const tb=document.createElement('table');tb.className='tbl num';tb.hidden=true;
-  tb.innerHTML=`<thead><tr><th>Semana</th>${TIPOS.map(t=>`<th>${t.n}</th>`).join('')}<th>Total</th></tr></thead><tbody>${dados.map((d,i)=>`<tr><td>${d.rotulo}${d.parcial?'*':''}</td>${TIPOS.map(t=>`<td>${fmt(d[t.k])}</td>`).join('')}<td><b>${fmt(tot[i])}</b></td></tr>`).join('')}</tbody>`;
+  tb.innerHTML=`<thead><tr><th>Semana</th>${TIPOS.map(t=>`<th>${t.n}</th>`).join('')}<th>Total</th></tr></thead><tbody>${sem.map((d,i)=>`<tr><td>${esc(d.parcial?'Esta semana (tempo real)':d.nome)} · ${d.datas}</td>${TIPOS.map(t=>`<td>${fmt(d[t.k])}</td>`).join('')}<td><b>${fmt(tot[i])}</b></td></tr>`).join('')}</tbody>`;
   box.appendChild(tb);
-  const tg=$('#tg-est'); tg.onclick=()=>{const on=tb.hidden;tb.hidden=!on;svg.style.display=on?'none':'';tg.textContent=on?'Ver gráfico':'Ver tabela';tg.setAttribute('aria-pressed',on)};
+  const tg=$('#tg-est'); tg.textContent='Ver tabela'; tg.setAttribute('aria-pressed','false');
+  tg.onclick=()=>{const on=tb.hidden;tb.hidden=!on;svg.style.display=on?'none':'';tg.textContent=on?'Ver gráfico':'Ver tabela';tg.setAttribute('aria-pressed',on)};
 }
-
-function chartCriativos(D){
+function chartCriativos(){
   const box=$('#ch-cri'); box.innerHTML='';
-  const v=D.criativosSemanal, rot=D.semanas, n=v.length;
-  const W=420,H=270,m={t:26,r:8,b:28,l:34}, iw=W-m.l-m.r, ih=H-m.t-m.b, E=eixo(Math.max(...v,1)), max=E.max;
-  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,class:'chart',role:'img','aria-label':'Criativos produzidos por semana'});
-  svg.innerHTML='<defs><pattern id="hach2" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="7" fill="rgba(15,15,14,.45)"/></pattern></defs>';
-  const g=el('g',{class:'grid'},svg), ax=el('g',{class:'axis'},svg);
-  for(let i=0;i<=E.n;i++){const y=m.t+ih-ih*i/E.n;el('line',{x1:m.l,x2:W-m.r,y1:y,y2:y},g);const t=el('text',{x:m.l-8,y:y+4,'text-anchor':'end'},ax);t.textContent=fmt(E.st*i)}
-  const bw=iw/n,w=Math.min(46,bw*.56);
-  v.forEach((val,i)=>{const x=m.l+bw*i+(bw-w)/2,h=val/max*ih,y=m.t+ih-h,parc=i===n-1;
-    const grp=el('g',{tabindex:0,role:'img','aria-label':`Semana de ${rot[i]}: ${val} criativos`},svg);
-    el('path',{d:barPath(x,y,w,h),fill:'var(--series-1)'},grp); if(parc)el('path',{d:barPath(x,y,w,h),fill:'url(#hach2)'},grp);
-    el('rect',{x:m.l+bw*i,y:m.t,width:bw,height:ih,fill:'transparent'},grp);
-    const tl=el('text',{x:x+w/2,y:y-7,'text-anchor':'middle',fill:'var(--text-primary)','font-size':12,'font-weight':700},svg);tl.textContent=fmt(val);
-    const lb=el('text',{x:x+w/2,y:H-8,'text-anchor':'middle'},ax);lb.textContent=rot[i]+(parc?'*':'');
-    bindTip(grp,`<b>Semana de ${rot[i]}${parc?' (em andamento)':''}</b><div class="r">Criativos: <b>${fmt(val)}</b></div>`);
-  });
-  box.appendChild(svg);
+  const sem=C.semanas;
+  barras(box,sem,[{n:'Criativos',c:'var(--series-1)',v:C.criSemanal}],{ariaLabel:'Criativos produzidos por semana',tipoLista:'squad',
+    itensSemana:s=>RAW.squads.map(t=>({...t,cat:T.categoria(t.nome)})).map(t=>({...t,qtd:T.quantidade(t.nome,t.cat)})).filter(t=>t.cat==='Criativos'&&t.qtd>0&&t.fechado>=s.ini&&t.fechado<s.fim)});
+  const nota=document.createElement('p');nota.className='sub';nota.textContent='* esta semana, ainda em andamento · clique numa barra para ver as levas';box.appendChild(nota);
 }
 
-function squads(D){
-  const cats=[...new Set(D.squads.flatMap(s=>Object.keys(s.mix)))];
+function squads(){
+  const cats=[...new Set(C.squads.flatMap(s=>Object.keys(s.mix)))];
   const ordem=Object.keys(MIXC).filter(c=>cats.includes(c));
   $('#leg-mix').innerHTML=ordem.map(c=>`<span><i class="sw" style="background:${MIXC[c]}"></i>${c}</span>`).join('');
-  const maxSem=Math.max(1,...D.squads.flatMap(s=>s.semanal));
-  $('#squads').innerHTML=D.squads.map(s=>{
+  const maxSem=Math.max(1,...C.squads.flatMap(s=>s.semanal));
+  const sem=C.semanas;
+  $('#squads').innerHTML=C.squads.map(s=>{
     const tot=Object.values(s.mix).reduce((a,b)=>a+b,0)||1;
     const mix=ordem.filter(c=>s.mix[c]).map(c=>`<i style="width:${s.mix[c]/tot*100}%;background:${MIXC[c]}" title="${c}: ${s.mix[c]}"></i>`).join('');
-    const lbl=ordem.filter(c=>s.mix[c]).sort((a,b)=>s.mix[b]-s.mix[a]).slice(0,3).map(c=>`${c} ${s.mix[c]}`).join(' · ')||'sem demandas concluídas';
-    const sk=s.semanal.map((v,i)=>`<rect x="${i*20}" y="${36-Math.max(v?2:0,v/maxSem*36)}" width="14" height="${Math.max(v?2:0,v/maxSem*36)}" rx="2" fill="${i===s.semanal.length-1?'#3a3a35':'#5a5a52'}"><title>Semana de ${D.semanas[i]}: ${v}</title></rect>`).join('');
-    return `<div class="sq"><div class="nm"><b>${esc(s.nome)}</b><span>${esc(s.sub)}</span></div><div class="n num">${fmt(s.entregas)}</div><div class="mx"><div class="mixbar" role="img" aria-label="Mix: ${esc(lbl)}">${mix||'<i style="width:100%;background:var(--surface-2)"></i>'}</div><div class="mixlbl">${esc(lbl)}</div></div><div class="sk" style="display:flex;align-items:center;gap:10px"><svg width="${s.semanal.length*20}" height="38" role="img" aria-label="Concluídas por semana">${sk}</svg>${delta(s.entregas,s.anterior,{curto:true})}</div></div>`;
+    const lbl=ordem.filter(c=>s.mix[c]).sort((a,b)=>s.mix[b]-s.mix[a]).slice(0,3).map(c=>`${c} ${s.mix[c]}`).join(' · ')||'sem demandas concluídas no período';
+    const sk=s.semanal.map((v,i)=>{const h=Math.max(v?2:0,v/maxSem*36);return `<rect x="${i*20}" y="${36-h}" width="14" height="${h}" rx="2" fill="${sem[i].sel?'#8a8a80':'#45453f'}"${sem[i].parcial?' stroke="#8a8a80" stroke-dasharray="2 2" fill-opacity=".35"':''}><title>${sem[i].parcial?'Esta semana (tempo real)':sem[i].nome} · ${sem[i].datas}: ${v}</title></rect>`}).join('');
+    const id=registra(`${s.nome} · demandas concluídas`,s.itens,'squad');
+    return `<div class="sq"><div class="nm">${url(s.url)?`<a href="${url(s.url)}" target="_blank" rel="noopener" title="Abrir a lista no ClickUp">${esc(s.nome)} ↗</a>`:`<b>${esc(s.nome)}</b>`}<span>${esc(s.sub)}</span></div><button class="n num" data-lista="${id}" title="Ver as demandas">${fmt(s.entregas)}</button><div class="mx"><div class="mixbar" role="img" aria-label="Mix: ${esc(lbl)}">${mix||'<i style="width:100%;background:var(--surface-2)"></i>'}</div><div class="mixlbl">${esc(lbl)}</div></div><div class="sk" style="display:flex;align-items:center;gap:10px"><svg width="${s.semanal.length*20}" height="38" role="img" aria-label="Concluídas por semana">${sk}</svg>${delta(s.entregas,s.anterior,{curto:true})}</div></div>`;
   }).join('');
 }
 
-function infra(D){
-  const I=D.infra, v=I.sla7; const cls=v==null?'':v>=I.meta?'ok':v>=60?'warn':'crit';
-  const cor=v==null?'var(--text-muted)':v>=I.meta?'var(--good)':v>=60?'var(--warning)':'var(--critical)';
-  const R=42,C=2*Math.PI*R, pv=Math.min(100,v||0);
-  const rotulo={ok:'✓ Na meta',warn:'! Atenção',crit:'✕ Abaixo da meta'}[cls]||'';
-  $('#inf-ring').innerHTML=`<svg width="104" height="104" viewBox="0 0 104 104" role="img" aria-label="${fmt(v)}% em até 24 horas"><circle cx="52" cy="52" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="10"/><circle cx="52" cy="52" r="${R}" fill="none" stroke="${cor}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C*pv/100} ${C}" transform="rotate(-90 52 52)"/><line x1="52" y1="4" x2="52" y2="16" stroke="var(--text-secondary)" stroke-width="2" transform="rotate(${I.meta*3.6} 52 52)"/></svg><div class="info"><div class="v num">${fmt(v)}%</div><p>${fmt(I.demandas7)} demandas medidas · mediana ${fmtH(I.mediana7)}</p><span class="status ${cls}">${rotulo} · meta ${I.meta}%</span></div>`;
-  // linha semanal
-  const d=I.semanal, W=380,H=150,m={t:14,r:12,b:24,l:42}, iw=W-m.l-m.r, ih=H-m.t-m.b;
-  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,class:'chart',role:'img','aria-label':'% de demandas em até 24 horas por semana'});
-  const g=el('g',{class:'grid'},svg), ax=el('g',{class:'axis'},svg);
-  [0,50,100].forEach(p=>{const y=m.t+ih-ih*p/100;el('line',{x1:m.l,x2:W-m.r,y1:y,y2:y},g);const t=el('text',{x:m.l-6,y:y+4,'text-anchor':'end'},ax);t.textContent=p+'%'});
-  const ym=m.t+ih-ih*I.meta/100; el('line',{x1:m.l,x2:W-m.r,y1:ym,y2:ym,stroke:'var(--text-secondary)','stroke-dasharray':'4 4','stroke-width':1.5},svg);
-  const mt=el('text',{x:W-m.r,y:ym-5,'text-anchor':'end',fill:'var(--text-secondary)','font-size':11},svg);mt.textContent='meta 80%';
-  const step=iw/(d.length-1||1); const pts=d.map((w,i)=>[m.l+step*i,w.sla==null?null:m.t+ih-ih*w.sla/100]);
-  const path=pts.filter(p=>p[1]!=null).map((p,i)=>(i?'L':'M')+p[0]+','+p[1]).join('');
-  el('path',{d:path,fill:'none',stroke:'var(--series-1)','stroke-width':2,'stroke-linejoin':'round'},svg);
-  d.forEach((w,i)=>{const[x,y]=pts[i];const lb=el('text',{x,y:H-6,'text-anchor':'middle'},ax);lb.textContent=w.rotulo+(w.parcial?'*':'');
-    if(y==null)return; const grp=el('g',{tabindex:0},svg);
-    el('circle',{cx:x,cy:y,r:4.5,fill:'var(--series-1)',stroke:'var(--surface-1)','stroke-width':2},grp);
-    el('rect',{x:x-step/2,y:m.t,width:step,height:ih,fill:'transparent'},grp);
-    bindTip(grp,`<b>Semana de ${w.rotulo}${w.parcial?' (em andamento)':''}</b><div class="r">Em até 24 h: <b>${fmt(w.sla)}%</b></div><div class="r">Mediana: <b>${fmtH(w.mediana)}</b></div><div class="r">Demandas: <b>${fmt(w.n)}</b></div>`);});
-  const box=$('#ch-inf'); box.innerHTML=''; box.appendChild(svg);
-  const p=document.createElement('p');p.className='sub';p.innerHTML=`${fmt(I.entregas7)} subtasks de infra entregues em 7 dias ${delta(I.entregas7,I.entregasAnt)}`;box.appendChild(p);
-}
-
-function abertos(D){
-  const a=D.esteira.abertos; const n={ads:'Pack de ads',lead:'Lead/microlead',pote:'Troca de pote'};
+function abertos(){
+  const a=C.abertos;
   if(!a.length){$('#ab').innerHTML='<p class="sub">Nenhum material parado. Tudo que ficou pronto já foi enviado.</p>';return}
   const velhos=a.filter(x=>x.dias>=3).length;
-  $('#ab').innerHTML=`<div class="ring" style="margin-bottom:12px"><div class="info"><div class="v num">${fmt(a.length)}</div><p>materiais prontos sem envio${velhos?` · <b style="color:#f6c860">${velhos} há 3 dias ou mais</b>`:''}</p></div></div><div class="est">${a.map(x=>`<div class="it"><i class="sw" style="background:${TIPOS.find(t=>t.k===x.tipo).c}"></i><div class="p">${esc(x.produto)}<div class="t">${n[x.tipo]}</div></div><span class="age ${x.dias>=3?'velho':''}">${x.dias===0?'hoje':x.dias===1?'1 dia':x.dias+' dias'}</span></div>`).join('')}</div>`;
+  $('#ab').innerHTML=`<div class="bignum"><div class="v num">${fmt(a.length)}</div><p>prontos sem envio${velhos?` · <b style="color:#f6c860">${velhos} há 3 dias ou mais</b>`:''}</p></div><div class="est">${a.map(x=>{
+    const afs=(x.afiliados||[]).map(f=>lnk(f.url,esc(curtoAf(f.nome)))).join(', ')||'sem afiliado marcado';
+    return `<div class="it"><i class="sw" style="background:${TIPOS.find(t=>t.k===x.tipo).c}"></i><div class="p">${lnk(x.url,esc(x.produto||x.nome))}<div class="t">${TIPO1[x.tipo]} · ${afs}</div></div>${url(x.drive)?`<a class="lk" href="${url(x.drive)}" target="_blank" rel="noopener">Drive ↗</a>`:''}<span class="age ${x.dias>=3?'velho':''}">${x.dias===0?'hoje':x.dias===1?'1 dia':x.dias+' dias'}</span></div>`}).join('')}</div>`;
 }
 
-function cx(D){
-  const C=D.cx; const max=Math.max(1,...C.tipos.map(t=>t.n));
-  $('#cx').innerHTML=`<div class="ring" style="margin-bottom:12px"><div class="info"><div class="v num">${fmt(C.criadas)}</div><p>tasks criadas sozinhas · <b style="color:var(--text-primary)">${fmt(C.afiliados)}</b> afiliados atendidos${C.canceladas?` · ${fmt(C.canceladas)} recusados pelo líder`:''}</p></div></div><div class="rank">${C.tipos.map(t=>`<div class="rk"><span>${esc(t.nome[0].toUpperCase()+t.nome.slice(1))}</span><div class="bar" style="width:${t.n/max*100}%;background:#d55181"></div><b class="num">${fmt(t.n)}</b></div>`).join('')}</div>`;
+function cx(){
+  const X=C.cx; const maxA=Math.max(1,...X.analistas.map(t=>t.n)), maxT=Math.max(1,...X.tipos.map(t=>t.n));
+  const fila=X.emFila.length?` · <button class="tg" data-lista="${registra('Pedidos da CX aguardando o líder',X.emFila,'cx')}">${fmt(X.emFila.length)} aguardando o líder agora</button>`:'';
+  $('#cx').innerHTML=`<div class="bignum clic" data-lista="${registra('Pedidos da CX',X.itens,'cx')}" role="button" tabindex="0"><div class="v num">${fmt(X.pedidos)}</div><p>pedidos no período · <b style="color:var(--text-primary)">${fmt(X.criadas)}</b> viraram task · ${fmt(X.afiliados)} afiliados${X.canceladas?` · ${fmt(X.canceladas)} recusados`:''}${fila}</p></div>
+  <div class="subt">Quem pediu</div><div class="rank">${X.analistas.map(t=>`<button class="rk cx" data-lista="${registra('Pedidos de '+t.nome,t.itens,'cx')}"><span>${esc(t.nome)}</span><div class="bar" style="width:${t.n/maxA*100}%"></div><b class="num">${fmt(t.n)}</b></button>`).join('')||'<p class="sub">Nenhum pedido no período.</p>'}</div>
+  <div class="subt">O que pediram</div><div class="rank">${X.tipos.map(t=>`<button class="rk cx" data-lista="${registra('Pedidos de '+t.nome,t.itens,'cx')}"><span>${esc(t.nome[0].toUpperCase()+t.nome.slice(1))}</span><div class="bar" style="width:${t.n/maxT*100}%;opacity:.7"></div><b class="num">${fmt(t.n)}</b></button>`).join('')}</div>`;
 }
 
-function ranks(D){
-  const r=(arr,ads)=>{const max=Math.max(1,...arr.map(x=>x.n));return arr.map(x=>`<div class="rk ${ads?'ads':''}" tabindex="0"><span>${esc(x.nome)}</span><div class="bar" style="width:${x.n/max*100}%"></div><b class="num">${fmt(x.n)}</b></div>`).join('')||'<p class="sub">Sem dados no período.</p>'};
-  $('#prod').innerHTML=r(D.esteira.produtos,false); $('#nich').innerHTML=r(D.esteira.nichos,true);
+function ranks(){
+  const r=(arr,ads,pref)=>{const top=arr.slice(0,10);const max=Math.max(1,...top.map(x=>x.n));return top.map(x=>`<button class="rk ${ads?'ads':''}" data-lista="${registra(pref+x.nome,x.itens,'esteira')}"><span>${esc(x.nome)}</span><div class="bar" style="width:${x.n/max*100}%"></div><b class="num">${fmt(x.n)}</b></button>`).join('')||'<p class="sub">Sem materiais no período.</p>'};
+  $('#prod').innerHTML=r(C.produtos,false,'Materiais de '); $('#nich').innerHTML=r(C.nichos,true,'Packs de ads · ');
 }
 
-function vendas(D){
-  if(D.vendas){ /* reservado para quando a fonte do Looker for conectada */ return; }
-  $('#vendas').innerHTML=`<div class="lock"><div class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#c3c2b7" d="M12 2a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v3h6V7a3 3 0 0 0-3-3z"/></svg></div><div><b>Aguardando a conexão com a base de vendas</b><p>Assim que a planilha que alimenta o "Dashboard de Afiliados" do Looker for liberada, esta faixa mostra vendas, receita, AOV e ROAS da semana, com os produtos e afiliados que mais cresceram e caíram.</p></div></div><div class="ghost" aria-hidden="true"><div><small>Vendas</small><span></span></div><div><small>Receita</small><span></span></div><div><small>AOV</small><span></span></div><div><small>ROAS</small><span></span></div></div>`;
-}
-
-async function iniciar(){
+// ---------- dados: robô ao vivo (branch dados-torre) → reserva no site ----------
+let SHA='', TXT='', VIVO=false;
+async function busca(forcar){
   try{
-    let D=window.__DADOS__;
-    if(!D){const r=await fetch('data.json?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);D=await r.json();}
-    render(D);
-  }catch(e){const a=$('#aviso');a.style.display='block';a.textContent='Não consegui carregar os dados agora ('+e.message+'). Atualize a página em alguns minutos.';}
+    const c=await fetch(`https://api.github.com/repos/${REPO}/commits/${RAMO}`,{cache:forcar?'reload':'no-cache',headers:{Accept:'application/vnd.github+json'}});
+    if(c.ok){const j=await c.json();
+      if(j.sha!==SHA||!TXT){const r=await fetch(`https://raw.githubusercontent.com/${REPO}/${j.sha}/${ARQ}`);if(r.ok){TXT=await r.text();SHA=j.sha}}
+      if(TXT)return{txt:TXT,vivo:true};
+    }
+  }catch(e){}
+  try{const r=await fetch(`https://raw.githubusercontent.com/${REPO}/${RAMO}/${ARQ}?t=${Date.now()}`,{cache:'no-store'});if(r.ok)return{txt:await r.text(),vivo:true}}catch(e){}
+  const r=await fetch('data.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);return{txt:await r.text(),vivo:false};
 }
-iniciar();
+function selo(){
+  if(!RAW)return;
+  const dt=Date.parse(RAW.sincronizado_em), min=(Date.now()-dt)/6e4;
+  const h=Number(new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hourCycle:'h23'}).format(new Date()));
+  const ok=VIVO&&min<5;
+  $('#frescor-dot').className='dot'+(ok||h<6?'':' velho');
+  const quando=min<1?'agora':min<60?`há ${Math.round(min)} min`:`há ${Math.floor(min/60)} h`;
+  $('#frescor-tx').textContent=`ClickUp lido ${quando} · ${new Date(dt).toLocaleTimeString('pt-BR',{timeZone:TZ,hour:'2-digit',minute:'2-digit'})}${ok?' · ao vivo':h<6?' · robô pausado até 6h':' · atrasado'}`;
+  $('#frescor').title=ok?'O robô relê o ClickUp a cada 1 minuto. O botão Sincronizar busca a leitura mais nova na hora.':'A leitura está atrasada. Clique em Sincronizar.';
+}
+let CARREGANDO=false, ASSIN='';
+async function carrega(forcar){
+  if(CARREGANDO)return; CARREGANDO=true;
+  const b=$('#sync'); if(forcar){b.classList.add('gira');b.querySelector('span').textContent='Sincronizando…'}
+  try{
+    const {txt,vivo}=await busca(forcar); const d=JSON.parse(txt);
+    if(d.versao!==2)throw new Error('os dados ainda estão no formato antigo; a primeira coleta nova chega em instantes');
+    VIVO=vivo; $('#aviso').style.display='none';
+    const assin=d.sincronizado_em+'|'+txt.length;
+    if(assin!==ASSIN){ASSIN=assin;RAW=d;desenha()}
+    else RAW.sincronizado_em=d.sincronizado_em;
+    selo();
+  }catch(e){const a=$('#aviso');a.style.display='block';a.textContent='Não consegui ler os dados agora ('+e.message+'). Tento de novo em 1 minuto.';console.error(e)}
+  finally{CARREGANDO=false;if(forcar){b.classList.remove('gira');b.querySelector('span').textContent='Sincronizar'}}
+}
+$('#sync').onclick=()=>carrega(true);
+setInterval(()=>{if(!document.hidden)carrega(false)},60e3);
+setInterval(selo,15e3);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)carrega(false)});
+
+F=lePeriodo(); montaPeriodo();
+if(window.__DADOS__){RAW=window.__DADOS__;VIVO=true;desenha();selo()}else carrega(false);
 </script>
 </body>
 </html>
