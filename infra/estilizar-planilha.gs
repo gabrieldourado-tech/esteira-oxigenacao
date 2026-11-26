@@ -26,11 +26,16 @@ function estilizarOcorrencias_(ss) {
   const sh = ss.getSheetByName('Ocorrências') || ss.getSheets()[0];
   const T = TEMA;
   if (sh.getMaxRows() < 1000) sh.insertRowsAfter(sh.getMaxRows(), 1000 - sh.getMaxRows());
-  if (sh.getMaxColumns() > 3) sh.deleteColumns(4, sh.getMaxColumns() - 3);
+  // 3 colunas de dados + colunas de "fundo" escuras para a planilha ocupar a tela toda
+  const EXTRA = 12;
+  if (sh.getMaxColumns() < 3 + EXTRA) sh.insertColumnsAfter(sh.getMaxColumns(), 3 + EXTRA - sh.getMaxColumns());
+  if (sh.getMaxColumns() > 3 + EXTRA) sh.deleteColumns(4 + EXTRA, sh.getMaxColumns() - 3 - EXTRA);
   const linhas = sh.getMaxRows();
   sh.getBandings().forEach((b) => b.remove());
   if (sh.getFilter()) sh.getFilter().remove();
   sh.clearConditionalFormatRules();
+  sh.getRange(1, 4, linhas, EXTRA).clearDataValidations().setBackground(T.fundo).setBorder(false, false, false, false, false, false);
+  for (let c = 4; c <= 3 + EXTRA; c++) sh.setColumnWidth(c, 110);
 
   const tudo = sh.getRange(1, 1, linhas, 3);
   tudo.setFontFamily(T.fonte).setFontSize(10).setFontColor(T.texto).setBackground(T.faixa1)
@@ -53,7 +58,7 @@ function estilizarOcorrencias_(ss) {
   sh.getRange(2, 2, linhas - 1, 1).setWrap(true).setVerticalAlignment('middle');
   sh.getRange(2, 3, linhas - 1, 1).setHorizontalAlignment('center').setFontWeight('bold');
   sh.setRowHeightsForced(2, linhas - 1, 34);
-  sh.setColumnWidth(1, 165); sh.setColumnWidth(2, 640); sh.setColumnWidth(3, 140);
+  sh.setColumnWidth(1, 180); sh.setColumnWidth(2, 900); sh.setColumnWidth(3, 160);
 
   // faixas alternadas (valem para as linhas novas que o painel adicionar)
   const banda = tudo.applyRowBanding(SpreadsheetApp.BandingTheme.GREY, true, false);
@@ -80,8 +85,9 @@ function montarPainel_(ss) {
   if (sh) ss.deleteSheet(sh);
   sh = ss.insertSheet('Painel', 0);
   sh.getCharts().forEach((c) => sh.removeChart(c));
-  if (sh.getMaxColumns() < 14) sh.insertColumnsAfter(sh.getMaxColumns(), 14 - sh.getMaxColumns());
-  if (sh.getMaxColumns() > 14) sh.deleteColumns(15, sh.getMaxColumns() - 14);
+  const TOTAL_COL = 26; // A..N é o conteúdo; O..Z são fundo escuro para cobrir telas largas
+  if (sh.getMaxColumns() < TOTAL_COL) sh.insertColumnsAfter(sh.getMaxColumns(), TOTAL_COL - sh.getMaxColumns());
+  if (sh.getMaxColumns() > TOTAL_COL) sh.deleteColumns(TOTAL_COL + 1, sh.getMaxColumns() - TOTAL_COL);
   if (sh.getMaxRows() > 70) sh.deleteRows(71, sh.getMaxRows() - 70);
   const tudo = sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns());
   tudo.setBackground(T.fundo).setFontFamily(T.fonte).setFontColor(T.texto).setFontSize(10).setVerticalAlignment('middle');
@@ -89,8 +95,10 @@ function montarPainel_(ss) {
   sh.setTabColor(T.laranja);
 
   // grade: A e N são margens; B..M = 12 colunas de 92 px
-  sh.setColumnWidth(1, 28); sh.setColumnWidth(14, 28);
-  for (let c = 2; c <= 13; c++) sh.setColumnWidth(c, 92);
+  const COLW = 120;
+  sh.setColumnWidth(1, 32); sh.setColumnWidth(14, 32);
+  for (let c = 2; c <= 13; c++) sh.setColumnWidth(c, COLW);
+  for (let c = 15; c <= TOTAL_COL; c++) sh.setColumnWidth(c, 100);
   const O = "'Ocorrências'!";
 
   // título
@@ -180,7 +188,7 @@ function montarPainel_(ss) {
   const graf = sh.newChart().asColumnChart()
     .addRange(gd.getRange('A1:C13'))
     .setStacked().setPosition(26, 2, 4, 6)
-    .setOption('width', 1090).setOption('height', 300)
+    .setOption('width', 12 * COLW - 20).setOption('height', 320)
     .setOption('backgroundColor', T.painel)
     .setOption('colors', [T.pablo, T.luis])
     .setOption('legend', { position: 'top', textStyle: { color: T.texto, fontSize: 11 } })
