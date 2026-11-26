@@ -168,15 +168,23 @@ function montarPainel_(ss) {
 
   // gráfico: ocorrências por mês e responsável
   secao_(sh, 'B25:M25', 'EVOLUÇÃO POR MÊS');
+  // dados do gráfico numa aba oculta (meses como texto, para as barras aparecerem mesmo com 1 mês só)
+  let gd = ss.getSheetByName('_grafico'); if (gd) ss.deleteSheet(gd);
+  gd = ss.insertSheet('_grafico');
+  gd.getRange('A1:C1').setValues([['Mês', 'Pablo', 'Luis']]);
+  gd.getRange('A2').setFormula(pt_('=IFERROR(FILTER(TEXT(Painel!B12:B23,"mmm/yy"),Painel!B12:B23<>""),"")'));
+  gd.getRange('B2').setFormula(pt_('=IFERROR(FILTER(Painel!D12:D23,Painel!B12:B23<>""),"")'));
+  gd.getRange('C2').setFormula(pt_('=IFERROR(FILTER(Painel!E12:E23,Painel!B12:B23<>""),"")'));
+  gd.hideSheet();
   const graf = sh.newChart().asColumnChart()
-    .addRange(sh.getRange('B11:B23')).addRange(sh.getRange('D11:E23'))
+    .addRange(gd.getRange('A1:C13'))
     .setStacked().setPosition(26, 2, 4, 6)
     .setOption('width', 1090).setOption('height', 300)
     .setOption('backgroundColor', { fill: T.painel })
     .setOption('chartArea', { backgroundColor: T.painel, left: 50, top: 30, width: '88%', height: '72%' })
     .setOption('colors', [T.pablo, T.luis])
     .setOption('legend', { position: 'top', textStyle: { color: T.texto, fontName: T.fonte, fontSize: 11 } })
-    .setOption('hAxis', { textStyle: { color: T.suave, fontName: T.fonte }, gridlines: { color: 'transparent' }, format: 'MMM yyyy', direction: -1 })
+    .setOption('hAxis', { textStyle: { color: T.suave, fontName: T.fonte }, gridlines: { color: 'transparent' }, direction: -1 })
     .setOption('vAxis', { textStyle: { color: T.suave, fontName: T.fonte }, gridlines: { color: T.linha }, baselineColor: T.linha, minValue: 0, format: '0' })
     .setOption('bar', { groupWidth: '45%' })
     .setOption('useFirstColumnAsDomain', true)
