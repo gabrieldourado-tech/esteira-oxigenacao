@@ -98,7 +98,7 @@ function montarPainel_(ss) {
   sh.getRange('B2:M2').merge().setValue('FUNNEL OPS — OCORRÊNCIAS').setFontSize(22).setFontWeight('bold').setFontColor(T.texto);
   sh.setRowHeight(2, 44);
   sh.getRange('B3:M3').merge()
-    .setFormula('="Histórico de ocorrências do time de Infra · atualizado em "&TEXT(NOW();"dd/mm/yyyy hh:mm")'.replace(/;/g, ','))
+    .setFormula(pt_('="Histórico de ocorrências do time de Infra · atualizado em "&TEXT(NOW();"dd/mm/yyyy hh:mm")'))
     .setFontColor(T.suave).setFontSize(10);
   sh.getRange('B4:M4').setBorder(null, null, true, null, null, null, T.laranja, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   sh.setRowHeight(4, 8); sh.setRowHeight(5, 16);
@@ -115,15 +115,15 @@ function montarPainel_(ss) {
     const bloco = sh.getRange(`${c1}6:${c2}8`);
     bloco.setBackground(T.painel).setBorder(true, true, true, true, false, false, T.linha, SpreadsheetApp.BorderStyle.SOLID);
     sh.getRange(`${c1}6:${c2}6`).merge().setValue('  ' + rotulo).setFontSize(9).setFontWeight('bold').setFontColor(T.suave).setVerticalAlignment('bottom');
-    sh.getRange(`${c1}7:${c2}7`).merge().setFormula(valor).setNumberFormat(fmt).setFontSize(30).setFontWeight('bold').setFontColor(cor).setHorizontalAlignment('left');
+    sh.getRange(`${c1}7:${c2}7`).merge().setFormula(pt_(valor)).setNumberFormat(fmt).setFontSize(30).setFontWeight('bold').setFontColor(cor).setHorizontalAlignment('left');
     sh.getRange(`${c1}7:${c2}7`).setHorizontalAlignment('left');
     const r = sh.getRange(`${c1}8:${c2}8`).merge().setFontSize(9).setFontColor(T.apagado).setVerticalAlignment('top');
-    if (String(rodape).charAt(0) === '=') r.setFormula(rodape); else r.setValue('  ' + rodape);
+    if (String(rodape).charAt(0) === '=') r.setFormula(pt_(rodape)); else r.setValue('  ' + rodape);
     sh.getRange(`${c1}6:${c1}8`).setBorder(null, true, null, null, null, null, cor, SpreadsheetApp.BorderStyle.SOLID_THICK);
   });
   // recuo do número grande (espaço à esquerda)
   ['B7', 'E7', 'H7', 'K7'].forEach((a) => {
-    const c = sh.getRange(a); c.setFormula('=" "&TEXT(' + c.getFormula().slice(1) + ',"0")');
+    const c = sh.getRange(a); c.setFormula(pt_('=" "&TEXT(' + c.getFormula().slice(1) + ',"0")'));
   });
 
   // seção: por mês
@@ -131,10 +131,10 @@ function montarPainel_(ss) {
   sh.getRange('B11:G11').setValues([['MÊS', '', 'PABLO', 'LUIS', 'TOTAL', '']])
     .setFontSize(9).setFontWeight('bold').setFontColor(T.suave).setBackground(T.painel);
   sh.getRange('B11:C11').merge();
-  sh.getRange('B12').setFormula(`=IFERROR(SORT(UNIQUE(FILTER(DATE(YEAR(${O}A2:A),MONTH(${O}A2:A),1),${O}A2:A<>"")),1,FALSE),"")`);
-  sh.getRange('D12').setFormula(`=ARRAYFORMULA(IF(B12:B23="",,COUNTIFS(${O}C2:C,"Pablo",${O}A2:A,">="&B12:B23,${O}A2:A,"<"&EDATE(B12:B23,1))))`);
-  sh.getRange('E12').setFormula(`=ARRAYFORMULA(IF(B12:B23="",,COUNTIFS(${O}C2:C,"Luis",${O}A2:A,">="&B12:B23,${O}A2:A,"<"&EDATE(B12:B23,1))))`);
-  sh.getRange('F12').setFormula('=ARRAYFORMULA(IF(B12:B23="",,D12:D23+E12:E23))');
+  sh.getRange('B12').setFormula(pt_(`=IFERROR(SORT(UNIQUE(FILTER(DATE(YEAR(${O}A2:A),MONTH(${O}A2:A),1),${O}A2:A<>"")),1,FALSE),"")`));
+  sh.getRange('D12').setFormula(pt_(`=ARRAYFORMULA(IF(B12:B23="",,COUNTIFS(${O}C2:C,"Pablo",${O}A2:A,">="&B12:B23,${O}A2:A,"<"&EDATE(B12:B23,1))))`));
+  sh.getRange('E12').setFormula(pt_(`=ARRAYFORMULA(IF(B12:B23="",,COUNTIFS(${O}C2:C,"Luis",${O}A2:A,">="&B12:B23,${O}A2:A,"<"&EDATE(B12:B23,1))))`));
+  sh.getRange('F12').setFormula(pt_('=ARRAYFORMULA(IF(B12:B23="",,D12:D23+E12:E23))'));
   const mes = sh.getRange('B12:G23');
   mes.setBackground(T.painel).setFontSize(10);
   sh.getRange('B12:B23').setNumberFormat('mmm "de" yyyy').setFontWeight('bold');
@@ -149,9 +149,9 @@ function montarPainel_(ss) {
   sh.getRange('H11:M11').setValues([['QUANDO', '', 'QUEM', 'O QUE ACONTECEU', '', '']])
     .setFontSize(9).setFontWeight('bold').setFontColor(T.suave).setBackground(T.painel);
   sh.getRange('H11:I11').merge(); sh.getRange('K11:M11').merge();
-  sh.getRange('H12').setFormula(`=IFERROR(ARRAY_CONSTRAIN(SORT(FILTER(${O}A2:A,${O}A2:A<>""),1,FALSE),8,1),"Nenhuma ocorrência ainda")`);
-  sh.getRange('K12').setFormula(`=IFERROR(ARRAY_CONSTRAIN(SORT(FILTER(${O}B2:B,${O}A2:A<>""),FILTER(${O}A2:A,${O}A2:A<>""),FALSE),8,1),"")`);
-  sh.getRange('J12').setFormula(`=IFERROR(ARRAY_CONSTRAIN(SORT(FILTER(${O}C2:C,${O}A2:A<>""),FILTER(${O}A2:A,${O}A2:A<>""),FALSE),8,1),"")`);
+  sh.getRange('H12').setFormula(pt_(`=IFERROR(ARRAY_CONSTRAIN(SORT(FILTER(${O}A2:A,${O}A2:A<>""),1,FALSE),8,1),"Nenhuma ocorrência ainda")`));
+  sh.getRange('K12').setFormula(pt_(`=IFERROR(ARRAY_CONSTRAIN(SORT(FILTER(${O}B2:B,${O}A2:A<>""),FILTER(${O}A2:A,${O}A2:A<>""),FALSE),8,1),"")`));
+  sh.getRange('J12').setFormula(pt_(`=IFERROR(ARRAY_CONSTRAIN(SORT(FILTER(${O}C2:C,${O}A2:A<>""),FILTER(${O}A2:A,${O}A2:A<>""),FALSE),8,1),"")`));
   const ult = sh.getRange('H12:M19');
   ult.setBackground(T.painel);
   for (let r = 12; r <= 19; r++) {
@@ -186,6 +186,13 @@ function montarPainel_(ss) {
 
   sh.setFrozenRows(0);
   sh.getRange('A1').activate();
+}
+
+// A planilha está em português (Brasil): nas fórmulas o separador é ponto e vírgula.
+function pt_(f) {
+  let out = '', aspas = false;
+  for (const ch of f) { if (ch === '"') aspas = !aspas; out += (!aspas && ch === ',') ? ';' : ch; }
+  return out;
 }
 
 function secao_(sh, a1, texto) {
