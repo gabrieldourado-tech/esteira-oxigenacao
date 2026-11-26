@@ -171,24 +171,25 @@ function montarPainel_(ss) {
   // dados do gráfico numa aba oculta (meses como texto, para as barras aparecerem mesmo com 1 mês só)
   let gd = ss.getSheetByName('_grafico'); if (gd) ss.deleteSheet(gd);
   gd = ss.insertSheet('_grafico');
-  gd.getRange('A1:C1').setValues([['Mês', 'Pablo', 'Luis']]);
-  gd.getRange('A2').setFormula(pt_('=IFERROR(FILTER(TEXT(Painel!B12:B23,"mmm/yy"),Painel!B12:B23<>""),"")'));
-  gd.getRange('B2').setFormula(pt_('=IFERROR(FILTER(Painel!D12:D23,Painel!B12:B23<>""),"")'));
-  gd.getRange('C2').setFormula(pt_('=IFERROR(FILTER(Painel!E12:E23,Painel!B12:B23<>""),"")'));
+  gd.getRange('A1:D1').setValues([['Mês', 'Pablo', 'Luis', 'Início do mês']]);
+  gd.getRange('D2').setFormula(pt_(`=IFERROR(SORT(UNIQUE(FILTER(DATE(YEAR(${O}A2:A),MONTH(${O}A2:A),1),${O}A2:A<>"")),1,TRUE),"")`));
+  gd.getRange('A2').setFormula(pt_('=ARRAYFORMULA(IF(D2:D13="",,TEXT(D2:D13,"mmm/yy")))'));
+  gd.getRange('B2').setFormula(pt_(`=ARRAYFORMULA(IF(D2:D13="",,COUNTIFS(${O}C2:C,"Pablo",${O}A2:A,">="&D2:D13,${O}A2:A,"<"&EDATE(D2:D13,1))))`));
+  gd.getRange('C2').setFormula(pt_(`=ARRAYFORMULA(IF(D2:D13="",,COUNTIFS(${O}C2:C,"Luis",${O}A2:A,">="&D2:D13,${O}A2:A,"<"&EDATE(D2:D13,1))))`));
   gd.hideSheet();
   const graf = sh.newChart().asColumnChart()
     .addRange(gd.getRange('A1:C13'))
     .setStacked().setPosition(26, 2, 4, 6)
     .setOption('width', 1090).setOption('height', 300)
-    .setOption('backgroundColor', { fill: T.painel })
-    .setOption('chartArea', { backgroundColor: T.painel, left: 50, top: 30, width: '88%', height: '72%' })
+    .setOption('backgroundColor', T.painel)
     .setOption('colors', [T.pablo, T.luis])
-    .setOption('legend', { position: 'top', textStyle: { color: T.texto, fontName: T.fonte, fontSize: 11 } })
-    .setOption('hAxis', { textStyle: { color: T.suave, fontName: T.fonte }, gridlines: { color: 'transparent' }, direction: -1 })
-    .setOption('vAxis', { textStyle: { color: T.suave, fontName: T.fonte }, gridlines: { color: T.linha }, baselineColor: T.linha, minValue: 0, format: '0' })
+    .setOption('legend', { position: 'top', textStyle: { color: T.texto, fontSize: 11 } })
+    .setOption('hAxis', { textStyle: { color: T.suave } })
+    .setOption('vAxis', { textStyle: { color: T.suave }, gridlines: { color: T.linha }, minValue: 0, format: '0' })
     .setOption('bar', { groupWidth: '45%' })
     .setOption('useFirstColumnAsDomain', true)
     .setNumHeaders(1)
+    .setHiddenDimensionStrategy(Charts.ChartHiddenDimensionStrategy.SHOW_BOTH) // a aba de dados é oculta
     .build();
   sh.insertChart(graf);
 
