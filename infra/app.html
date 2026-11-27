@@ -122,7 +122,7 @@ a{color:inherit}
 @media (max-width:700px){.dp-pop{flex-direction:column}.dp-presets{flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid #e3e3e3}.dp-cals .dp-cal:nth-child(2){display:none}}
 
 /* ---------- KPIs com anel ---------- */
-.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:14px}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:center;min-width:0}
 .kpi .ring{flex:none}
 .kpi .k{color:var(--soft);font-size:11.5px;font-weight:600;letter-spacing:.01em}
@@ -149,7 +149,7 @@ a{color:inherit}
 svg text{font-family:var(--f)}
 
 /* esteira */
-.lanes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.lanes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
 .lane{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;min-width:0}
 .lane-h{padding:10px 12px 8px;border-bottom:1px solid var(--line)}
 .lane-h .nm{font-size:12px;color:var(--soft);font-weight:600}
@@ -213,6 +213,15 @@ svg text{font-family:var(--f)}
 .slow a{display:flex;justify-content:space-between;gap:10px;text-decoration:none;padding:4px 0;font-size:12.5px;border-bottom:1px dashed var(--line)}
 .slow a span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .slow a b{color:var(--red);white-space:nowrap}
+.dbar text{font-family:inherit}
+.lane .card .s span:last-child{white-space:nowrap;flex:none}
+.lane .card .s span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.fz-row{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;padding:7px 0;cursor:pointer}
+.fz-row:hover .fz-bg{background:#3a414c}
+.fz-bg{height:22px;background:var(--line);border-radius:4px;overflow:hidden}
+.fz-bg i{display:block;height:100%;background:var(--green);border-radius:4px}
+.fz-row b{font-size:15px;font-weight:800}
+.fz-sub{grid-column:2/4;font-size:11px;color:var(--faint);margin-top:-4px}
 
 /* ajustes */
 .feed{list-style:none;margin:0;padding:0;max-height:300px;overflow:auto}
@@ -239,7 +248,7 @@ td a{text-decoration:none} td a:hover{text-decoration:underline}
 .empty{color:var(--faint);padding:14px 0;font-size:12.5px}
 
 /* tira de destaques */
-.strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:12px}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
 .hl{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:center;min-width:0}
 .hl .ic{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--c)}
 .hl .k{color:var(--soft);font-size:11px;font-weight:700;letter-spacing:.02em}
@@ -282,11 +291,10 @@ svg [data-list]:hover{opacity:.82}
       <a href="#entregas-pn"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M3 17l6-6 4 4 8-8v4h2V3h-8v2h4l-6 6-4-4-8 8z"/></svg>Entregas</a>
       <a href="#lead-pn"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 10.4V6h-2v7.4l5 3 1-1.7z"/></svg>Edição → infra</a>
       <a href="#ajustes-pn"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M1 21h22L12 2zm12-3h-2v-2h2zm0-4h-2v-4h2z"/></svg>Ajustes</a>
-      <a href="#tipos-pn"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M11 2v20a10 10 0 0 1 0-20zm2 0v9h9a10 10 0 0 0-9-9zm0 11v9a10 10 0 0 0 9-9z"/></svg>Tipos de demanda</a>
+      <a href="#strip"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>Destaques</a>
       <a href="#tasks-pn"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M3 4h18v3H3zm0 6h18v3H3zm0 6h18v3H3z"/></svg>Todas as tasks</a>
       <a href="#ocorrencias" id="nav-oc"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h9l5 5v15H6zm8 1.5V8h4.5zM9 12h8v2H9zm0 4h8v2H9z"/></svg>Ocorrências</a>
     </nav>
-    <div class="meta-card" id="meta-card"></div>
   </aside>
 
   <main class="main" id="visao">
@@ -319,14 +327,14 @@ svg [data-list]:hover{opacity:.82}
 
     <div class="grid">
       <section class="pn c12" id="esteira-pn" aria-labelledby="h-est">
-        <header><h2 id="h-est"><button type="button" class="ttl" data-exp="est" title="O que é este quadro?">ESTEIRA AGORA<span class="ib" aria-hidden="true">?</span></button></h2><div class="legend" id="leg-esteira"></div><p>Tasks abertas agora, respeitando os filtros. Período: entra quem tem prazo no período (ou, sem prazo, foi criada no período).</p></header>
+        <header><h2 id="h-est"><button type="button" class="ttl" data-exp="est" title="O que é este quadro?">ESTEIRA AGORA<span class="ib" aria-hidden="true">?</span></button></h2><div class="legend" id="leg-esteira"></div><p>Fotografia de agora (não depende do período). Os filtros de pessoa, squad e tipo valem.</p></header>
         <div class="b"><div id="esteira" class="lanes"></div></div>
       </section>
     </div>
 
     <div class="grid">
       <section class="pn c8" id="entregas-pn" aria-labelledby="h-ent">
-        <header><h2 id="h-ent"><button type="button" class="ttl" data-exp="ent" title="O que é este quadro?">TASKS ENTREGUES POR <span id="gran">SEMANA</span><span class="ib" aria-hidden="true">?</span></button></h2><span class="hint" id="ent-hint"></span></header>
+        <header><h2 id="h-ent"><button type="button" class="ttl" data-exp="ent" title="O que é este quadro?">TASKS ENTREGUES POR <span id="gran">DIA</span><span class="ib" aria-hidden="true">?</span></button></h2><span class="hint" id="ent-hint"></span></header>
         <div class="b"><div id="linha"></div></div>
       </section>
       <section class="pn c4" aria-labelledby="h-pes">
@@ -342,7 +350,7 @@ svg [data-list]:hover{opacity:.82}
         <div class="b"><div id="lead"></div></div>
       </section>
       <section class="pn c5" aria-labelledby="h-anat">
-        <header><h2 id="h-anat"><button type="button" class="ttl" data-exp="anat" title="O que é este quadro?">PARA ONDE VAI O TEMPO<span class="ib" aria-hidden="true">?</span></button></h2><p>Onde a task passa o tempo até ser entregue: parada esperando ou sendo feita.</p></header>
+        <header><h2 id="h-anat"><button type="button" class="ttl" data-exp="anat" title="O que é este quadro?">PARA ONDE VAI O TEMPO<span class="ib" aria-hidden="true">?</span></button></h2><p>Tempo médio que cada pessoa fica com a task no status <b>fazendo</b>.</p></header>
         <div class="b"><div id="anat"></div><div id="anat-note"></div></div>
       </section>
     </div>
@@ -362,27 +370,16 @@ svg [data-list]:hover{opacity:.82}
       </section>
     </div>
 
-    <div class="grid" id="tipos-pn">
-      <section class="pn c4" aria-labelledby="h-mix">
-        <header><h2 id="h-mix"><button type="button" class="ttl" data-exp="mix" title="O que é este quadro?">MIX DE DEMANDAS<span class="ib" aria-hidden="true">?</span></button></h2><span class="hint">tasks entregues</span></header>
-        <div class="b"><div id="donut"></div></div>
-      </section>
-      <section class="pn c8" aria-labelledby="h-cat">
-        <header><h2 id="h-cat"><button type="button" class="ttl" data-exp="cat" title="O que é este quadro?">TIPOS DE DEMANDA<span class="ib" aria-hidden="true">?</span></button></h2><p>Conta só as implementações e demandas diretas entregues no período (revisões e deploys ficam de fora). Tempo típico = mediana: metade foi mais rápida, metade mais lenta. <b>Edição → entrega</b>: da subtask de edição feita até a task feita. <b>Demanda direta</b>: da criação ao feito, só para tasks da lista de Infra. Entre parênteses, quantas tasks deu pra medir.</p></header>
-        <div class="b"><div class="tbl" style="max-height:330px"><table><thead><tr><th>Tipo</th><th title="Implementações e demandas diretas entregues no período">Entregas</th><th title="Complexidade de 1 a 5 definida por tipo no config.json">Complexidade</th><th title="Da subtask de edição feita até esta task feita. Só para tasks com edição.">Edição → entrega</th><th title="Da criação da task até o feito. Só para demandas diretas na lista de Infra (sem task mãe).">Demanda direta</th><th>Ajuste</th><th title="Fatia deste tipo no total de entregas da tabela">% do total</th></tr></thead><tbody id="cats"></tbody></table></div></div>
-      </section>
-    </div>
-
+    <section class="strip" id="strip" aria-label="Destaques"></section>
     <div class="grid">
       <section class="pn c12" id="tasks-pn" aria-labelledby="h-tbl">
         <header><h2 id="h-tbl">TODAS AS TASKS</h2><p id="tbl-sub"></p></header>
-        <div class="b"><div class="tbl"><table><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table></div>
+        <div class="b"><div class="tbl" style="max-height:380px"><table><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table></div>
           <button class="btn-o more" id="more" hidden>Mostrar mais 60</button></div>
       </section>
     </div>
 
-    <section class="strip" id="strip" aria-label="Destaques"></section>
-    <div class="foot"><span>Fonte: 100% das tasks de Vini Malvas, Pablo Gabriel e Luis Alexandre no ClickUp. Tipo e complexidade vêm do nome da task e da task mãe (regras em infra/config.json).</span><span>Os dados do ClickUp são atualizados de 1 em 1 minuto (das 6h à meia-noite)</span></div>
+    <div class="foot"><span>Fonte: 100% das tasks de Vini Malvas, Pablo Gabriel e Luis Alexandre no ClickUp. Tasks sem data de vencimento ficam fora da esteira e dos cards (aparecem em Qualidade do dado).</span><span>Os dados do ClickUp são atualizados de 1 em 1 minuto (das 6h à meia-noite)</span></div>
   </main>
 
   <main class="main" id="ocorr-view" hidden aria-labelledby="h-oc">
@@ -441,8 +438,8 @@ function untip(){tipEl.style.opacity=0}
 /* ---------- listas clicáveis (pop-up com as tasks) ---------- */
 const LISTS=new Map();let LN=0;
 // itens: task ({...task}) ou {t:task, extra:'texto'}; devolve o id para usar em data-list
-const EXPL={"ent": "<p>Quantas tasks da infra foram <b>concluídas (feito)</b> no período escolhido, respeitando os filtros de pessoa, squad e tipo.</p><ul><li>Cada subtask conta separado: implementar, revisar e subir no Apolo são 3 tasks.</li><li>A seta compara com o período anterior do mesmo tamanho (ex.: estes 30 dias contra os 30 dias antes). <b style=\"color:var(--green)\">▲ verde</b> = entregou mais, <b style=\"color:#F87171\">▼ vermelho</b> = entregou menos.</li></ul>", "lead": "<p>Tempo típico entre <b>a edição ficar pronta</b> e <b>a infra terminar a demanda</b>.</p><ul><li>É a mediana: metade das demandas foi mais rápida que esse número, metade mais lenta.</li><li>Só entram demandas que têm subtask de edição e foram concluídas no período.</li><li>Aqui a seta para baixo é boa: significa que a infra ficou mais rápida que no período anterior.</li></ul>", "sla": "<p>De cada 100 demandas com edição entregues no período, <b>quantas a infra terminou em até 24 horas</b> depois da edição pronta.</p><ul><li>A meta é 80%.</li><li>Anel <b style=\"color:var(--green)\">verde</b> = 80% ou mais, <b style=\"color:var(--amber)\">amarelo</b> = 60 a 79%, <b style=\"color:#F87171\">vermelho</b> = abaixo de 60%.</li><li>A lista abaixo mostra as demandas que passaram de 24 h.</li></ul>", "aj": "<p>Quantas subtasks de infra <b>foram para o status ajuste/ajustar</b> no período, ou seja, voltaram para correção.</p><ul><li>O anel mostra quanto isso representa sobre as tasks entregues.</li><li>Na lista abaixo aparece cada task e o comentário com o motivo, quando alguém comentou.</li></ul>", "atr": "<p>Subtasks de infra <b>ainda abertas cuja data de vencimento já passou</b>.</p><ul><li>A task só conta como atrasada depois que o dia do vencimento termina (meia-noite, horário de Brasília).</li><li>\"de X abertas\" é o total de tasks abertas na esteira com prazo dentro do período (ou criadas nele, se não têm prazo).</li></ul>", "and": "<p>Tasks abertas que <b>já estão liberadas para a infra</b>: na fila, fazendo, em ajuste ou em revisão.</p><ul><li>\"Liberada\" quer dizer que a edição já terminou, ou que a demanda não depende de edição.</li><li>\"+ X esperando\" são as que ainda dependem da edição ou de outra etapa terminar antes.</li></ul>"};
-const EXPL_Q={"lead": ["DA EDIÇÃO PRONTA ATÉ A INFRA ENTREGUE", "<p>Quanto tempo a infra leva para entregar uma demanda <b>depois que a edição termina</b>.</p><ul>\n            <li><b>O relógio começa</b> quando a edição da demanda vai para concluído (a infra já pode trabalhar) e <b>para</b> quando a última subtask de infra (implementar, revisar, subir no Apolo) vai para concluído.</li>\n            <li><b>Tempo típico:</b> metade das demandas foi entregue em menos que isso, metade em mais.</li>\n            <li><b>Dentro de 24 h:</b> de cada 100 demandas, quantas cumpriram a meta de 24 h.</li>\n            <li><b>85% fecham em até:</b> 85 de cada 100 demandas foram entregues até esse tempo. Só as 15 mais lentas passaram disso.</li>\n            <li><b>Demandas medidas:</b> quantas demandas entraram na conta no período escolhido.</li>\n            <li><b>Barras por squad:</b> cada barra é o total de demandas do squad. <i class=\"dot\" style=\"background:var(--green)\"></i>verde = até 24 h, <i class=\"dot\" style=\"background:var(--amber)\"></i>amarelo = de 24 a 48 h, <i class=\"dot\" style=\"background:var(--red)\"></i>vermelho = mais de 48 h. O número dentro da cor é a quantidade de demandas. A % à direita é quantas ficaram no verde. Clique numa cor para ver as tasks.</li>\n            <li><b>As que mais demoraram:</b> as 5 demandas mais lentas do período, com link para o ClickUp.</li>\n            <li>Demandas sem edição (pedidos diretos para a infra) não entram aqui, porque não têm de onde começar a contar.</li>\n          </ul>"], "anat": ["PARA ONDE VAI O TEMPO", "<p>Onde a task passa o tempo até ser entregue: <b>parada esperando</b> ou <b>sendo feita</b>.</p><ul>\n            <li><b>Cada barra é uma pessoa.</b> O tamanho da barra é o tempo médio de uma entrega dela: da edição pronta até o feito (nos pedidos diretos, da criação até o feito).</li>\n            <li>A barra é dividida pelo tempo que a task passou em cada status:</li>\n            <li class=\"sub-li\"><i class=\"dot\" style=\"background:#64748B\"></i><b>Na fila:</b> parada, esperando alguém começar.</li>\n            <li class=\"sub-li\"><i class=\"dot\" style=\"background:var(--green)\"></i><b>Fazendo:</b> alguém estava trabalhando nela.</li>\n            <li class=\"sub-li\"><i class=\"dot\" style=\"background:var(--red)\"></i><b>Em ajuste:</b> voltou para corrigir erro.</li>\n            <li class=\"sub-li\"><i class=\"dot\" style=\"background:var(--amber)\"></i><b>Em revisão:</b> esperando ou passando pela revisão.</li>\n            <li><b>Exemplo:</b> barra de 16 h com 12 h cinza e 3 h verde = a task ficou 12 h parada e levou 3 h para ser feita. O problema é fila, não velocidade.</li>\n            <li><b>Embaixo de cada barra:</b> quantas entregas entraram na conta e quantas passaram pelo status \"fazendo\". Se o time pula direto de \"pendente\" para \"feito\", todo o tempo aparece como fila.</li>\n            <li>Passe o mouse em cada cor para ver as horas. Clique na barra para ver as tasks.</li>\n          </ul>"], "est": ["ESTEIRA AGORA", "<p>Fotografia de <b>agora</b>: onde está cada task aberta da infra.</p><ul><li><b>Cada coluna é uma etapa</b>, da esquerda para a direita:</li><li class=\"sub-li\"><b>Esperando etapa anterior:</b> a infra ainda não pode começar, porque a edição (ou outra etapa) não terminou, ou a task está como \"não executar\".</li><li class=\"sub-li\"><b>Na fila:</b> liberada para a infra, mas ninguém começou.</li><li class=\"sub-li\"><b>Fazendo:</b> alguém está trabalhando nela.</li><li class=\"sub-li\"><b>Em ajuste:</b> voltou para corrigir erro.</li><li class=\"sub-li\"><b>Em revisão:</b> pronta, esperando a revisão.</li><li><b>O número grande</b> é quantas tasks estão na etapa. Clique nele para ver todas.</li><li><b>Etiqueta vermelha \"X atrasadas\"</b> = subtasks cujo vencimento já passou. Cartão com borda vermelha = task atrasada.</li><li><b>Cada cartão</b> é uma task: nome da demanda, nome da subtask, quem é o responsável (pela cor) e há quanto tempo está esperando (desde a edição pronta, ou desde a criação). Clique para abrir no ClickUp.</li><li>Os filtros de pessoa e squad valem aqui. O período também: entram as tasks com prazo no período (ou, sem prazo, criadas nele).</li></ul>"], "ent": ["TASKS ENTREGUES", "<p>Quantas tasks a infra <b>entregou (feito)</b> ao longo do tempo.</p><ul><li><b>Linha laranja cheia:</b> total do time (ou da seleção do filtro).</li><li><b>Linhas tracejadas:</b> uma por pessoa, na cor dela.</li><li><b>Cada ponto</b> é um dia, uma semana ou um mês, conforme o período escolhido: até 15 dias = por dia, até ~6 meses = por semana, acima disso = por mês. O título mostra qual.</li><li><b>Etiqueta verde \"PICO\":</b> o dia/semana/mês com mais entregas.</li><li><b>Média</b> (canto direito): entregas médias por dia/semana/mês no período.</li><li>Passe o mouse para ver os números de cada ponto. Clique para ver as tasks entregues naquele dia/semana/mês.</li><li>Cada subtask conta separado: implementar, revisar e subir no Apolo são 3 entregas.</li></ul>"], "pes": ["QUEM ENTREGOU O QUÊ", "<p>O resumo de cada pessoa no período escolhido.</p><ul><li><b>Número grande:</b> quantas tasks a pessoa entregou (feito).</li><li><b>Linha abaixo do nome:</b> que tipo de trabalho mais apareceu nas entregas dela. Execução = implementar/configurar; Revisão = revisar o que outro fez; Deploy = subir no Apolo; Demanda direta = pedido feito direto para a infra, sem task mãe.</li><li><b>Ajustes:</b> quantas tasks dela foram para o status ajuste, e quanto isso é das entregas.</li><li><b>Abertas:</b> tasks dela liberadas e ainda não entregues.</li><li><b>Edição → infra:</b> tempo típico (mediana) entre a edição pronta e a entrega dela.</li><li>Clique em qualquer número para ver as tasks.</li><li>Atenção: revisão conta como entrega. Quem revisa muito (como o Malvas) aparece com mais entregas.</li></ul>"], "quem": ["QUEM MAIS TEVE AJUSTE", "<p>Quem teve mais tasks <b>voltando para correção</b> no período.</p><ul><li><b>Cada barra é uma pessoa.</b> Quanto maior a barra vermelha, mais tasks dela foram para o status ajuste/ajustar. A primeira (mais forte) é quem teve mais.</li><li><b>Número laranja:</b> quantidade de tasks que foram para ajuste.</li><li><b>\"X% de N\":</b> quanto isso representa sobre as N tasks que a pessoa entregou no período.</li><li>Só conta quando a subtask de infra passou de verdade pelo status de ajuste. Comentário sozinho não conta.</li><li>Clique na linha para ver as tasks e o motivo, quando houver.</li></ul>"], "mot": ["POR QUE VOLTOU", "<p>Os <b>motivos</b> dos ajustes, lidos dos comentários das subtasks que foram para ajuste.</p><ul><li><b>Cada barra é um motivo</b> (ex.: link/redirect, checkout/preço, pixel/tracking, vídeo/VSL). O painel reconhece o motivo por palavras-chave no comentário.</li><li><b>O número</b> é quantos comentários de ajuste citaram aquele motivo. Um comentário pode citar mais de um motivo.</li><li><b>\"X ajustes sem motivo escrito\"</b> (amarelo, em cima): tasks que foram para ajuste sem ninguém comentar o porquê. Clique para ver quais.</li><li>Para o motivo aparecer aqui: ao mandar para ajuste, comente na subtask de implementação começando com <b>\"Ajuste:\"</b> e o motivo.</li><li>Clique numa barra para ver as tasks e o comentário.</li></ul>"], "feed": ["ÚLTIMOS AJUSTES PEDIDOS", "<p>A lista das tasks que <b>foram para ajuste</b> no período, da mais recente para a mais antiga.</p><ul><li><b>Título:</b> demanda → subtask. Clique para abrir no ClickUp.</li><li><b>Texto entre aspas:</b> o comentário com o motivo do ajuste, com quem escreveu e quando (os links são escondidos). \"Sem comentário do motivo\" = ninguém explicou o porquê.</li><li><b>Linha de baixo:</b> responsável, squad, quando foi para ajuste e o status atual da task.</li><li><b>Etiquetas:</b> o motivo reconhecido no comentário.</li><li>Mostra até as 50 mais recentes.</li></ul>"], "mix": ["MIX DE DEMANDAS", "<p>Que <b>tipo de trabalho</b> a infra mais entregou no período.</p><ul><li><b>Cada fatia da rosca é um tipo de demanda</b> (ex.: troca de pote, novo upsell, links de checkout). Quanto maior a fatia, mais entregas daquele tipo.</li><li><b>No centro:</b> a % do tipo mais frequente.</li><li><b>Lista ao lado:</b> cada tipo com a quantidade e a %. Os tipos menores são somados em \"Outros tipos\".</li><li>Conta só implementações e demandas diretas. Revisões e \"subir no Apolo\" ficam de fora para não contar a mesma demanda várias vezes.</li><li>O tipo é definido pelo nome da task e da task mãe.</li><li>Clique numa fatia ou num item da lista para ver as tasks.</li></ul>"], "cat": ["TIPOS DE DEMANDA", "<p>A tabela de <b>cada tipo de demanda</b>: quantas, quão difícil, quanto tempo leva e quanto volta para ajuste.</p><ul><li><b>Tipo:</b> a categoria da demanda, definida pelo nome da task e da task mãe.</li><li><b>Entregas:</b> quantas desse tipo foram entregues no período (só implementações e demandas diretas; revisões e \"subir no Apolo\" ficam de fora).</li><li><b>Complexidade:</b> de 1 a 5 bolinhas. É um peso fixo por tipo, combinado na configuração do painel. Não é medido.</li><li><b>Edição → entrega:</b> tempo típico (mediana) entre a edição pronta e a task feita. Entre parênteses, quantas tasks deu para medir.</li><li><b>Demanda direta:</b> tempo típico entre a criação da task e o feito, para pedidos feitos direto na lista de Infra, sem task mãe.</li><li><b>Ajuste:</b> % das entregas desse tipo que foram para ajuste (entre parênteses, a quantidade). Vermelho = teve ajuste.</li><li><b>% do total:</b> quanto esse tipo representa de todas as entregas da tabela.</li><li>Clique no tipo, na quantidade ou no tempo para ver as tasks.</li></ul>"]};
+const EXPL={"lead": "<p>Tempo típico entre <b>a edição ficar pronta</b> e <b>a infra terminar a demanda</b>.</p><ul><li>É a mediana: metade das demandas foi mais rápida que esse número, metade mais lenta.</li><li>Só entram demandas que têm subtask de edição e foram concluídas no período.</li><li>Aqui a seta para baixo é boa: significa que a infra ficou mais rápida que no período anterior.</li></ul>", "aj": "<p>Quantas subtasks de infra <b>foram para o status ajuste/ajustar</b> no período, ou seja, voltaram para correção.</p><ul><li>O anel mostra quanto isso representa sobre as tasks entregues.</li><li>Na lista abaixo aparece cada task e o comentário com o motivo, quando alguém comentou.</li></ul>", "taxa": "<p>De todas as tasks que <b>venciam no período</b>, quantas <b>% já foram concluídas</b>.</p><ul><li>Compara o esforço do time sem depender de quantas tasks surgiram: semana com 50 tasks e semana com 30 ficam na mesma régua (100%).</li><li>Só entram tasks com data de vencimento e já liberadas para a infra (com vídeo). Canceladas ficam de fora.</li><li>A seta compara com o período anterior em pontos percentuais (p.p.).</li><li>Anel <b style=\"color:var(--green)\">verde</b> = 80% ou mais, <b style=\"color:var(--amber)\">amarelo</b> = 60 a 79%, <b style=\"color:#F87171\">vermelho</b> = abaixo de 60%.</li></ul>", "pronta": "<p>Tasks que <b>já podiam ser feitas</b> (o vídeo já está pronto) mas <b>passaram do prazo</b> e ainda não foram implementadas.</p><ul><li>A task vence no fim do dia do vencimento (meia-noite, horário de Brasília).</li><li>Tasks esperando vídeo não entram aqui, porque o atraso não é da infra.</li></ul>", "hoje": "<p>Todas as tasks <b>pendentes que vencem hoje</b>.</p><ul><li>Embaixo mostra quantas já podem ser feitas (com vídeo) e quantas ainda esperam o vídeo ou outra etapa.</li></ul>"};
+const EXPL_Q={"lead": ["DA EDIÇÃO PRONTA ATÉ A INFRA ENTREGUE", "<p>Quanto tempo a infra demora para implementar <b>depois que o vídeo sai</b>.</p><ul><li><b>Tempo médio:</b> a média, por demanda, do momento em que a edição foi concluída até a última subtask de infra ficar feita. Clique para ver todas.</li><li><b>% feitas no mesmo dia:</b> quantas demandas a infra entregou no mesmo dia em que o vídeo ficou pronto.</li><li><b>As que mais demoraram:</b> as 8 demandas mais lentas do período, com link para o ClickUp.</li><li>Pedidos diretos para a infra, sem edição, não entram aqui.</li></ul>"], "anat": ["PARA ONDE VAI O TEMPO", "<p>Quanto tempo, em média, cada pessoa fica com a task no status <b>fazendo</b> (mesmo nome do ClickUp).</p><ul><li>Conta só as implementações entregues no período que passaram por \"fazendo\".</li><li>Embaixo de cada barra: quantas entregas passaram por \"fazendo\". Se a pessoa pula de \"pendente\" direto para \"feito\", essa task não entra na média.</li><li>Clique na barra para ver as tasks e o tempo de cada uma.</li></ul>"], "est": ["ESTEIRA AGORA", "<p>Onde está cada task <b>neste momento</b>. Não depende do período escolhido.</p><ul><li class=\"sub-li\"><b>Esperando etapa anterior:</b> pendentes, com data, mas ainda <b>sem vídeo</b>.</li><li class=\"sub-li\"><b>Na fila:</b> já têm vídeo e <b>vencem hoje</b> (ou já venceram, em vermelho). Ninguém começou.</li><li class=\"sub-li\"><b>Fazendo:</b> alguém está trabalhando nela.</li><li class=\"sub-li\"><b>Em revisão:</b> pronta, esperando a revisão.</li><li class=\"sub-li\"><b>Em ajuste:</b> voltou para corrigir.</li><li class=\"sub-li\"><b>Concluídas hoje:</b> o que foi entregue hoje.</li><li>Tasks sem data de vencimento não entram em \"esperando\" nem \"na fila\". Elas aparecem em \"Qualidade do dado\", lá embaixo.</li><li>O número grande abre a lista completa. Cada cartão abre a task no ClickUp.</li></ul>"], "ent": ["TASKS ENTREGUES POR DIA", "<p>Quantas tasks foram <b>concluídas em cada dia</b>. O número em cima da barra é o total do dia.</p><ul><li>Barras mais claras = sábado e domingo.</li><li>Passe o mouse para ver quanto cada pessoa entregou no dia. Clique na barra para ver as tasks.</li><li>Em períodos maiores que 2 meses, cada barra vira uma semana.</li><li>Cada subtask conta separado: implementar, revisar e subir no Apolo são 3 entregas.</li></ul>"], "pes": ["QUEM ENTREGOU O QUÊ", "<p>O resumo de cada pessoa no período escolhido.</p><ul><li><b>Número grande:</b> quantas tasks a pessoa entregou (feito).</li><li><b>Linha abaixo do nome:</b> que tipo de trabalho mais apareceu nas entregas dela. Execução = implementar/configurar; Revisão = revisar o que outro fez; Deploy = subir no Apolo; Demanda direta = pedido feito direto para a infra, sem task mãe.</li><li><b>Ajustes:</b> quantas tasks dela foram para o status ajuste, e quanto isso é das entregas.</li><li><b>Abertas:</b> tasks dela liberadas e ainda não entregues.</li><li><b>Edição → infra:</b> tempo típico (mediana) entre a edição pronta e a entrega dela.</li><li>Clique em qualquer número para ver as tasks.</li><li>Atenção: revisão conta como entrega. Quem revisa muito (como o Malvas) aparece com mais entregas.</li></ul>"], "quem": ["QUEM MAIS TEVE AJUSTE", "<p>Quem teve mais tasks <b>voltando para correção</b> no período.</p><ul><li><b>Cada barra é uma pessoa.</b> Quanto maior a barra vermelha, mais tasks dela foram para o status ajuste/ajustar. A primeira (mais forte) é quem teve mais.</li><li><b>Número laranja:</b> quantidade de tasks que foram para ajuste.</li><li><b>\"X% de N\":</b> quanto isso representa sobre as N tasks que a pessoa entregou no período.</li><li>Só conta quando a subtask de infra passou de verdade pelo status de ajuste. Comentário sozinho não conta.</li><li>Clique na linha para ver as tasks e o motivo, quando houver.</li></ul>"], "mot": ["POR QUE VOLTOU", "<p>Os <b>motivos</b> dos ajustes, lidos dos comentários das subtasks que foram para ajuste.</p><ul><li><b>Cada barra é um motivo</b> (ex.: link/redirect, checkout/preço, pixel/tracking, vídeo/VSL). O painel reconhece o motivo por palavras-chave no comentário.</li><li><b>O número</b> é quantos comentários de ajuste citaram aquele motivo. Um comentário pode citar mais de um motivo.</li><li><b>\"X ajustes sem motivo escrito\"</b> (amarelo, em cima): tasks que foram para ajuste sem ninguém comentar o porquê. Clique para ver quais.</li><li>Para o motivo aparecer aqui: ao mandar para ajuste, comente na subtask de implementação começando com <b>\"Ajuste:\"</b> e o motivo.</li><li>Clique numa barra para ver as tasks e o comentário.</li></ul>"], "feed": ["ÚLTIMOS AJUSTES PEDIDOS", "<p>A lista das tasks que <b>foram para ajuste</b> no período, da mais recente para a mais antiga.</p><ul><li><b>Título:</b> demanda → subtask. Clique para abrir no ClickUp.</li><li><b>Texto entre aspas:</b> o comentário com o motivo do ajuste, com quem escreveu e quando (os links são escondidos). \"Sem comentário do motivo\" = ninguém explicou o porquê.</li><li><b>Linha de baixo:</b> responsável, squad, quando foi para ajuste e o status atual da task.</li><li><b>Etiquetas:</b> o motivo reconhecido no comentário.</li><li>Mostra até as 50 mais recentes.</li></ul>"]};
 function reg(titulo,itens,sub,exp){const id='L'+(++LN);LISTS.set(id,{titulo,itens:itens.map(x=>x&&x.t?x:{t:x}),sub,exp});return id}
 const dl=(titulo,itens,sub)=>itens&&itens.length?` data-list="${reg(titulo,itens,sub)}" class="clk" tabindex="0" role="button"`:'';
 const regDem=(titulo,dems,sub)=>reg(titulo,dems.slice().sort((a,b)=>b.lead-a.lead).map(d=>({t:d.exec,extra:`Edição → infra: <b>${fmtH(d.lead)}</b>`})),sub);
@@ -545,7 +542,8 @@ const selP=()=>F.pessoas?P.filter(p=>F.pessoas.includes(p.id)):P;
 const umaPessoa=()=>!!F.pessoas&&F.pessoas.length===1;
 const noPeriodo=ms=>entre(ms,F.ini,F.fim);
 // tasks abertas entram no período pelo prazo; sem prazo, pela data de criação
-const abertaNoPeriodo=t=>noPeriodo(t.prazo||t.criado);
+// só entra quem TEM data de vencimento (tasks sem data aparecem em "Qualidade do dado")
+const abertaNoPeriodo=t=>!!t.prazo&&noPeriodo(t.prazo);
 function dono(t){const id=(F.pessoas&&t.assignees.find(i=>F.pessoas.includes(i)))||t.assignees[0];return P.find(p=>p.id===id)||{curto:'—',nome:'Sem responsável',cor:C.faint,id:0}}
 function estacao(t){
   const s=st(t.status);
@@ -573,6 +571,10 @@ const execucoes=ts=>ts.filter(t=>t.papel==='execucao'||t.papel==='demanda');
 const FUSO=3*3600*1000, DIA=24*3600*1000;
 const fimDoDia=ms=>Math.floor((ms-FUSO)/DIA)*DIA+FUSO+DIA;
 const vencida=t=>!t.feita&&!!t.pai_id&&!!t.prazo&&fimDoDia(t.prazo)<=Date.now();
+const diaBR=ms=>Math.floor((ms-FUSO)/DIA);            // nº do dia no horário de Brasília
+const hojeBR=()=>diaBR(Date.now());
+const liberada=t=>{const e=estacao(t);return !!e&&e!=='espera'};   // já tem vídeo (ou não depende de edição)
+const venceHoje=t=>!t.feita&&!t.cancelada&&!!t.prazo&&diaBR(t.prazo)===hojeBR();
 const ajData=t=>t.ajuste_em||t.fim||t.criado;           // quando foi para ajuste
 const foiAjuste=t=>t.n_ajustes>0;                       // passou pelo status de ajuste
 const ajustadas=(ts,a,b)=>ts.filter(t=>foiAjuste(t)&&entre(ajData(t),a,b)).sort((x,y)=>ajData(y)-ajData(x));
@@ -581,8 +583,11 @@ function resumo(ts,a,b){
   const ent=ts.filter(t=>t.feita&&entre(t.fim,a,b));
   const dem=demandas(ts).filter(d=>d.lead!=null&&entre(d.fim,a,b));
   const ajL=ajustadas(ts,a,b), aj=ajL.length;
-  const sla=DATA.config.sla_horas||24;
-  return {ent,dem,n:ent.length,med:d3.median(dem,d=>d.lead),noSla:dem.length?dem.filter(d=>d.lead<=sla).length/dem.length*100:null,taxaAj:ent.length?aj/ent.length*100:null,aj,ajL,nEx:ent.length};
+  // taxa de conclusão: das tasks com vencimento no período (já liberadas para a infra), quantas % estão feitas
+  const devidas=ts.filter(t=>!t.cancelada&&t.prazo&&entre(t.prazo,a,b)&&(t.feita||liberada(t)));
+  const feitas=devidas.filter(t=>t.feita);
+  return {ent,dem,n:ent.length,med:d3.median(dem,d=>d.lead),media:d3.mean(dem,d=>d.lead),taxaAj:ent.length?aj/ent.length*100:null,aj,ajL,nEx:ent.length,
+    devidas,feitas,taxa:devidas.length?feitas.length/devidas.length*100:null};
 }
 
 /* ---------- render ---------- */
@@ -591,14 +596,14 @@ function render(){
   const ts=base();
   const span=F.fim-F.ini+1;
   const R=resumo(ts,F.ini,F.fim), A=resumo(ts,F.ini-span,F.ini-1);
-  const abertas=ts.filter(t=>estacao(t)&&abertaNoPeriodo(t));
-  kpis(R,A,abertas);metaCard(R);lede(R,abertas);esteira(abertas,R.ajL);linha(ts);pessoas(ts);lead(R.dem);anatomia(R.ent);
-  quemAjuste(R.ent);motivos(ts);feed(ts);mix(R.ent);cats(R.ent);tabela(ts);destaques(ts,R,abertas);
+  const abertas=ts.filter(t=>estacao(t));
+  kpis(R,A,abertas);lede(R,abertas);esteira(abertas,R.ajL,ts);linha(ts);pessoas(ts);lead(R.dem);anatomia(R.ent);
+  quemAjuste(R.ent);motivos(ts);feed(ts);destaques(ts,R,abertas);tabela(ts);
 }
 
 function lede(R,ab){
-  const late=ab.filter(vencida).length;
-  document.getElementById('lede').innerHTML=`De ${fdLong(F.ini)} a ${fdLong(F.fim)}: <b>${R.n}</b> tasks entregues`+(R.med!=null?`, edição → infra em <b>${fmtH(R.med)}</b> na mediana`:'')+(late?`, <b style="color:var(--red)">${late} abertas atrasadas</b>.`:'.');
+  const hoje=ab.filter(venceHoje).length, atr=ab.filter(t=>liberada(t)&&vencida(t)).length;
+  document.getElementById('lede').innerHTML=`De ${fdLong(F.ini)} a ${fdLong(F.fim)}: <b>${R.n}</b> tasks entregues`+(R.taxa!=null?`, <b>${fmt(R.taxa,0)}%</b> das tasks com vencimento no período concluídas`:'')+(R.med!=null?`, edição → infra em <b>${fmtH(R.med)}</b>`:'')+`. <b>${hoje}</b> vencem hoje`+(atr?`, <b style="color:var(--red)">${atr} prontas e atrasadas</b>.`:'.');
 }
 
 function ring(pct,cor,size=46){
@@ -610,82 +615,85 @@ function delta(atual,ant,{bomSobe=true,un='%',pp=false}={}){
   const v=pp?atual-ant:(atual-ant)/ant*100; if(Math.abs(v)<.5)return '<span>igual ao período anterior</span>';
   const bom=(v>0)===bomSobe; return `<span class="${bom?'up':'down'}">${v>0?'▲':'▼'} ${fmt(Math.abs(v),0)}${pp?' p.p.':un}</span> vs período anterior`;
 }
-function kpis(R,A,ab){
-  const sla=DATA.config.sla_horas||24, late=ab.filter(vencida).length, abN=ab.filter(t=>estacao(t)!=='espera').length;
-  const emAjusteAgora=ab.filter(t=>estacao(t)==='ajuste').length;
-  const card=(ringH,k,v,u,d,lid,exp)=>{if(lid&&LISTS.get(lid))LISTS.get(lid).exp=exp;return `<div class="kpi"${lid?` data-list="${lid}"`:` data-exp="${exp}"`} tabindex="0" role="button" title="O que é este número${lid?' e quais tasks entram nele':''}">${ringH||''}<div style="min-width:0"><div class="k">${k}<span class="ib" aria-hidden="true">?</span></div><div class="v${lid?' clk':''}">${v}${u?`<small>${u}</small>`:''}</div><div class="d">${d}</div></div></div>`};
-  const agora=Date.now(), exAj=R.ajL, forasla=R.dem.filter(d=>d.lead>sla), atr=ab.filter(vencida).sort((a,b)=>a.prazo-b.prazo), and=ab.filter(t=>estacao(t)!=='espera');
-  const L={ent:R.ent.length?reg('Tasks entregues no período',R.ent.slice().sort((a,b)=>b.fim-a.fim)):null,lead:R.dem.length?regDem('Demandas medidas: edição → infra',R.dem,'da mais demorada para a mais rápida'):null,
-    sla:forasla.length?regDem(`Demandas fora da meta de ${sla} h`,forasla):null,aj:exAj.length?reg('Tasks que foram para ajuste no período',exAj.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}<br>${comentAj(t)}`}))):null,
-    atr:atr.length?reg('Tasks abertas atrasadas',atr.map(t=>({t,extra:`Venceu em ${fdata(new Date(t.prazo))}`}))):null,and:and.length?reg('Tasks em andamento agora',and):null};
-  document.getElementById('kpis').innerHTML=[
-    card('','TASKS ENTREGUES',R.n,'',delta(R.n,A.n),L.ent,'ent'),
-    card('', 'EDIÇÃO → INFRA', R.med==null?'—':fmtH(R.med).split(' ')[0], R.med==null?'':fmtH(R.med).split(' ')[1], R.med==null?'sem demandas medidas':delta(R.med,A.med,{bomSobe:false}),L.lead,'lead'),
-    card(ring(R.noSla,R.noSla>=80?C.green:R.noSla>=60?C.amber:C.red),`DENTRO DE ${sla} H`,R.noSla==null?'—':fmt(R.noSla,0),R.noSla==null?'':'%',forasla.length?`${forasla.length} fora da meta (clique)`:`${R.dem.length} demandas medidas`,L.sla,'sla'),
-    card(ring(R.taxaAj,R.taxaAj>20?C.red:R.taxaAj>10?C.amber:C.green),'VOLTOU P/ AJUSTE',R.aj,'',R.aj?`${R.aj} tasks foram para ajuste`:'nenhuma foi para ajuste',L.aj,'aj'),
-    card(ring(ab.length?late/ab.length*100:0,C.red),'ABERTAS ATRASADAS',late,'',`de ${ab.length} abertas na esteira`,L.atr,'atr'),
-    card('','EM ANDAMENTO AGORA',abN,'',`liberadas para a infra · + ${ab.length-abN} esperando`,L.and,'and'),
-  ].join('');
+function deltaPP(atual,ant){
+  if(atual==null||ant==null)return '';
+  const v=atual-ant;if(Math.abs(v)<.5)return ' · igual ao período anterior';
+  return ` · <span class="${v>0?'up':'down'}">${v>0?'▲':'▼'} ${fmt(Math.abs(v),0)} p.p.</span>`;
 }
-function metaCard(R){
-  const sla=DATA.config.sla_horas||24, v=R.noSla;
-  document.getElementById('meta-card').innerHTML=`<div class="k">Meta: infra em até ${sla} h após a edição</div><div class="v">${v==null?'—':fmt(v,0)+'%'}</div><div class="k">das demandas no período</div><div class="bar"><i style="width:${v||0}%"></i></div><span class="st${v!=null&&v<80?' bad':''}">${v==null?'Sem dados':v>=80?'● Dentro da meta':'● Abaixo da meta (80%)'}</span>`;
+function kpis(R,A,ab){
+  const card=(ringH,k,v,u,d,lid,exp)=>{if(lid&&LISTS.get(lid))LISTS.get(lid).exp=exp;return `<div class="kpi"${lid?` data-list="${lid}"`:` data-exp="${exp}"`} tabindex="0" role="button" title="O que é este número${lid?' e quais tasks entram nele':''}">${ringH||''}<div style="min-width:0"><div class="k">${k}<span class="ib" aria-hidden="true">?</span></div><div class="v${lid?' clk':''}">${v}${u?`<small>${u}</small>`:''}</div><div class="d">${d}</div></div></div>`};
+  const pronta=ab.filter(t=>liberada(t)&&vencida(t)).sort((a,b)=>a.prazo-b.prazo);
+  const hoje=ab.filter(venceHoje), hojeLib=hoje.filter(liberada).length;
+  const devL=R.devidas.slice().sort((a,b)=>(a.feita-b.feita)||(a.prazo-b.prazo)).map(t=>({t,extra:t.feita?`Concluída em ${fdh(new Date(t.fim))} · prazo ${fdata(new Date(t.prazo))}`:`<b style="color:#F87171">Ainda não concluída</b> · prazo ${fdata(new Date(t.prazo))}`}));
+  const L={taxa:devL.length?reg('Tasks com vencimento no período',devL,'as que faltam aparecem primeiro'):null,
+    lead:R.dem.length?regDem('Demandas medidas: edição → infra',R.dem,'da mais demorada para a mais rápida'):null,
+    aj:R.ajL.length?reg('Tasks que foram para ajuste no período',R.ajL.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}<br>${comentAj(t)}`}))):null,
+    pronta:pronta.length?reg('Prontas para fazer e atrasadas',pronta.map(t=>({t,extra:`Venceu em ${fdata(new Date(t.prazo))} · status: ${esc(t.status)}`}))):null,
+    hoje:hoje.length?reg('Vencem hoje',hoje.map(t=>({t,extra:liberada(t)?`Já pode fazer · status: ${esc(t.status)}`:'Esperando o vídeo / etapa anterior'}))):null};
+  const corTaxa=R.taxa==null?C.line2:R.taxa>=80?C.green:R.taxa>=60?C.amber:C.red;
+  document.getElementById('kpis').innerHTML=[
+    card(ring(R.taxa,corTaxa),'TAXA DE CONCLUSÃO',R.taxa==null?'—':fmt(R.taxa,0),R.taxa==null?'':'%',R.devidas.length?`${R.feitas.length} de ${R.devidas.length} tasks${deltaPP(R.taxa,A.taxa)}`:'nenhuma task vence no período',L.taxa,'taxa'),
+    card('', 'EDIÇÃO → INFRA', R.med==null?'—':fmtH(R.med).split(' ')[0], R.med==null?'':fmtH(R.med).split(' ')[1], R.med==null?'sem demandas medidas':delta(R.med,A.med,{bomSobe:false}),L.lead,'lead'),
+    card(ring(R.taxaAj,R.taxaAj>20?C.red:R.taxaAj>10?C.amber:C.green),'VOLTOU P/ AJUSTE',R.aj,'',R.aj?`${R.aj} tasks foram para ajuste`:'nenhuma foi para ajuste',L.aj,'aj'),
+    card('','PRONTAS E ATRASADAS',pronta.length?`<span style="color:#F87171">${pronta.length}</span>`:'0','',pronta.length?'com vídeo, prazo já passou':'nenhuma atrasada',L.pronta,'pronta'),
+    card('','VENCEM HOJE',hoje.length,'',hoje.length?`${hojeLib} já podem ser feitas · ${hoje.length-hojeLib} esperando vídeo`:'nada vence hoje',L.hoje,'hoje'),
+  ].join('');
 }
 
 /* esteira em cards */
-const ESTACOES=[['espera','Esperando etapa anterior','Edição ou etapa anterior em aberto'],['fila','Na fila','Liberada, ninguém começou'],['fazendo','Fazendo','Em execução'],['ajuste','Em ajuste','Voltou para corrigir'],['revisao','Em revisão','Aguardando revisão']];
-function esteira(ab,ajL){
-  document.getElementById('leg-esteira').innerHTML=P.map(p=>`<span><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}</span>`).join('')+`<span style="color:#F87171">vermelho = subtask de infra com vencimento já passado</span>`;
-  const porEst=d3.group(ab,estacao), agora=Date.now();
+const ESTACOES=[['espera','Esperando etapa anterior','Sem vídeo ainda, já tem data'],['fila','Na fila','Com vídeo, vence hoje (ou já venceu)'],['fazendo','Fazendo','Em execução'],['revisao','Em revisão','Aguardando revisão'],['ajuste','Em ajuste','Voltou para corrigir'],['concluida','Concluídas hoje','Entregues hoje']];
+function esteira(ab,ajL,ts){
+  document.getElementById('leg-esteira').innerHTML=P.map(p=>`<span><i class="dot" style="background:${p.cor}"></i>${esc(p.curto)}</span>`).join('')+`<span style="color:#F87171">vermelho = prazo já passou</span>`;
+  const agora=Date.now(), hoje=hojeBR();
+  const membros={
+    espera:ab.filter(t=>estacao(t)==='espera'&&t.prazo),
+    fila:ab.filter(t=>estacao(t)==='fila'&&t.prazo&&(diaBR(t.prazo)===hoje||vencida(t))),
+    fazendo:ab.filter(t=>estacao(t)==='fazendo'),
+    revisao:ab.filter(t=>estacao(t)==='revisao'),
+    ajuste:ab.filter(t=>estacao(t)==='ajuste'),
+    concluida:ts.filter(t=>t.feita&&t.fim&&diaBR(t.fim)===hoje),
+  };
   document.getElementById('esteira').innerHTML=ESTACOES.map(([k,l,dica])=>{
-    const arr=(porEst.get(k)||[]).map(t=>({t,late:vencida(t),idade:(agora-(t.edicao_fim||t.criado))/H})).sort((a,b)=>(b.late-a.late)||(b.idade-a.idade));
+    const feita=k==='concluida';
+    const arr=membros[k].map(t=>({t,late:!feita&&vencida(t),idade:(agora-(t.edicao_fim||t.criado))/H}))
+      .sort(feita?((a,b)=>b.t.fim-a.t.fim):((a,b)=>(b.late-a.late)||(b.idade-a.idade)));
     const late=arr.filter(x=>x.late).length;
-    const cards=arr.slice(0,12).map(({t,late,idade})=>{const p=dono(t);return `<li><a class="card${late?' atr':''}" style="--c:${p.cor}" href="${esc(t.url)}" target="_blank" rel="noopener" title="${esc((t.pai_nome?t.pai_nome+' → ':'')+t.nome)}"><div class="t">${esc(t.pai_nome||t.nome)}</div><div class="s"><span>${t.pai_nome?esc(t.nome)+' · ':''}${esc(p.curto)}</span>${late?'<span class="bad">atrasada</span>':`<span>${fmtH(idade)}</span>`}</div></a></li>`}).join('');
-    const todas=arr.map(x=>({t:x.t,extra:x.late?`Atrasada: prazo ${fdata(new Date(x.t.prazo))}`:`Parada há ${fmtH(x.idade)}`})), soAtr=todas.filter((x,i)=>arr[i].late);
+    const cards=arr.slice(0,12).map(({t,late,idade})=>{const p=dono(t);return `<li><a class="card${late?' atr':''}" style="--c:${p.cor}" href="${esc(t.url)}" target="_blank" rel="noopener" title="${esc((t.pai_nome?t.pai_nome+' → ':'')+t.nome)}"><div class="t">${esc(t.pai_nome||t.nome)}</div><div class="s"><span>${t.pai_nome?esc(t.nome)+' · ':''}${esc(p.curto)}</span>${feita?`<span>às ${d3.timeFormat('%H:%M')(new Date(t.fim))}</span>`:late?'<span class="bad">atrasada</span>':`<span>${fmtH(idade)}</span>`}</div></a></li>`}).join('');
+    const todas=arr.map(x=>({t:x.t,extra:feita?`Entregue às ${d3.timeFormat('%H:%M')(new Date(x.t.fim))}`:x.late?`Atrasada: prazo ${fdata(new Date(x.t.prazo))}`:(x.t.prazo?`Prazo ${fdata(new Date(x.t.prazo))} · `:'')+`parada há ${fmtH(x.idade)}`})), soAtr=todas.filter((x,i)=>arr[i].late);
     const extra=k==='ajuste'&&ajL&&ajL.length?`<div style="margin-top:6px;font-size:11.5px;color:var(--soft)"><span${dl('Subtasks de infra que foram para ajuste no período',ajL.map(t=>({t,extra:`Foi para ajuste em ${fdh(new Date(ajData(t)))}<br>${comentAj(t)}`})))}>${ajL.length} foram para ajuste no período</span></div>`:'';
-    return `<div class="lane${late?' alert':''}"><div class="lane-h"><div class="nm">${l}</div><div class="ct"><span${dl(l,todas)}>${arr.length}</span></div>${late?`<span class="late"${dl(l+': atrasadas',soAtr).replace('class="clk"','')}>${late} atrasada${late>1?'s':''}</span>`:`<span class="ok">${esc(dica)}</span>`}${extra}</div>${arr.length?`<ul>${cards}</ul>${arr.length>12?`<div class="more"><span${dl(l,todas)}>+ ${arr.length-12} — ver todas</span></div>`:''}`:'<div class="vazio">Nada aqui agora.</div>'}</div>`;
+    return `<div class="lane${late?' alert':''}"><div class="lane-h"><div class="nm">${l}</div><div class="ct"${feita?' style="color:var(--green)"':''}><span${dl(l,todas)}>${arr.length}</span></div>${late?`<span class="late"${dl(l+': atrasadas',soAtr).replace('class="clk"','')}>${late} atrasada${late>1?'s':''}</span>`:`<span class="ok">${esc(dica)}</span>`}${extra}</div>${arr.length?`<ul>${cards}</ul>${arr.length>12?`<div class="more"><span${dl(l,todas)}>+ ${arr.length-12} — ver todas</span></div>`:''}`:'<div class="vazio">Nada aqui agora.</div>'}</div>`;
   }).join('');
 }
 
 /* entregas no tempo: área do total + linha por pessoa */
 function linha(ts){
   const host=document.getElementById('linha');host.innerHTML='';
-  const span=(F.fim-F.ini)/DAY, iv=span<=15?d3.timeDay:span<=200?d3.timeMonday:d3.timeMonth;
-  document.getElementById('gran').textContent=iv===d3.timeDay?'DIA':iv===d3.timeMonday?'SEMANA':'MÊS';
+  const span=(F.fim-F.ini)/DAY, iv=span<=62?d3.timeDay:d3.timeMonday;
+  document.getElementById('gran').textContent=iv===d3.timeDay?'DIA':'SEMANA';
   const bins=iv.range(iv.floor(new Date(F.ini)),new Date(F.fim+1)); if(!bins.length)return;
-  const lista=selP();
   const ent=ts.filter(t=>t.feita&&noPeriodo(t.fim));
-  const cont=arr=>{const m=d3.rollup(arr,v=>v.length,t=>+iv.floor(new Date(t.fim)));return bins.map(d=>({d,n:m.get(+d)||0}))};
-  const total=cont(ent), series=lista.map(p=>({p,vals:cont(ent.filter(t=>t.assignees.includes(p.id)))}));
-  const W=host.clientWidth, Hh=250, m={l:36,r:14,t:26,b:26};
-  const x=d3.scaleTime().domain([bins[0],bins[bins.length-1]]).range([m.l,W-m.r]);
-  const y=d3.scaleLinear().domain([0,Math.max(1,d3.max(total,v=>v.n))]).nice().range([Hh-m.b,m.t]);
-  const svg=d3.select(host).append('svg').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Tasks entregues no período, total e por pessoa');
-  const defs=svg.append('defs');const g=defs.append('linearGradient').attr('id','ga').attr('x1',0).attr('x2',0).attr('y1',0).attr('y2',1);
-  g.append('stop').attr('offset','0%').attr('stop-color',C.orange).attr('stop-opacity',.45);g.append('stop').attr('offset','100%').attr('stop-color',C.orange).attr('stop-opacity',0);
-  y.ticks(4).forEach(v=>{svg.append('line').attr('x1',m.l).attr('x2',W-m.r).attr('y1',y(v)).attr('y2',y(v)).attr('stroke',C.line);svg.append('text').attr('x',m.l-6).attr('y',y(v)+4).attr('text-anchor','end').attr('fill',C.faint).attr('font-size',10.5).text(v)});
-  const fmtX=iv===d3.timeMonth?(d=>MESC[d.getMonth()].replace('.','').toUpperCase()):d3.timeFormat('%d/%m');
-  const passo=Math.ceil(bins.length/Math.max(2,Math.floor((W-m.l-m.r)/64)));
-  bins.forEach((d,i)=>{if(i%passo===0)svg.append('text').attr('x',x(d)).attr('y',Hh-8).attr('text-anchor','middle').attr('fill',C.faint).attr('font-size',10.5).text(fmtX(d))});
-  const cur=d3.curveMonotoneX;
-  if(!umaPessoa()){svg.append('path').attr('d',d3.area().x(v=>x(v.d)).y0(Hh-m.b).y1(v=>y(v.n)).curve(cur)(total)).attr('fill','url(#ga)');
-    svg.append('path').attr('d',d3.line().x(v=>x(v.d)).y(v=>y(v.n)).curve(cur)(total)).attr('fill','none').attr('stroke',C.orange).attr('stroke-width',2.5);
-    const pk=total.reduce((a,b)=>b.n>a.n?b:a);if(pk.n){svg.append('circle').attr('cx',x(pk.d)).attr('cy',y(pk.n)).attr('r',4.5).attr('fill',C.orange);
-      const lx=Math.min(W-m.r-60,Math.max(m.l,x(pk.d)-30));svg.append('rect').attr('x',lx).attr('y',y(pk.n)-24).attr('width',60).attr('height',17).attr('rx',3).attr('fill',C.green);
-      svg.append('text').attr('x',lx+30).attr('y',y(pk.n)-12).attr('text-anchor','middle').attr('fill','#05210f').attr('font-size',10.5).attr('font-weight',800).text('PICO '+pk.n)}}
-  series.forEach(s=>svg.append('path').attr('d',d3.line().x(v=>x(v.d)).y(v=>y(v.n)).curve(cur)(s.vals)).attr('fill','none').attr('stroke',s.p.cor).attr('stroke-width',umaPessoa()?2.5:1.6).attr('stroke-dasharray',umaPessoa()?null:'4 3').attr('opacity',umaPessoa()?1:.9));
-  const guia=svg.append('line').attr('y1',m.t).attr('y2',Hh-m.b).attr('stroke',C.soft).attr('stroke-dasharray','3 3').attr('opacity',0);
-  svg.append('rect').attr('x',m.l).attr('y',m.t).attr('width',W-m.l-m.r).attr('height',Hh-m.t-m.b).attr('fill','transparent')
-    .on('mousemove',ev=>{const [mx]=d3.pointer(ev);const i=Math.max(0,Math.min(bins.length-1,d3.bisectCenter(bins.map(d=>x(d)),mx)));const d=bins[i];guia.attr('x1',x(d)).attr('x2',x(d)).attr('opacity',1);
-      tip(ev,`<b>${iv===d3.timeMonth?MES[d.getMonth()]+' '+d.getFullYear():iv===d3.timeDay?fdLong(+d):'Semana de '+fdata(d)}</b><br>Total: <b>${total[i].n}</b> tasks`+series.map(s=>`<br><span style="color:${s.p.cor}">●</span> ${esc(s.p.curto)}: ${s.vals[i].n}`).join('')+'<br><i>clique para ver as tasks</i>')})
-    .on('mouseleave',()=>{guia.attr('opacity',0);untip()})
-    .on('click',ev=>{const [mx]=d3.pointer(ev);const i=Math.max(0,Math.min(bins.length-1,d3.bisectCenter(bins.map(d=>x(d)),mx)));const d=bins[i],fimB=+iv.offset(d,1)-1;
-      const arr=ent.filter(t=>t.fim>=+d&&t.fim<=fimB).sort((a,b)=>b.fim-a.fim);if(arr.length)abreLista(reg(`Entregues — ${iv===d3.timeMonth?MES[d.getMonth()]+' '+d.getFullYear():iv===d3.timeDay?fdLong(+d):'semana de '+fdata(d)}`,arr))});
-  svg.select('rect:last-of-type').style('cursor','pointer');
-  const lg=svg.append('g').attr('transform',`translate(${m.l},12)`);let lx=0;
-  if(!umaPessoa()){lg.append('rect').attr('x',0).attr('y',-6).attr('width',14).attr('height',3).attr('fill',C.orange);lg.append('text').attr('x',19).attr('y',-2).attr('fill',C.fg).attr('font-size',11.5).text(F.pessoas?'Total da seleção':'Time');lx=70}
-  series.forEach(s=>{lg.append('line').attr('x1',lx).attr('x2',lx+14).attr('y1',-5).attr('y2',-5).attr('stroke',s.p.cor).attr('stroke-width',2).attr('stroke-dasharray','4 3');lg.append('text').attr('x',lx+19).attr('y',-2).attr('fill',C.fg).attr('font-size',11.5).text(s.p.curto);lx+=s.p.curto.length*7+38});
-  document.getElementById('ent-hint').textContent=`Média: ${fmt(d3.mean(total,v=>v.n),1)} por ${iv===d3.timeDay?'dia':iv===d3.timeMonday?'semana':'mês'}`;
+  const m=d3.group(ent,t=>+iv.floor(new Date(t.fim)));
+  const vals=bins.map(d=>({d,arr:(m.get(+d)||[]).sort((a,b)=>b.fim-a.fim)}));
+  const W=host.clientWidth, Hh=250, mg={l:30,r:8,t:22,b:26};
+  const x=d3.scaleBand().domain(vals.map(v=>+v.d)).range([mg.l,W-mg.r]).padding(.22);
+  const y=d3.scaleLinear().domain([0,Math.max(1,d3.max(vals,v=>v.arr.length))]).nice().range([Hh-mg.b,mg.t]);
+  const svg=d3.select(host).append('svg').attr('class','dbar').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Tasks entregues por '+(iv===d3.timeDay?'dia':'semana'));
+  y.ticks(4).forEach(v=>{svg.append('line').attr('x1',mg.l).attr('x2',W-mg.r).attr('y1',y(v)).attr('y2',y(v)).attr('stroke',C.line);svg.append('text').attr('x',mg.l-6).attr('y',y(v)+4).attr('text-anchor','end').attr('fill',C.faint).attr('font-size',10.5).text(v)});
+  const fmtX=d3.timeFormat('%d/%m'), passo=Math.max(1,Math.ceil(vals.length/Math.floor((W-mg.l-mg.r)/40)));
+  const fimSem=d3.timeFormat('%a');
+  vals.forEach((v,i)=>{
+    const n=v.arr.length, bx=x(+v.d), bw=x.bandwidth(), fimDeSemana=iv===d3.timeDay&&[0,6].includes(v.d.getDay());
+    const titulo=iv===d3.timeDay?fdLong(+v.d):'Semana de '+fdata(v.d);
+    const g=svg.append('g').style('cursor',n?'pointer':'default');
+    if(n)g.attr('data-list',reg(`Entregues — ${titulo}`,v.arr)).attr('tabindex',0).attr('role','button').attr('aria-label',`${titulo}: ${n} tasks`);
+    g.append('rect').attr('x',bx-2).attr('y',mg.t).attr('width',bw+4).attr('height',Hh-mg.t-mg.b).attr('fill','transparent');
+    if(n){g.append('rect').attr('x',bx).attr('y',y(n)).attr('width',bw).attr('height',Hh-mg.b-y(n)).attr('rx',3).attr('fill',fimDeSemana?'rgba(255,122,26,.45)':C.orange);
+      g.append('text').attr('x',bx+bw/2).attr('y',y(n)-5).attr('text-anchor','middle').attr('fill',C.fg).attr('font-weight',800).attr('font-size',bw<16?9.5:11.5).text(n)}
+    g.on('mousemove',ev=>tip(ev,`<b>${titulo}</b><br>Total: <b>${n}</b> tasks`+selP().map(p=>`<br><span style="color:${p.cor}">●</span> ${esc(p.curto)}: ${v.arr.filter(t=>t.assignees.includes(p.id)).length}`).join('')+(n?'<br><i>clique para ver as tasks</i>':''))).on('mouseleave',untip);
+    if(i%passo===0)svg.append('text').attr('x',bx+bw/2).attr('y',Hh-8).attr('text-anchor','middle').attr('fill',fimDeSemana?C.faint:C.soft).attr('font-size',10.5).text(fmtX(v.d));
+  });
+  const uteis=iv===d3.timeDay?vals.filter(v=>![0,6].includes(v.d.getDay())):vals;
+  document.getElementById('ent-hint').textContent=`Média: ${fmt(d3.mean(uteis,v=>v.arr.length),1)} por ${iv===d3.timeDay?'dia útil':'semana'}`;
 }
 
 function pessoas(ts){
@@ -704,52 +712,37 @@ function pessoas(ts){
 
 /* edição -> infra: faixas por squad */
 function lead(dem){
-  const host=document.getElementById('lead');const sla=DATA.config.sla_horas||24;
+  const host=document.getElementById('lead');
   if(!dem.length){host.innerHTML='<p class="empty">Nenhuma demanda com edição e infra concluídas no período.</p>';document.getElementById('lead-hint').textContent='';return}
-  const faixas=[['ok',`até ${sla} h`,d=>d.lead<=sla,C.green],['meio',`${sla} a ${sla*2} h`,d=>d.lead>sla&&d.lead<=sla*2,C.amber],['ruim',`mais de ${sla*2} h`,d=>d.lead>sla*2,C.red]];
-  const med=d3.median(dem,d=>d.lead), p85=d3.quantile(dem.map(d=>d.lead).sort(d3.ascending),.85), ok=dem.filter(d=>d.lead<=sla).length;
-  document.getElementById('lead-hint').textContent=`Meta: ${sla} h`;
-  const linhaSq=(nome,arr)=>{const n=arr.length,c=faixas.map(([k,l,f,cor])=>({l,cor,f,v:arr.filter(f).length}));const pct=arr.filter(d=>d.lead<=sla).length/n*100;
-    return `<div class="sqrow"><div class="nm"><b${dl(nome+': demandas medidas',arr.slice().sort((a,b)=>b.lead-a.lead).map(d=>({t:d.exec,extra:`Edição → infra: <b>${fmtH(d.lead)}</b>`})))}>${esc(nome)}</b><span>${n} demanda${n>1?'s':''} · mediana ${fmtH(d3.median(arr,d=>d.lead))}</span></div>
-      <div class="stack" aria-label="${c.map(x=>`${x.v} ${x.l}`).join(', ')}">${c.filter(x=>x.v).map(x=>`<i style="width:${x.v/n*100}%;background:${x.cor}" title="${x.v} ${x.l} — clique para ver" data-list="${regDem(`${nome}: ${x.l}`,arr.filter(x.f))}" tabindex="0" role="button">${x.v/n>.09?x.v:''}</i>`).join('')}</div>
-      <div class="pct" style="color:${pct>=80?C.green:pct>=60?C.amber:C.red}">${fmt(pct,0)}%<small>na meta</small></div></div>`};
-  const grupos=d3.groups(dem,d=>d.squad||'Sem squad').sort((a,b)=>b[1].length-a[1].length);
-  const lentas=dem.slice().sort((a,b)=>b.lead-a.lead).slice(0,5);
-  host.innerHTML=`<div class="leadtop"><div><b>${fmtH(med)}</b><span>tempo típico (mediana)</span></div><div><b style="color:${ok/dem.length>=.8?C.green:C.amber}" data-list="${regDem(`Dentro de ${sla} h`,dem.filter(d=>d.lead<=sla))}" class="clk" tabindex="0" role="button">${fmt(ok/dem.length*100,0)}%</b><span>dentro de ${sla} h</span></div><div><b>${fmtH(p85)}</b><span>85% fecham em até</span></div><div><b data-list="${regDem('Demandas medidas',dem)}" class="clk" tabindex="0" role="button">${dem.length}</b><span>demandas medidas</span></div></div>
-    <div class="legend" style="margin-bottom:6px">${faixas.map(([,l,,c])=>`<span><i class="dot" style="background:${c}"></i>${l}</span>`).join('')}</div>
-    ${grupos.map(([s,a])=>linhaSq(s,a)).join('')}
+  const media=d3.mean(dem,d=>d.lead);
+  const mesmoDia=dem.filter(d=>diaBR(d.fim)===diaBR(d.fim-d.lead*H));
+  const lentas=dem.slice().sort((a,b)=>b.lead-a.lead).slice(0,8);
+  document.getElementById('lead-hint').textContent=`${dem.length} demandas`;
+  host.innerHTML=`<div class="leadtop">
+      <div><b data-list="${regDem('Demandas medidas: edição → infra',dem,'da mais demorada para a mais rápida')}" class="clk" tabindex="0" role="button">${fmtH(media)}</b><span>tempo médio da edição pronta até a infra entregue</span></div>
+      <div><b style="color:${C.green}"${mesmoDia.length?` data-list="${regDem('Feitas no mesmo dia da edição',mesmoDia)}" class="clk" tabindex="0" role="button"`:''}>${fmt(mesmoDia.length/dem.length*100,0)}%</b><span>feitas no mesmo dia em que o vídeo ficou pronto (${mesmoDia.length} de ${dem.length})</span></div>
+    </div>
     <div class="slow"><h3>As que mais demoraram</h3>${lentas.map(d=>`<a href="${esc(d.url)}" target="_blank" rel="noopener"><span>${esc(d.nome)} <span class="sub">· ${esc(d.squad||'')} · ${esc(dono(d.exec).curto)}</span></span><b>${fmtH(d.lead)}</b></a>`).join('')}</div>`;
 }
 
+// tempo médio no status "fazendo" (nome igual ao do ClickUp), por pessoa
 function anatomia(ent){
-  const host=document.getElementById('anat');host.innerHTML='';
-  const grupos=[['fila','Na fila','#64748B'],['fazendo','Fazendo',C.green],['ajuste','Em ajuste',C.red],['revisao','Em revisão',C.amber]];
-  const quebra=t=>{const h=re=>d3.sum(Object.entries(t.tempos).filter(([s])=>re.test(s)),([,v])=>v)/60;
-    const faz=h(FAZ),aj=h(AJ),rev=h(REV);const tot=t.lead_edicao_h!=null?t.lead_edicao_h:Math.max(0,(t.fim-t.criado)/H);
-    return {fila:Math.max(0,tot-faz-aj-rev),fazendo:Math.min(faz,tot),ajuste:aj,revisao:rev}};
+  const host=document.getElementById('anat');
+  const hFaz=t=>d3.sum(Object.entries(t.tempos||{}).filter(([s])=>FAZ.test(s)),([,v])=>v)/60;
   const lista=selP().map(p=>{
-    const mine=execucoes(ent).filter(t=>t.assignees.includes(p.id)&&t.fim&&(!t.pai_id||t.lead_edicao_h!=null));
-    const qs=mine.map(quebra);const m={};grupos.forEach(([k])=>m[k]=qs.length?d3.mean(qs,q=>q[k]):0);
-    return {p,m,mine,n:mine.length,usaFazendo:mine.filter(t=>Object.keys(t.tempos).some(s=>FAZ.test(s))).length};
+    const mine=execucoes(ent).filter(t=>t.assignees.includes(p.id));
+    const com=mine.filter(t=>hFaz(t)>0);
+    return {p,mine,com,media:com.length?d3.mean(com,hFaz):null};
   });
-  const W=host.clientWidth, left=64, bh=22, gap=30, Hh=lista.length*(bh+gap)+26;
-  const max=d3.max(lista,r=>d3.sum(grupos,g=>r.m[g[0]]))||1;
-  const x=d3.scaleLinear().domain([0,max]).range([0,W-left-56]);
-  const svg=d3.select(host).append('svg').attr('width',W).attr('height',Hh).attr('role','img').attr('aria-label','Média de horas por status e pessoa');
-  lista.forEach((r,i)=>{
-    const y=i*(bh+gap)+4;let acc=0;
-    const g=svg.append('g').attr('class','anat-row').attr('data-list',r.n?reg(`${r.p.nome}: implementações entregues`,r.mine.slice().sort((a,b)=>b.fim-a.fim),'tempo médio de cada uma, da edição pronta até o feito'):null).attr('tabindex',r.n?0:null).attr('role',r.n?'button':null).attr('aria-label',r.n?`${r.p.nome}: ver as ${r.n} entregas`:null);
-    g.append('rect').attr('x',0).attr('y',y-4).attr('width',W).attr('height',bh+24).attr('fill','transparent');
-    g.append('text').attr('x',0).attr('y',y+bh/2+5).attr('fill',C.fg).attr('font-weight',700).attr('font-size',12.5).text(r.p.curto);
-    g.append('rect').attr('class','bg').attr('x',left).attr('y',y).attr('width',W-left-56).attr('height',bh).attr('rx',4).attr('fill',C.line);
-    grupos.forEach(([k,l,c])=>{const v=r.m[k];if(v<=0)return;g.append('rect').attr('x',left+x(acc)).attr('y',y).attr('width',Math.max(1,x(v)-1)).attr('height',bh).attr('rx',3).attr('fill',c).on('mousemove',ev=>tip(ev,`<b>${esc(r.p.nome)}</b><br>${l}: ${fmtH(v)} em média`)).on('mouseleave',untip);acc+=v});
-    g.append('text').attr('x',left+x(acc)+6).attr('y',y+bh/2+5).attr('fill',C.soft).attr('font-size',12).text(r.n?fmtH(acc):'—');
-    g.append('text').attr('x',left).attr('y',y+bh+14).attr('fill',C.faint).attr('font-size',11).text(r.n?`${r.n} entregas · ${Math.round(r.usaFazendo/r.n*100)}% passaram por "fazendo"`:'sem entregas no período');
-  });
-  const lg=svg.append('g').attr('transform',`translate(${left},${Hh-6})`);let lx=0;
-  grupos.forEach(([,l,c])=>{lg.append('rect').attr('x',lx).attr('y',-9).attr('width',10).attr('height',10).attr('rx',2).attr('fill',c);lg.append('text').attr('x',lx+14).attr('y',0).attr('fill',C.soft).attr('font-size',11).text(l);lx+=l.length*6.3+28});
-  const tot=d3.sum(lista,r=>r.n), faz=d3.sum(lista,r=>r.usaFazendo);
-  document.getElementById('anat-note').innerHTML=tot&&faz/tot<.5?`<div class="alerta"><span>⚠</span><span>Só ${Math.round(faz/tot*100)}% das entregas passaram por "fazendo". Sem isso, "na fila" mistura espera com trabalho e o tempo real de execução não aparece.</span></div>`:'';
+  const max=d3.max(lista,r=>r.media)||1;
+  host.innerHTML=lista.map(r=>{
+    const lid=r.com.length?reg(`${r.p.nome}: tempo em "fazendo"`,r.com.slice().sort((a,b)=>hFaz(b)-hFaz(a)).map(t=>({t,extra:`Ficou em "fazendo": <b>${fmtH(hFaz(t))}</b>`}))):null;
+    return `<div class="fz-row"${lid?` data-list="${lid}" tabindex="0" role="button" aria-label="${esc(r.p.nome)}: ver as tasks"`:''}><b style="color:${C.fg};font-size:12.5px">${esc(r.p.curto)}</b>
+      <div class="fz-bg"><i style="width:${r.media?Math.max(2,r.media/max*100):0}%"></i></div><b>${r.media==null?'—':fmtH(r.media)}</b>
+      <div class="fz-sub">${r.mine.length?`${r.com.length} de ${r.mine.length} entregas passaram por "fazendo"`:'sem entregas no período'}</div></div>`;
+  }).join('');
+  const tot=d3.sum(lista,r=>r.mine.length), com=d3.sum(lista,r=>r.com.length);
+  document.getElementById('anat-note').innerHTML=tot&&com/tot<.5?`<div class="alerta"><span>⚠</span><span>Só ${Math.round(com/tot*100)}% das entregas passaram por "fazendo". A média vale só para essas. Para medir de verdade, a task precisa ir para "fazendo" quando a pessoa começa.</span></div>`:'';
 }
 
 /* ajustes */
@@ -798,35 +791,7 @@ function feed(ts){
 }
 
 
-/* tipos de demanda */
-const PAL=[C.orange,C.blue,'#22D3EE',C.purple,C.green,C.amber,'#F472B6','#94A3B8'];
-function mix(ent){
-  const host=document.getElementById('donut');host.innerHTML='';
-  const ex=execucoes(ent);if(!ex.length){host.innerHTML='<p class="empty">Sem entregas no período.</p>';return}
-  const grp=d3.group(ex,t=>t.categoria);
-  let rows=[...grp].map(([k,v])=>[k,v.length,v]).sort((a,b)=>b[1]-a[1]);
-  if(rows.length>6){const resto=rows.slice(5).flatMap(r=>r[2]);rows=rows.slice(0,5).concat([['Outros tipos',resto.length,resto]])}
-  rows.forEach(r=>r[3]=reg(`Tipo: ${r[0]}`,r[2].slice().sort((a,b)=>b.fim-a.fim)));
-  const W=host.clientWidth, S=Math.min(170,W*.45), r=S/2;
-  const wrap=d3.select(host).append('div').style('display','flex').style('gap','14px').style('align-items','center');
-  const svg=wrap.append('svg').attr('width',S).attr('height',S).attr('role','img').attr('aria-label','Mix de tipos de demanda entregues');
-  const g=svg.append('g').attr('transform',`translate(${r},${r})`);
-  const arc=d3.arc().innerRadius(r*.62).outerRadius(r-2).padAngle(.015);
-  g.selectAll('path').data(d3.pie().value(d=>d[1]).sort(null)(rows)).join('path').attr('d',arc).attr('fill',(d,i)=>PAL[i%PAL.length]).attr('data-list',d=>d.data[3])
-    .on('mousemove',(ev,d)=>tip(ev,`<b>${esc(d.data[0])}</b><br>${d.data[1]} tasks · ${fmt(d.data[1]/ex.length*100,0)}%`)).on('mouseleave',untip);
-  g.append('text').attr('text-anchor','middle').attr('y',-2).attr('fill',C.orange).attr('font-weight',800).attr('font-size',r*.32).text(fmt(rows[0][1]/ex.length*100,0)+'%');
-  g.append('text').attr('text-anchor','middle').attr('y',r*.22).attr('fill',C.soft).attr('font-size',10.5).text(rows[0][0].length>16?rows[0][0].slice(0,15)+'…':rows[0][0]);
-  wrap.append('div').style('flex','1').style('min-width','0').html(rows.map((d,i)=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:3px 0;font-size:12px" data-list="${d[3]}" tabindex="0" role="button"><span class="clk" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="dot" style="background:${PAL[i%PAL.length]}"></i>${esc(d[0])}</span><b style="white-space:nowrap">${d[1]} · ${fmt(d[1]/ex.length*100,0)}%</b></div>`).join(''));
-}
 const bolas=p=>{const n=Math.max(1,Math.min(5,Math.round(p)));return `<span class="cx" title="Complexidade ${n} de 5">${'●'.repeat(n)}<i>${'●'.repeat(5-n)}</i></span>`};
-function cats(ent){
-  const ex=execucoes(ent);
-  const rows=d3.rollups(ex,v=>{const ed=v.filter(t=>t.lead_edicao_h!=null),dir=v.filter(t=>!t.pai_id&&t.fim&&t.criado);const al=v.filter(t=>t.n_ajustes>0);
-    return {v,n:v.length,peso:d3.median(v,t=>t.peso),ed,hEd:d3.median(ed,t=>t.lead_edicao_h),dir,hDir:d3.median(dir,t=>(t.fim-t.criado)/H),al,aj:al.length}},t=>t.categoria).sort((a,b)=>b[1].n-a[1].n);
-  const tempo=(h,arr,tit,f)=>arr.length?`<span${dl(tit,arr.slice().sort((a,b)=>f(b)-f(a)).map(t=>({t,extra:`Tempo: <b>${fmtH(f(t))}</b>`})))}>${fmtH(h)}</span> <span class="sub">(${arr.length})</span>`:'<span class="sub">—</span>';
-  document.getElementById('cats').innerHTML=rows.length?rows.map(([c,r])=>`<tr><td style="white-space:nowrap"><span${dl('Tipo: '+c,r.v.slice().sort((a,b)=>b.fim-a.fim))}>${esc(c)}</span></td><td class="n"><span${dl('Tipo: '+c,r.v.slice().sort((a,b)=>b.fim-a.fim))}>${r.n}</span></td><td>${bolas(r.peso)}</td><td class="n">${tempo(r.hEd,r.ed,c+': edição pronta → entregue',t=>t.lead_edicao_h)}</td><td class="n">${tempo(r.hDir,r.dir,c+': demanda direta aberta → entregue',t=>(t.fim-t.criado)/H)}</td><td class="n" style="color:${r.aj?'#F87171':'inherit'}">${r.aj?`<span${dl(c+': voltaram para ajuste',r.al.map(t=>({t,extra:comentAj(t)})))}>${fmt(r.aj/r.n*100,0)}% (${r.aj})</span>`:(r.n?'0%':'—')}</td><td class="n">${fmt(r.n/ex.length*100,1)}%</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Sem entregas no período.</td></tr>';
-}
-
 const COLS=[['nome','Task'],['pessoa','Pessoa'],['categoria','Tipo'],['peso','Complexidade'],['status','Status'],['lead','Edição → infra'],['n_ajustes','Ajustes'],['fim','Entregue']];
 function tabela(ts){
   const thead=document.getElementById('thead');
@@ -848,27 +813,33 @@ function tabela(ts){
 }
 
 function destaques(ts,R,ab){
-  const ex=execucoes(R.ent);
-  const sqLento=d3.rollups(R.dem,v=>({m:d3.median(v,d=>d.lead),n:v.length}),d=>d.squad||'Sem squad').filter(d=>d[1].n>=2).sort((a,b)=>b[1].m-a[1].m)[0];
-  const catAj=d3.rollups(ex,v=>({a:v.filter(t=>t.n_ajustes>0).length,n:v.length}),t=>t.categoria).filter(d=>d[1].a).sort((a,b)=>b[1].a-a[1].a)[0];
-  const top=selP().map(p=>({p,n:R.ent.filter(t=>t.assignees.includes(p.id)).length})).sort((a,b)=>b.n-a.n)[0];
-  const fila=d3.rollups(ab.filter(t=>estacao(t)==='fila'),v=>v.length,t=>dono(t).curto).sort((a,b)=>b[1]-a[1])[0];
-  const faz=ex.length?Math.round(ex.filter(t=>Object.keys(t.tempos||{}).some(s=>FAZ.test(s))).length/ex.length*100):null;
-  const semPrazo=ab.filter(t=>estacao(t)!=='espera'&&!t.prazo).length;
   const ic=(c,p)=>`<div class="ic" style="--c:${c}"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="${c}" d="${p}"/></svg></div>`;
-  const it=(c,p,k,v,d,lid)=>`<div class="hl"${lid?` data-list="${lid}" tabindex="0" role="button"`:''}>${ic(c,p)}<div><div class="k">${k}</div><div class="v${lid?' clk':''}">${v}</div><div class="d">${d}</div></div></div>`;
-  const lTop=top&&top.n?reg(`${top.p.nome}: entregas no período`,R.ent.filter(t=>t.assignees.includes(top.p.id)).sort((a,b)=>b.fim-a.fim)):null;
-  const lSq=sqLento?regDem(`${sqLento[0]}: demandas medidas`,R.dem.filter(d=>(d.squad||'Sem squad')===sqLento[0])):null;
-  const lCat=catAj?reg(`${catAj[0]}: voltaram para ajuste`,ex.filter(t=>t.categoria===catAj[0]&&t.n_ajustes>0).map(t=>({t,extra:comentAj(t)}))):null;
-  const lFila=fila?reg(`Fila de ${fila[0]}`,ab.filter(t=>estacao(t)==='fila'&&dono(t).curto===fila[0])):null;
-  const lPrazo=semPrazo?reg('Abertas sem prazo',ab.filter(t=>estacao(t)!=='espera'&&!t.prazo)):null;
+  const it=(c,p,k,v,d,lid,attrs='')=>`<div class="hl"${lid?` data-list="${lid}" tabindex="0" role="button"`:attrs}>${ic(c,p)}<div style="min-width:0"><div class="k">${k}</div><div class="v${lid?' clk':''}">${v}</div><div class="d">${d}</div></div></div>`;
+  // quem mais entregou
+  const porP=selP().map(p=>({p,arr:R.ent.filter(t=>t.assignees.includes(p.id))})).sort((a,b)=>b.arr.length-a.arr.length);
+  const top=porP[0];
+  const lTop=top&&top.arr.length?reg(`${top.p.nome}: entregas no período`,top.arr.slice().sort((a,b)=>b.fim-a.fim)):null;
+  // quem entregou mais rápido (tempo médio da edição pronta até a entrega, nas implementações)
+  const rap=selP().map(p=>{const a=execucoes(R.ent).filter(t=>t.assignees.includes(p.id)&&t.lead_edicao_h!=null);return {p,a,m:a.length?d3.mean(a,t=>t.lead_edicao_h):null}}).filter(r=>r.a.length>=3).sort((a,b)=>a.m-b.m);
+  const fast=rap[0];
+  const lFast=fast?reg(`${fast.p.nome}: edição → entrega`,fast.a.slice().sort((a,b)=>a.lead_edicao_h-b.lead_edicao_h).map(t=>({t,extra:`Edição → entrega: <b>${fmtH(t.lead_edicao_h)}</b>`}))):null;
+  // quem teve mais ocorrências (planilha de ocorrências; precisa do código de acesso)
+  let ocV='—',ocD='entre na aba Ocorrências com o código para ver';
+  if(OC.pin){const nomes=selP().map(p=>p.curto);const doPer=OC.itens.filter(o=>o.em&&noPeriodo(o.em)&&nomes.includes(o.responsavel));
+    const cont=d3.rollups(doPer,v=>v.length,o=>o.responsavel).sort((a,b)=>b[1]-a[1]);
+    if(cont.length){ocV=esc(cont[0][0]);ocD=cont.map(([n,v])=>`${esc(n)}: ${v}`).join(' · ')+' no período'}else{ocV='Ninguém';ocD='nenhuma ocorrência no período'}}
+  // qualidade do dado
+  const semData=ab.filter(t=>!t.prazo);
+  const ex=execucoes(R.ent), faz=ex.length?Math.round(ex.filter(t=>Object.keys(t.tempos||{}).some(s=>FAZ.test(s))).length/ex.length*100):null;
+  const semMotivo=R.ajL.filter(t=>!(t.ajustes||[]).length).length;
+  const lSem=semData.length?reg('Tasks abertas sem data de vencimento',semData.map(t=>({t,extra:`Status: ${esc(t.status)} · sem data, fica fora da esteira e dos cards`}))):null;
   document.getElementById('strip').innerHTML=[
-    it(C.orange,'M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z','QUEM MAIS ENTREGOU',top?esc(top.p.nome):'—',top?`${top.n} tasks no período`:'',lTop),
-    it(C.red,'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 10.4V6h-2v7.4l5 3 1-1.7z','SQUAD MAIS LENTO',sqLento?esc(sqLento[0]):'—',sqLento?`mediana ${fmtH(sqLento[1].m)} edição → infra`:'poucas demandas medidas',lSq),
-    it(C.amber,'M1 21h22L12 2zm12-3h-2v-2h2zm0-4h-2v-4h2z','TIPO COM MAIS AJUSTE',catAj?esc(catAj[0]):'Nenhum',catAj?`${catAj[1].a} de ${catAj[1].n} voltaram`:'sem ajustes no período',lCat),
-    it(C.blue,'M3 5h18v3H3zm0 5h12v3H3zm0 5h8v3H3z','MAIOR FILA AGORA',fila?esc(fila[0]):'Ninguém',fila?`${fila[1]} tasks liberadas esperando`:'fila vazia',lFila),
-    it(faz!=null&&faz<60?C.amber:C.green,'M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z','QUALIDADE DO DADO',faz==null?'—':`${faz}% usam "fazendo"`,`${semPrazo} abertas sem prazo`,lPrazo),
+    it(C.orange,'M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z','QUEM MAIS ENTREGOU',top&&top.arr.length?esc(top.p.nome):'—',porP.filter(r=>r.arr.length).map(r=>`${esc(r.p.curto)}: ${r.arr.length}`).join(' · ')||'sem entregas no período',lTop),
+    it(C.green,'M13 2 3 14h7l-1 8 10-12h-7z','QUEM ENTREGOU MAIS RÁPIDO',fast?esc(fast.p.nome):'—',fast?`média ${fmtH(fast.m)} da edição pronta à entrega`+(rap[1]?` · ${esc(rap[1].p.curto)}: ${fmtH(rap[1].m)}`:''):'poucas entregas com edição no período',lFast),
+    it(C.red,'M1 21h22L12 2zm12-3h-2v-2h2zm0-4h-2v-4h2z','QUEM TEVE MAIS OCORRÊNCIAS',ocV,ocD,null,OC.pin?'':` data-oc-link tabindex="0" role="button" style="cursor:pointer"`),
+    it(semData.length?C.amber:C.green,'M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z','QUALIDADE DO DADO',`${semData.length} abertas sem data`,`${faz==null?'—':faz+'%'} das entregas passaram por "fazendo"`+(semMotivo?` · ${semMotivo} ajustes sem motivo`:''),lSem),
   ].join('');
+  const ocl=document.querySelector('[data-oc-link]');if(ocl)ocl.onclick=()=>{document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('on',x.id==='nav-oc'));mostraAba(true)};
 }
 
 /* ---------- carga ---------- */
@@ -1031,7 +1002,11 @@ document.getElementById('oc-form').onsubmit=async e=>{
   finally{bt.disabled=false;bt.textContent='Registrar ocorrência'}
 };
 if(location.hash==='#ocorrencias'){document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('on',x.id==='nav-oc'));mostraAba(true)}
-load();setInterval(load,60*1000);
+// se o navegador já tem o código, carrega as ocorrências para o destaque "quem teve mais ocorrências"
+let OC_PRE=false;
+async function ocPreCarrega(){if(OC_PRE||OC.pin)return;OC_PRE=true;const p=pinGuardado();if(!p)return;
+  try{const j=await ocApi({acao:'listar',pin:p});OC.pin=p;OC.itens=j.itens;OC.url=j.url;if(DATA)render()}catch(e){}}
+load().then(ocPreCarrega);setInterval(load,60*1000);
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>DATA&&render(),150)});
 </script>
 </body>
